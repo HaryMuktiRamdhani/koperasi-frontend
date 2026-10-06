@@ -11,22 +11,16 @@ interface DashboardData {
 }
 
 function Dashboard() {
-  const [data, setData] =
-    useState<DashboardData | null>(null);
-
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getDashboard() {
       try {
         const response = await api.get("/dashboard");
-
         setData(response.data);
       } catch (error) {
-        console.error(
-          "Gagal mengambil dashboard",
-          error
-        );
+        console.error("Gagal mengambil dashboard", error);
       } finally {
         setLoading(false);
       }
@@ -36,53 +30,92 @@ function Dashboard() {
   }, []);
 
   if (loading) {
-    return <p>Memuat dashboard...</p>;
+    return (
+      <div className="flex min-h-40 items-center justify-center">
+        <p className="text-gray-500">Memuat dashboard...</p>
+      </div>
+    );
   }
 
   if (!data) {
-    return <p>Data dashboard tidak tersedia.</p>;
+    return (
+      <div className="rounded-lg bg-white p-6 shadow-sm">
+        <p className="text-gray-500">
+          Data dashboard tidak tersedia.
+        </p>
+      </div>
+    );
   }
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p>
-            Ringkasan data koperasi sekolah
-          </p>
-        </div>
+      <div className="mb-7">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Dashboard
+        </h1>
+
+        <p className="mt-1 text-gray-500">
+          Ringkasan data koperasi sekolah
+        </p>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <span>Total Siswa</span>
-          <strong>{data.totalStudents}</strong>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Total Siswa
+          </span>
+
+          <strong className="text-3xl font-bold text-gray-900">
+            {data.totalStudents}
+          </strong>
         </div>
 
-        <div className="stat-card">
-          <span>Total Barang</span>
-          <strong>{data.totalItems}</strong>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Total Barang
+          </span>
+
+          <strong className="text-3xl font-bold text-gray-900">
+            {data.totalItems}
+          </strong>
         </div>
 
-        <div className="stat-card">
-          <span>Total Tagihan</span>
-          <strong>{data.totalBills}</strong>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Total Tagihan
+          </span>
+
+          <strong className="text-3xl font-bold text-gray-900">
+            {data.totalBills}
+          </strong>
         </div>
 
-        <div className="stat-card">
-          <span>Tagihan Lunas</span>
-          <strong>{data.paidBills}</strong>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Tagihan Lunas
+          </span>
+
+          <strong className="text-3xl font-bold text-green-600">
+            {data.paidBills}
+          </strong>
         </div>
 
-        <div className="stat-card">
-          <span>Belum Bayar</span>
-          <strong>{data.unpaidBills}</strong>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Belum Bayar
+          </span>
+
+          <strong className="text-3xl font-bold text-red-600">
+            {data.unpaidBills}
+          </strong>
         </div>
 
-        <div className="stat-card">
-          <span>Total Pemasukan</span>
-          <strong>
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <span className="mb-3 block text-sm text-gray-500">
+            Total Pemasukan
+          </span>
+
+          <strong className="text-3xl font-bold text-gray-900">
             Rp {data.totalIncome.toLocaleString("id-ID")}
           </strong>
         </div>
