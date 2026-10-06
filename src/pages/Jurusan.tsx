@@ -13,6 +13,7 @@ function Jurusan() {
   const [nama, setNama] = useState("");
   const [kode, setKode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
 
   async function getJurusan() {
     try {
@@ -27,6 +28,11 @@ function Jurusan() {
     event.preventDefault();
 
     if (!nama || !kode) {
+      return;
+    }
+
+    if (editId) {
+      await handleEdit(event);
       return;
     }
 
@@ -50,10 +56,42 @@ function Jurusan() {
     }
   }
 
+  async function handleEdit(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!nama || !kode || !editId) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await api.put(`/jurusan/${editId}`, {
+        nama,
+        kode,
+      });
+
+      setNama("");
+      setKode("");
+      setEditId(null);
+
+      await getJurusan();
+    } catch (error: any) {
+      console.error(error);
+      alert(error.response?.data?.message || "Gagal mengubah jurusan");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function startEdit(item: JurusanData) {
+    setEditId(item.id);
+    setNama(item.nama);
+    setKode(item.kode);
+  }
+
   async function handleDelete(id: string) {
-    const confirmDelete = window.confirm(
-      "Yakin ingin menghapus jurusan ini?"
-    );
+    const confirmDelete = window.confirm("Yakin ingin menghapus jurusan ini?");
 
     if (!confirmDelete) {
       return;
@@ -79,7 +117,7 @@ function Jurusan() {
       </div>
 
       <div className="form-card">
-        <h2>Tambah Jurusan</h2>
+        <h2>{editId ? "Edit Jurusan" : "Tambah Jurusan"}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -98,7 +136,11 @@ function Jurusan() {
             />
 
             <button type="submit" disabled={loading}>
-              {loading ? "Menyimpan..." : "Tambah"}
+              {loading
+                ? "Menyimpan..."
+                : editId
+                  ? "Simpan Perubahan"
+                  : "Tambah"}
             </button>
           </div>
         </form>
@@ -126,9 +168,9 @@ function Jurusan() {
                 <td>{item.kode}</td>
                 <td>{item.isActive ? "Aktif" : "Nonaktif"}</td>
                 <td>
-                  <button onClick={() => handleDelete(item.id)}>
-                    Hapus
-                  </button>
+                  <button onClick={() => startEdit(item)}>Edit</button>
+
+                  <button onClick={() => handleDelete(item.id)}>Hapus</button>
                 </td>
               </tr>
             ))}
