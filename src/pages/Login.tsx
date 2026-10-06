@@ -10,7 +10,6 @@ function Login() {
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
-
     setError("");
     setLoading(true);
 
@@ -38,17 +37,21 @@ function Login() {
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1>Koperasi Sekolah</h1>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Koperasi Sekolah
+        </h1>
 
-        <p className="login-subtitle">
+        <p className="mt-2 mb-6 text-gray-500">
           Silakan masuk untuk melanjutkan
         </p>
 
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label>Email</label>
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              Email
+            </label>
 
             <input
               type="email"
@@ -57,11 +60,14 @@ function Login() {
                 setEmail(event.target.value)
               }
               placeholder="Masukkan email"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              Password
+            </label>
 
             <input
               type="password"
@@ -70,11 +76,12 @@ function Login() {
                 setPassword(event.target.value)
               }
               placeholder="Masukkan password"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           {error && (
-            <p className="error-message">
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
               {error}
             </p>
           )}
@@ -82,6 +89,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
+            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Memproses..." : "Login"}
           </button>
