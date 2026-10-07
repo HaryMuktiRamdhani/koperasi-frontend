@@ -5,6 +5,9 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ComingSoon from "./pages/ComingSoon";
 import Jurusan from "./pages/Jurusan";
+import Classes from "./pages/Classes";
+import Student from "./pages/Student";
+import Item from "./pages/Item";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -19,11 +22,11 @@ function App() {
 
           <Route path="/jurusan" element={<Jurusan />} />
 
-          <Route path="/classes" element={<ComingSoon />} />
+          <Route path="/classes" element={<Classes />} />
 
-          <Route path="/students" element={<ComingSoon />} />
+          <Route path="/students" element={<Student />} />
 
-          <Route path="/items" element={<ComingSoon />} />
+          <Route path="/items" element={<Item />} />
 
           <Route path="/bills" element={<ComingSoon />} />
 

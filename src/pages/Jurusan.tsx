@@ -49,10 +49,7 @@ function Jurusan() {
       await getJurusan();
     } catch (error: any) {
       console.error(error);
-      alert(
-        error.response?.data?.message ||
-          "Gagal menambahkan jurusan"
-      );
+      alert(error.response?.data?.message || "Gagal menambahkan jurusan");
     } finally {
       setLoading(false);
     }
@@ -79,10 +76,7 @@ function Jurusan() {
       await getJurusan();
     } catch (error: any) {
       console.error(error);
-      alert(
-        error.response?.data?.message ||
-          "Gagal mengubah jurusan"
-      );
+      alert(error.response?.data?.message || "Gagal mengubah jurusan");
     } finally {
       setLoading(false);
     }
@@ -95,9 +89,7 @@ function Jurusan() {
   }
 
   async function handleDelete(id: string) {
-    const confirmDelete = window.confirm(
-      "Yakin ingin menghapus jurusan ini?"
-    );
+    const confirmDelete = window.confirm("Yakin ingin menghapus jurusan ini?");
 
     if (!confirmDelete) {
       return;
@@ -107,10 +99,7 @@ function Jurusan() {
       await api.delete(`/jurusan/${id}`);
       await getJurusan();
     } catch (error: any) {
-      alert(
-        error.response?.data?.message ||
-          "Gagal menghapus jurusan"
-      );
+      alert(error.response?.data?.message || "Gagal menghapus jurusan");
     }
   }
 
@@ -121,11 +110,9 @@ function Jurusan() {
   return (
     <div>
       <div className="mb-7">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Jurusan
-        </h1>
+        <h1 className="text-2xl font-bold text-blue-500">JURUSAN</h1>
 
-        <p className="mt-1 text-gray-500">
+        <p className="mt-1 text-gray-600 font-bold">
           Kelola data jurusan sekolah
         </p>
       </div>
@@ -141,26 +128,22 @@ function Jurusan() {
               type="text"
               placeholder="Nama jurusan"
               value={nama}
-              onChange={(event) =>
-                setNama(event.target.value)
-              }
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              onChange={(event) => setNama(event.target.value)}
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 outline-none"
             />
 
             <input
               type="text"
               placeholder="Kode jurusan"
               value={kode}
-              onChange={(event) =>
-                setKode(event.target.value)
-              }
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              onChange={(event) => setKode(event.target.value)}
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 outline-none"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-gray-600 px-5 py-2.5 font-semibold text-white"
             >
               {loading
                 ? "Menyimpan..."
@@ -172,7 +155,7 @@ function Jurusan() {
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Daftar Jurusan
@@ -193,21 +176,14 @@ function Jurusan() {
 
             <tbody className="divide-y divide-gray-200">
               {jurusan.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 text-gray-600">
-                    {index + 1}
-                  </td>
+                <tr key={item.id}>
+                  <td className="px-6 py-4 text-gray-600">{index + 1}</td>
 
                   <td className="px-6 py-4 font-medium text-gray-900">
                     {item.nama}
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600">
-                    {item.kode}
-                  </td>
+                  <td className="px-6 py-4 text-gray-600">{item.kode}</td>
 
                   <td className="px-6 py-4">
                     <span
@@ -217,9 +193,7 @@ function Jurusan() {
                           : "bg-gray-100 text-gray-600"
                       }`}
                     >
-                      {item.isActive
-                        ? "Aktif"
-                        : "Nonaktif"}
+                      {item.isActive ? "Aktif" : "Nonaktif"}
                     </span>
                   </td>
 
@@ -227,16 +201,14 @@ function Jurusan() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => startEdit(item)}
-                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600"
                       >
                         Edit
                       </button>
 
                       <button
-                        onClick={() =>
-                          handleDelete(item.id)
-                        }
-                        className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
+                        onClick={() => handleDelete(item.id)}
+                        className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600"
                       >
                         Hapus
                       </button>

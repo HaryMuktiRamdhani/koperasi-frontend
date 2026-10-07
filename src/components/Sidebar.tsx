@@ -10,7 +10,7 @@ function Sidebar() {
   }
 
   return (
-    <aside className="flex min-h-screen w-60 flex-col bg-gray-900 px-4 py-6 text-white">
+    <aside className="flex min-h-screen w-60 flex-col bg-gray-600 px-4 py-6 text-white">
       <div className="px-2 pb-8">
         <h2 className="text-xl font-bold">Koperasi</h2>
         <span className="text-sm text-gray-400">Sekolah</span>
