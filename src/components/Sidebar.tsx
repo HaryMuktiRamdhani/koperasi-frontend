@@ -1,4 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  GraduationCap,
+  School,
+  Users,
+  Package,
+  ReceiptText,
+  Wallet,
+  LogOut,
+} from "lucide-react";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -9,70 +19,103 @@ function Sidebar() {
     navigate("/");
   }
 
+  const menuItems = [
+    {
+      to: "/dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      to: "/jurusan",
+      label: "Jurusan",
+      icon: GraduationCap,
+    },
+    {
+      to: "/classes",
+      label: "Kelas",
+      icon: School,
+    },
+    {
+      to: "/students",
+      label: "Siswa",
+      icon: Users,
+    },
+    {
+      to: "/items",
+      label: "Barang",
+      icon: Package,
+    },
+    {
+      to: "/bills",
+      label: "Tagihan",
+      icon: ReceiptText,
+    },
+    {
+      to: "/payments",
+      label: "Pembayaran",
+      icon: Wallet,
+    },
+  ];
+
   return (
-    <aside className="flex min-h-screen w-60 flex-col bg-gray-600 px-4 py-6 text-white">
-      <div className="px-2 pb-8">
-        <h2 className="text-xl font-bold">Koperasi</h2>
-        <span className="text-sm text-gray-400">Sekolah</span>
+    <aside className="flex min-h-screen w-60 flex-col border-r border-gray-200 bg-white px-3 py-5">
+      {/* Logo */}
+      <div className="mb-8 px-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-900">
+            <span className="text-sm font-semibold text-white">
+              KS
+            </span>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">
+              Koperasi
+            </h2>
+
+            <p className="text-xs text-gray-500">
+              Sekolah
+            </p>
+          </div>
+        </div>
       </div>
 
+      {/* Navigation */}
       <nav className="flex flex-col gap-1">
-        <Link
-          to="/dashboard"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Dashboard
-        </Link>
+        {menuItems.map((item) => {
+          const Icon = item.icon;
 
-        <Link
-          to="/jurusan"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Jurusan
-        </Link>
-
-        <Link
-          to="/classes"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Kelas
-        </Link>
-
-        <Link
-          to="/students"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Siswa
-        </Link>
-
-        <Link
-          to="/items"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Barang
-        </Link>
-
-        <Link
-          to="/bills"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Tagihan
-        </Link>
-
-        <Link
-          to="/payments"
-          className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-gray-800 hover:text-white"
-        >
-          Pembayaran
-        </Link>
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                [
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition",
+                  isActive
+                    ? "bg-gray-100 font-medium text-gray-900"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
+                ].join(" ")
+              }
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span>{item.label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
 
-      <button
-        className="mt-auto rounded-lg bg-gray-800 px-3 py-2.5 text-sm font-semibold text-gray-300 transition hover:bg-gray-700 hover:text-white"
-        onClick={handleLogout}
-      >
-        Keluar
-      </button>
+      {/* Logout */}
+      <div className="mt-auto border-t border-gray-100 pt-4">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Keluar</span>
+        </button>
+      </div>
     </aside>
   );
 }

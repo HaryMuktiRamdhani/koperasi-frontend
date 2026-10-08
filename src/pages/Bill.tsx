@@ -1,53 +1,56 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
+interface TagihanData {
+  id: string;
+  studentId: string;
+  itemId: string;
+  amount: number;
+  status: string;
+  Student?: {
+    id: string;
+    nis: string;
+    name: string;
+  };
+  Item?: {
+    id: string;
+    name: string;
+    price: number;
+  };
+}
+
 interface SiswaData {
   id: string;
   nis: string;
   name: string;
-  classId: string;
-  jurusanId: string;
-  generation: string;
-  status: string;
-  Class?: {
-    id: string;
-    name: string;
-    level: string;
-    academicYear: string;
-  };
-  Jurusan?: {
-    id: string;
-    nama: string;
-    kode: string;
-  };
 }
 
-interface KelasData {
+interface BarangData {
   id: string;
   name: string;
-  level: string;
-  academicYear: string;
+  price: number;
 }
 
-interface JurusanData {
-  id: string;
-  nama: string;
-  kode: string;
-}
-
-function Student() {
+function Bill() {
+  const [tagihan, setTagihan] = useState<TagihanData[]>([]);
   const [siswa, setSiswa] = useState<SiswaData[]>([]);
-  const [kelas, setKelas] = useState<KelasData[]>([]);
-  const [jurusan, setJurusan] = useState<JurusanData[]>([]);
+  const [barang, setBarang] = useState<BarangData[]>([]);
 
-  const [nis, setNis] = useState("");
-  const [name, setName] = useState("");
-  const [classId, setClassId] = useState("");
-  const [jurusanId, setJurusanId] = useState("");
-  const [generation, setGeneration] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [itemId, setItemId] = useState("");
+  const [amount, setAmount] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+
+  async function getTagihan() {
+    try {
+      const response = await api.get("/bills");
+      setTagihan(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data tagihan", error);
+    }
+  }
 
   async function getSiswa() {
     try {
@@ -58,29 +61,20 @@ function Student() {
     }
   }
 
-  async function getKelas() {
+  async function getBarang() {
     try {
-      const response = await api.get("/classes");
-      setKelas(response.data);
+      const response = await api.get("/items");
+      setBarang(response.data);
     } catch (error) {
-      console.error("Gagal mengambil data kelas", error);
-    }
-  }
-
-  async function getJurusan() {
-    try {
-      const response = await api.get("/jurusan");
-      setJurusan(response.data);
-    } catch (error) {
-      console.error("Gagal mengambil data jurusan", error);
+      console.error("Gagal mengambil data barang", error);
     }
   }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (!nis || !name || !classId || !jurusanId || !generation) {
-      alert("Data siswa belum lengkap");
+    if (!studentId || !itemId || !amount) {
+      alert("Data tagihan belum lengkap");
       return;
     }
 
@@ -88,54 +82,48 @@ function Student() {
 
     try {
       const data = {
-        nis,
-        name,
-        classId,
-        jurusanId,
-        generation,
+        studentId,
+        itemId,
+        amount: Number(amount),
       };
 
       if (editId) {
-        await api.put(`/students/${editId}`, data);
+        await api.put(`/bills/${editId}`, data);
       } else {
-        await api.post("/students", data);
+        await api.post("/bills", data);
       }
 
       resetForm();
-      await getSiswa();
+      await getTagihan();
     } catch (error: any) {
       console.error(error);
 
       alert(
         error.response?.data?.message ||
-          "Gagal menyimpan data siswa"
+          "Gagal menyimpan tagihan"
       );
     } finally {
       setLoading(false);
     }
   }
 
-  function startEdit(item: SiswaData) {
+  function startEdit(item: TagihanData) {
     setEditId(item.id);
-    setNis(item.nis);
-    setName(item.name);
-    setClassId(item.classId);
-    setJurusanId(item.jurusanId);
-    setGeneration(item.generation);
+    setStudentId(item.studentId);
+    setItemId(item.itemId);
+    setAmount(String(item.amount));
   }
 
   function resetForm() {
     setEditId(null);
-    setNis("");
-    setName("");
-    setClassId("");
-    setJurusanId("");
-    setGeneration("");
+    setStudentId("");
+    setItemId("");
+    setAmount("");
   }
 
   async function handleDelete(id: string) {
     const confirmDelete = window.confirm(
-      "Yakin ingin menghapus siswa ini?"
+      "Yakin ingin menghapus tagihan ini?"
     );
 
     if (!confirmDelete) {
@@ -143,95 +131,82 @@ function Student() {
     }
 
     try {
-      await api.delete(`/students/${id}`);
-      await getSiswa();
+      await api.delete(`/bills/${id}`);
+      await getTagihan();
     } catch (error: any) {
       console.error(error);
 
       alert(
         error.response?.data?.message ||
-          "Gagal menghapus siswa"
+          "Gagal menghapus tagihan"
       );
     }
   }
 
   useEffect(() => {
+    getTagihan();
     getSiswa();
-    getKelas();
-    getJurusan();
+    getBarang();
   }, []);
 
   return (
     <div>
       <div className="mb-7">
         <h1 className="text-2xl font-bold text-gray-900">
-          Siswa
+          Tagihan
         </h1>
 
         <p className="mt-1 text-gray-500">
-          Kelola data siswa sekolah
+          Kelola tagihan siswa
         </p>
       </div>
 
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-5 text-lg font-semibold text-gray-900">
-          {editId ? "Edit Siswa" : "Tambah Siswa"}
+          {editId ? "Edit Tagihan" : "Tambah Tagihan"}
         </h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <input
-              type="text"
-              placeholder="NIS"
-              value={nis}
-              onChange={(event) => setNis(event.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-
-            <input
-              type="text"
-              placeholder="Nama siswa"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <select
-              value={classId}
-              onChange={(event) => setClassId(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            >
-              <option value="">Pilih kelas</option>
-
-              {kelas.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name} - {item.academicYear}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={jurusanId}
+              value={studentId}
               onChange={(event) =>
-                setJurusanId(event.target.value)
+                setStudentId(event.target.value)
               }
               className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
-              <option value="">Pilih jurusan</option>
+              <option value="">Pilih siswa</option>
 
-              {jurusan.map((item) => (
+              {siswa.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.nama} ({item.kode})
+                  {item.nis} - {item.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={itemId}
+              onChange={(event) =>
+                setItemId(event.target.value)
+              }
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Pilih barang</option>
+
+              {barang.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
                 </option>
               ))}
             </select>
 
             <input
-              type="text"
-              placeholder="Angkatan"
-              value={generation}
+              type="number"
+              min="0"
+              placeholder="Nominal tagihan"
+              value={amount}
               onChange={(event) =>
-                setGeneration(event.target.value)
+                setAmount(event.target.value)
               }
               className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
@@ -266,7 +241,7 @@ function Student() {
       <div className="overflow-hidden rounded-xl bg-white shadow-sm">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            Daftar Siswa
+            Daftar Tagihan
           </h2>
         </div>
 
@@ -275,18 +250,16 @@ function Student() {
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
                 <th className="px-6 py-4">No</th>
-                <th className="px-6 py-4">NIS</th>
-                <th className="px-6 py-4">Nama</th>
-                <th className="px-6 py-4">Kelas</th>
-                <th className="px-6 py-4">Jurusan</th>
-                <th className="px-6 py-4">Angkatan</th>
+                <th className="px-6 py-4">Siswa</th>
+                <th className="px-6 py-4">Barang</th>
+                <th className="px-6 py-4">Nominal</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Aksi</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {siswa.map((item, index) => (
+              {tagihan.map((item, index) => (
                 <tr
                   key={item.id}
                   className="hover:bg-gray-50"
@@ -295,28 +268,32 @@ function Student() {
                     {index + 1}
                   </td>
 
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900">
+                      {item.Student?.name || "-"}
+                    </div>
+
+                    <div className="text-xs text-gray-500">
+                      {item.Student?.nis || "-"}
+                    </div>
+                  </td>
+
                   <td className="px-6 py-4 text-gray-600">
-                    {item.nis}
+                    {item.Item?.name || "-"}
                   </td>
 
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {item.name}
-                  </td>
-
-                  <td className="px-6 py-4 text-gray-600">
-                    {item.Class?.name || "-"}
-                  </td>
-
-                  <td className="px-6 py-4 text-gray-600">
-                    {item.Jurusan?.kode || "-"}
-                  </td>
-
-                  <td className="px-6 py-4 text-gray-600">
-                    {item.generation}
+                    Rp {item.amount.toLocaleString("id-ID")}
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                    <span
+                      className={
+                        item.status === "Lunas"
+                          ? "rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700"
+                          : "rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700"
+                      }
+                    >
                       {item.status}
                     </span>
                   </td>
@@ -331,7 +308,9 @@ function Student() {
                       </button>
 
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() =>
+                          handleDelete(item.id)
+                        }
                         className="rounded-lg bg-red-50 px-3 py-1.5 font-medium text-red-600 hover:bg-red-100"
                       >
                         Hapus
@@ -341,13 +320,13 @@ function Student() {
                 </tr>
               ))}
 
-              {siswa.length === 0 && (
+              {tagihan.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={6}
                     className="px-6 py-10 text-center text-gray-500"
                   >
-                    Belum ada data siswa.
+                    Belum ada data tagihan.
                   </td>
                 </tr>
               )}
@@ -359,4 +338,4 @@ function Student() {
   );
 }
 
-export default Student;
+export default Bill;

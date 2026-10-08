@@ -3,11 +3,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
-import ComingSoon from "./pages/ComingSoon";
 import Jurusan from "./pages/Jurusan";
-import Classes from "./pages/Classes";
+import Classes from "./pages/Kelas";
 import Student from "./pages/Student";
 import Item from "./pages/Item";
+import Bill from "./pages/Bill";
+import Payment from "./pages/Payment";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -28,9 +29,9 @@ function App() {
 
           <Route path="/items" element={<Item />} />
 
-          <Route path="/bills" element={<ComingSoon />} />
+          <Route path="/bills" element={<Bill />} />
 
-          <Route path="/payments" element={<ComingSoon />} />
+          <Route path="/payments" element={<Payment />} />
         </Route>
       </Routes>
     </BrowserRouter>
