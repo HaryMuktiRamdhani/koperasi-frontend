@@ -9,9 +9,20 @@ import Student from "./pages/Student";
 import Item from "./pages/Item";
 import Bill from "./pages/Bill";
 import Payment from "./pages/Payment";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Help from "./pages/Help";
+import Users from "./pages/Users";
 
 function App() {
   const token = localStorage.getItem("token");
+  let role = "";
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) role = (JSON.parse(storedUser) as { role?: string }).role || "";
+  } catch {
+    role = "";
+  }
 
   return (
     <BrowserRouter>
@@ -32,6 +43,10 @@ function App() {
           <Route path="/bills" element={<Bill />} />
 
           <Route path="/payments" element={<Payment />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/users" element={role === "admin" ? <Users /> : <Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

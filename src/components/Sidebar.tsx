@@ -8,6 +8,7 @@ import {
   ReceiptText,
   Wallet,
   LogOut,
+  UserCog,
 } from "lucide-react";
 
 export const menuItems = [
@@ -46,10 +47,27 @@ export const menuItems = [
     label: "Pembayaran",
     icon: Wallet,
   },
+  {
+    to: "/users",
+    label: "Pengguna",
+    icon: UserCog,
+    adminOnly: true,
+  },
 ] as const;
 
 function Sidebar() {
   const navigate = useNavigate();
+  let role = "";
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser) as { role?: unknown };
+      role = typeof user.role === "string" ? user.role : "";
+    }
+  } catch {
+    role = "";
+  }
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -73,7 +91,7 @@ function Sidebar() {
       </div>
 
       <nav aria-label="Navigasi utama" className="flex flex-col gap-1.5">
-        {menuItems.map((item) => {
+        {menuItems.filter((item) => !("adminOnly" in item) || role === "admin").map((item) => {
           const Icon = item.icon;
 
           return (

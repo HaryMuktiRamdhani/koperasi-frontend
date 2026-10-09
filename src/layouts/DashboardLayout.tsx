@@ -1,13 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import { Bell, ChevronDown, Search, UserRound, X } from "lucide-react";
+import { Bell, ChevronDown, Search, UserRound, X, LoaderCircle, CircleAlert } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar, { menuItems } from "../components/Sidebar";
+import api from "../services/api";
 
 interface AuthUser {
   name?: string;
   email?: string;
   role?: string;
+}
+
+interface SearchResult {
+  id: string;
+  label: string;
+  detail: string;
+  category: string;
+  path: string;
+}
+
+interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  detail: string;
+  path: string;
+  createdAt: string;
 }
 
 function getStoredUser(): AuthUser {
@@ -62,7 +80,13 @@ function DashboardLayout() {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState("");
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const [highlightedResult, setHighlightedResult] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -70,20 +94,96 @@ function DashboardLayout() {
   const user = getStoredUser();
 
   const currentPage =
-    menuItems.find((item) => item.to === location.pathname)?.label || "Dashboard";
+    menuItems.find((item) => item.to === location.pathname)?.label ||
+    ({
+      "/profile": "Profile",
+      "/settings": "Settings",
+      "/help": "Help & Support",
+    }[location.pathname] || "Dashboard");
+  const visibleMenuItems = useMemo(
+    () => menuItems.filter((item) => !("adminOnly" in item) || user.role === "admin"),
+    [user.role],
+  );
   const matchingPages = useMemo(
     () =>
-      menuItems.filter((item) =>
+      visibleMenuItems.filter((item) =>
         `${item.label} ${item.to}`
           .toLowerCase()
           .includes(search.trim().toLowerCase()),
       ),
-    [search],
+    [search, visibleMenuItems],
+  );
+  const combinedResults = useMemo(
+    () => [
+      ...matchingPages.map((item) => ({
+        id: `page-${item.to}`,
+        label: item.label,
+        detail: "Navigasi halaman",
+        category: "Menu",
+        path: item.to,
+      })),
+      ...searchResults,
+    ],
+    [matchingPages, searchResults],
   );
 
   useEffect(() => {
     setHighlightedResult(0);
   }, [search]);
+
+  useEffect(() => {
+    if (search.trim().length < 2) {
+      setSearchResults([]);
+      setSearchError("");
+      setSearchLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      setSearchLoading(true);
+      setSearchError("");
+
+      try {
+        const response = await api.get<SearchResult[]>("/search", {
+          params: { q: search.trim() },
+        });
+        if (!cancelled) setSearchResults(response.data);
+      } catch {
+        if (!cancelled) setSearchError("Pencarian data gagal dimuat.");
+      } finally {
+        if (!cancelled) setSearchLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [search]);
+
+  useEffect(() => {
+    if (!notificationsOpen) return;
+
+    let cancelled = false;
+    async function loadNotifications() {
+      setNotificationsLoading(true);
+      setNotificationsError("");
+      try {
+        const response = await api.get<{ items: NotificationItem[] }>("/notifications");
+        if (!cancelled) setNotifications(response.data.items);
+      } catch {
+        if (!cancelled) setNotificationsError("Notifikasi gagal dimuat.");
+      } finally {
+        if (!cancelled) setNotificationsLoading(false);
+      }
+    }
+
+    loadNotifications();
+    return () => {
+      cancelled = true;
+    };
+  }, [notificationsOpen]);
 
   useEffect(() => {
     function handleDocumentClick(event: MouseEvent) {
@@ -124,29 +224,29 @@ function DashboardLayout() {
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const firstMatch = matchingPages[0];
+    const firstMatch = combinedResults[0];
 
     if (firstMatch) {
-      goToPage(firstMatch.to);
+      goToPage(firstMatch.path);
     }
   }
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "ArrowDown" && matchingPages.length > 0) {
+    if (event.key === "ArrowDown" && combinedResults.length > 0) {
       event.preventDefault();
-      setHighlightedResult((current) => (current + 1) % matchingPages.length);
+      setHighlightedResult((current) => (current + 1) % combinedResults.length);
     }
 
-    if (event.key === "ArrowUp" && matchingPages.length > 0) {
+    if (event.key === "ArrowUp" && combinedResults.length > 0) {
       event.preventDefault();
       setHighlightedResult(
-        (current) => (current - 1 + matchingPages.length) % matchingPages.length,
+        (current) => (current - 1 + combinedResults.length) % combinedResults.length,
       );
     }
 
-    if (event.key === "Enter" && matchingPages.length > 0) {
+    if (event.key === "Enter" && combinedResults.length > 0) {
       event.preventDefault();
-      goToPage(matchingPages[highlightedResult].to);
+      goToPage(combinedResults[highlightedResult].path);
     }
 
     if (event.key === "Escape") {
@@ -199,17 +299,20 @@ function DashboardLayout() {
                     role="listbox"
                     className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
                   >
-                    {matchingPages.length > 0 ? matchingPages.map((item, index) => {
-                      const Icon = item.icon;
-
-                      return (
+                    {searchLoading ? (
+                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500">
+                        <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Mencari data...
+                      </div>
+                    ) : searchError ? (
+                      <div className="px-3 py-4 text-center text-sm text-red-600">{searchError}</div>
+                    ) : combinedResults.length > 0 ? combinedResults.map((item, index) => (
                       <button
-                        key={item.to}
+                        key={`${item.category}-${item.id}`}
                         type="button"
                         role="option"
                         aria-selected={index === highlightedResult}
                         onMouseEnter={() => setHighlightedResult(index)}
-                        onClick={() => goToPage(item.to)}
+                        onClick={() => goToPage(item.path)}
                         className={[
                           "flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm",
                           index === highlightedResult
@@ -217,14 +320,13 @@ function DashboardLayout() {
                             : "text-slate-600 hover:bg-slate-50 hover:text-[#102a43]",
                         ].join(" ")}
                       >
-                        <Icon className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
+                        <Search className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
                         <span className="min-w-0">
                           <span className="block font-medium">{item.label}</span>
-                          <span className="block text-xs text-slate-400">Navigasi halaman</span>
+                          <span className="block text-xs text-slate-400">{item.category} · {item.detail}</span>
                         </span>
                       </button>
-                      );
-                    }) : (
+                    )) : (
                       <div className="px-3 py-4 text-center">
                         <p className="text-sm font-medium text-slate-700">Tidak ada halaman ditemukan</p>
                         <p className="mt-1 text-xs text-slate-400">Coba kata kunci lain.</p>
@@ -256,7 +358,7 @@ function DashboardLayout() {
                   <Bell className="h-5 w-5" strokeWidth={1.8} />
                 </button>
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-12 w-72 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="text-sm font-semibold text-[#102a43]">Notifikasi</h2>
@@ -271,13 +373,27 @@ function DashboardLayout() {
                         <X className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center">
-                      <Bell className="mx-auto h-5 w-5 text-slate-300" strokeWidth={1.7} />
-                      <p className="mt-2 text-sm font-medium text-slate-600">Belum ada notifikasi</p>
-                      <p className="mt-1 text-xs leading-relaxed text-slate-400">
-                        Sistem notifikasi belum tersedia dari server.
-                      </p>
-                    </div>
+                    {notificationsLoading ? (
+                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
+                    ) : notificationsError ? (
+                      <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"><CircleAlert className="h-4 w-4 shrink-0" /> {notificationsError}</div>
+                    ) : notifications.length === 0 ? (
+                      <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center">
+                        <Bell className="mx-auto h-5 w-5 text-slate-300" strokeWidth={1.7} />
+                        <p className="mt-2 text-sm font-medium text-slate-600">Belum ada notifikasi</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-400">Belum ada aktivitas operasional untuk ditampilkan.</p>
+                      </div>
+                    ) : (
+                      <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
+                        {notifications.map((notification) => (
+                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full rounded-lg border border-slate-100 p-3 text-left hover:bg-slate-50">
+                            <p className="text-xs font-semibold text-[#102a43]">{notification.title}</p>
+                            <p className="mt-1 text-xs text-slate-600">{notification.message}</p>
+                            <p className="mt-1 text-xs text-slate-400">{notification.detail}</p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -321,9 +437,11 @@ function DashboardLayout() {
                       <UserRound className="h-4 w-4" />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
-                    <p className="mb-2 px-2 text-[11px] leading-relaxed text-slate-400">
-                      Profil dan pengaturan akun belum tersedia sebagai halaman terpisah.
-                    </p>
+                    <div className="mb-2 space-y-1 border-t border-slate-100 pt-2">
+                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Profile</button>
+                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Settings</button>
+                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Help &amp; Support</button>
+                    </div>
                     <button
                       type="button"
                       onClick={handleLogout}
