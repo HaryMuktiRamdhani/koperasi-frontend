@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { ReceiptText } from "lucide-react";
 import api from "../services/api";
+import PageHeader from "../components/PageHeader";
 
 interface TagihanData {
   id: string;
@@ -151,15 +153,7 @@ function Bill() {
 
   return (
     <div>
-      <div className="mb-7">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Tagihan
-        </h1>
-
-        <p className="mt-1 text-gray-500">
-          Kelola tagihan siswa
-        </p>
-      </div>
+      <PageHeader title="Tagihan" description="Kelola tagihan siswa" icon={ReceiptText} />
 
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-5 text-lg font-semibold text-gray-900">

@@ -10,6 +10,44 @@ import {
   LogOut,
 } from "lucide-react";
 
+export const menuItems = [
+  {
+    to: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    to: "/jurusan",
+    label: "Jurusan",
+    icon: GraduationCap,
+  },
+  {
+    to: "/classes",
+    label: "Kelas",
+    icon: School,
+  },
+  {
+    to: "/students",
+    label: "Siswa",
+    icon: Users,
+  },
+  {
+    to: "/items",
+    label: "Barang",
+    icon: Package,
+  },
+  {
+    to: "/bills",
+    label: "Tagihan",
+    icon: ReceiptText,
+  },
+  {
+    to: "/payments",
+    label: "Pembayaran",
+    icon: Wallet,
+  },
+] as const;
+
 function Sidebar() {
   const navigate = useNavigate();
 
@@ -19,69 +57,22 @@ function Sidebar() {
     navigate("/");
   }
 
-  const menuItems = [
-    {
-      to: "/dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      to: "/jurusan",
-      label: "Jurusan",
-      icon: GraduationCap,
-    },
-    {
-      to: "/classes",
-      label: "Kelas",
-      icon: School,
-    },
-    {
-      to: "/students",
-      label: "Siswa",
-      icon: Users,
-    },
-    {
-      to: "/items",
-      label: "Barang",
-      icon: Package,
-    },
-    {
-      to: "/bills",
-      label: "Tagihan",
-      icon: ReceiptText,
-    },
-    {
-      to: "/payments",
-      label: "Pembayaran",
-      icon: Wallet,
-    },
-  ];
-
   return (
-    <aside className="flex min-h-screen w-60 flex-col border-r border-gray-200 bg-white px-3 py-5">
-      {/* Logo */}
-      <div className="mb-8 px-3">
+    <aside className="flex min-h-screen w-64 shrink-0 flex-col bg-[#102a43] px-4 py-6 text-white">
+      <div className="mb-10 px-2">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-900">
-            <span className="text-sm font-semibold text-white">
-              KS
-            </span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] shadow-sm">
+            <span className="text-sm font-bold tracking-wide text-[#102a43]">KS</span>
           </div>
 
           <div>
-            <h2 className="text-sm font-semibold text-gray-900">
-              Koperasi
-            </h2>
-
-            <p className="text-xs text-gray-500">
-              Sekolah
-            </p>
+            <h2 className="text-sm font-semibold tracking-wide text-white">Koperasi Sekolah</h2>
+            <p className="mt-0.5 text-xs text-slate-300">Panel administrasi</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-col gap-1">
+      <nav aria-label="Navigasi utama" className="flex flex-col gap-1.5">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -91,28 +82,31 @@ function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 [
-                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition",
+                  "flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm transition-colors",
                   isActive
-                    ? "bg-gray-100 font-medium text-gray-900"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
+                    ? "border-[#42c7bd]/20 bg-[#20b2aa] font-semibold text-[#102a43] shadow-sm"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white",
                 ].join(" ")
               }
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
               <span>{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="mt-auto border-t border-gray-100 pt-4">
+      <div className="mt-auto border-t border-white/10 pt-5">
+        <div className="mb-4 rounded-lg bg-white/5 px-3 py-3 text-xs text-slate-300">
+          <p className="font-medium text-white">Ruang kerja koperasi</p>
+          <p className="mt-1 leading-relaxed">Kelola administrasi sekolah dengan rapi.</p>
+        </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-[18px] w-[18px]" strokeWidth={1.8} />
           <span>Keluar</span>
         </button>
       </div>

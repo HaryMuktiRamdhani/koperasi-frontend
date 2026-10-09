@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { GraduationCap, Pencil, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
+import PageHeader from "../components/PageHeader";
 
 interface JurusanData {
   id: string;
@@ -141,14 +142,11 @@ function Jurusan() {
     <div className="mx-auto w-full max-w-7xl space-y-6">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
-            Data Jurusan
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Kelola informasi jurusan yang terdaftar di sekolah.
-          </p>
-        </div>
+        <PageHeader
+          title="Data Jurusan"
+          description="Kelola informasi jurusan yang terdaftar di sekolah."
+          icon={GraduationCap}
+        />
 
         <div className="text-sm text-gray-500">
           Total{" "}

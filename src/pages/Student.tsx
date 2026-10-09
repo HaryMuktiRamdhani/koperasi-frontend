@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Users } from "lucide-react";
 import api from "../services/api";
+import PageHeader from "../components/PageHeader";
 
 interface SiswaData {
   id: string;
@@ -163,15 +165,7 @@ function Student() {
 
   return (
     <div>
-      <div className="mb-7">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Siswa
-        </h1>
-
-        <p className="mt-1 text-gray-500">
-          Kelola data siswa sekolah
-        </p>
-      </div>
+      <PageHeader title="Siswa" description="Kelola data siswa sekolah" icon={Users} />
 
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-5 text-lg font-semibold text-gray-900">
