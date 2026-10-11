@@ -76,7 +76,7 @@ function Sidebar() {
   }
 
   return (
-    <aside className="flex min-h-screen w-64 shrink-0 flex-col bg-[#102a43] px-4 py-6 text-white">
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-[#102a43] px-4 py-6 text-white">
       <div className="mb-10 px-2">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] shadow-sm">

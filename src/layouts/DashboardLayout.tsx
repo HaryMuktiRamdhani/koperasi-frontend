@@ -262,10 +262,10 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-[#f5f7fa]">
+    <div className="flex h-screen overflow-hidden bg-[#f5f7fa]">
       <Sidebar />
 
-      <div className="min-w-0 flex-1">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
