@@ -266,22 +266,22 @@ function DashboardLayout() {
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-[var(--app-border)] bg-[var(--app-surface)]/95 px-5 py-4 text-[var(--app-text)] backdrop-blur lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
                 KOPERASI SEKOLAH
               </p>
               <div className="mt-1 flex items-center gap-2">
-                <span className="text-sm text-slate-400">Administrasi</span>
-                <span className="text-slate-300">/</span>
-                <h1 className="truncate text-base font-semibold text-[#102a43]">{currentPage}</h1>
+                <span className="text-sm text-[var(--app-text-secondary)]">Administrasi</span>
+                <span className="text-[var(--app-border)]">/</span>
+                <h1 className="truncate text-base font-semibold text-[var(--app-text)]">{currentPage}</h1>
               </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
               <form className="relative hidden md:block" onSubmit={handleSearchSubmit}>
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--app-text-secondary)]" />
                 <input
                   ref={searchRef}
                   aria-label="Cari halaman"
@@ -291,16 +291,16 @@ function DashboardLayout() {
                   onChange={(event) => setSearch(event.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Cari menu..."
-                  className="w-48 rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#20b2aa] focus:bg-white focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                  className="w-48 rounded-lg border border-[var(--app-border)] bg-[var(--app-surface-secondary)] py-2 pl-9 pr-3 text-sm text-[var(--app-text)] outline-none transition focus:border-[#20b2aa] focus:bg-[var(--app-surface)] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
                 />
                 {search && (
                   <div
                     id="global-search-results"
                     role="listbox"
-                    className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+                    className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] py-1 shadow-lg"
                   >
                     {searchLoading ? (
-                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500">
+                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-[var(--app-text-secondary)]">
                         <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Mencari data...
                       </div>
                     ) : searchError ? (
@@ -316,23 +316,23 @@ function DashboardLayout() {
                         className={[
                           "flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm",
                           index === highlightedResult
-                            ? "bg-[#e8f7f5] text-[#102a43]"
-                            : "text-slate-600 hover:bg-slate-50 hover:text-[#102a43]",
+                            ? "bg-[#e8f7f5] text-[var(--app-text)]"
+                            : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]",
                         ].join(" ")}
                       >
                         <Search className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
                         <span className="min-w-0">
                           <span className="block font-medium">{item.label}</span>
-                          <span className="block text-xs text-slate-400">{item.category} · {item.detail}</span>
+                          <span className="block text-xs text-[var(--app-text-secondary)]">{item.category} · {item.detail}</span>
                         </span>
                       </button>
                     )) : (
                       <div className="px-3 py-4 text-center">
-                        <p className="text-sm font-medium text-slate-700">Tidak ada halaman ditemukan</p>
-                        <p className="mt-1 text-xs text-slate-400">Coba kata kunci lain.</p>
+                        <p className="text-sm font-medium text-[var(--app-text)]">Tidak ada halaman ditemukan</p>
+                        <p className="mt-1 text-xs text-[var(--app-text-secondary)]">Coba kata kunci lain.</p>
                       </div>
                     )}
-                    <p className="border-t border-slate-100 px-3 py-2 text-[11px] text-slate-400">
+                    <p className="border-t border-[var(--app-border)] px-3 py-2 text-[11px] text-[var(--app-text-secondary)]">
                       Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc untuk menutup
                     </p>
                   </div>
@@ -352,44 +352,44 @@ function DashboardLayout() {
                     "rounded-lg p-2 transition-colors",
                     notificationsOpen
                       ? "bg-[#e8f7f5] text-[#13716d]"
-                      : "text-slate-500 hover:bg-slate-100 hover:text-[#102a43]",
+                      : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]",
                   ].join(" ")}
                 >
                   <Bell className="h-5 w-5" strokeWidth={1.8} />
                 </button>
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h2 className="text-sm font-semibold text-[#102a43]">Notifikasi</h2>
-                        <p className="mt-1 text-xs text-slate-500">Pusat informasi akun</p>
+                        <h2 className="text-sm font-semibold text-[var(--app-text)]">Notifikasi</h2>
+                        <p className="mt-1 text-xs text-[var(--app-text-secondary)]">Pusat informasi akun</p>
                       </div>
                       <button
                         type="button"
                         aria-label="Tutup notifikasi"
                         onClick={() => setNotificationsOpen(false)}
-                        className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        className="rounded-md p-1 text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                     {notificationsLoading ? (
-                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
+                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-[var(--app-text-secondary)]"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
                     ) : notificationsError ? (
                       <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"><CircleAlert className="h-4 w-4 shrink-0" /> {notificationsError}</div>
                     ) : notifications.length === 0 ? (
-                      <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center">
-                        <Bell className="mx-auto h-5 w-5 text-slate-300" strokeWidth={1.7} />
-                        <p className="mt-2 text-sm font-medium text-slate-600">Belum ada notifikasi</p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-400">Belum ada aktivitas operasional untuk ditampilkan.</p>
+                      <div className="mt-4 rounded-lg border border-dashed border-[var(--app-border)] px-3 py-5 text-center">
+                        <Bell className="mx-auto h-5 w-5 text-[var(--app-text-secondary)]" strokeWidth={1.7} />
+                        <p className="mt-2 text-sm font-medium text-[var(--app-text-secondary)]">Belum ada notifikasi</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[var(--app-text-secondary)]">Belum ada aktivitas operasional untuk ditampilkan.</p>
                       </div>
                     ) : (
                       <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                         {notifications.map((notification) => (
-                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full rounded-lg border border-slate-100 p-3 text-left hover:bg-slate-50">
-                            <p className="text-xs font-semibold text-[#102a43]">{notification.title}</p>
-                            <p className="mt-1 text-xs text-slate-600">{notification.message}</p>
-                            <p className="mt-1 text-xs text-slate-400">{notification.detail}</p>
+                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full rounded-lg border border-[var(--app-border)] p-3 text-left hover:bg-[var(--app-surface-secondary)]">
+                            <p className="text-xs font-semibold text-[var(--app-text)]">{notification.title}</p>
+                            <p className="mt-1 text-xs text-[var(--app-text-secondary)]">{notification.message}</p>
+                            <p className="mt-1 text-xs text-[var(--app-text-secondary)]">{notification.detail}</p>
                           </button>
                         ))}
                       </div>
@@ -408,44 +408,44 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50"
+                  className="flex items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-[var(--app-surface-secondary)]"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                     {getInitials(user.name, user.email)}
                   </span>
                   <span className="hidden max-w-32 text-left sm:block">
-                    <span className="block truncate text-sm font-semibold text-[#102a43]">
+                    <span className="block truncate text-sm font-semibold text-[var(--app-text)]">
                       {user.name || user.email || "Pengguna"}
                     </span>
-                    <span className="block text-xs text-slate-500">{formatRole(user.role)}</span>
+                    <span className="block text-xs text-[var(--app-text-secondary)]">{formatRole(user.role)}</span>
                   </span>
-                  <ChevronDown className="hidden h-4 w-4 text-slate-400 sm:block" />
+                  <ChevronDown className="hidden h-4 w-4 text-[var(--app-text-secondary)] sm:block" />
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-                    <div className="flex items-center gap-3 border-b border-slate-100 px-2 pb-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#d9f3f0] text-sm font-bold text-[#13716d]">
+                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-3 shadow-lg">
+                    <div className="flex items-center gap-3 border-b border-[var(--app-border)] px-2 pb-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#d9f3f0] text-sm font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                         {getInitials(user.name, user.email)}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#102a43]">{user.name || "Pengguna"}</p>
-                        <p className="truncate text-xs text-slate-500">{user.email || "Email tidak tersedia"}</p>
+                        <p className="truncate text-sm font-semibold text-[var(--app-text)]">{user.name || "Pengguna"}</p>
+                        <p className="truncate text-xs text-[var(--app-text-secondary)]">{user.email || "Email tidak tersedia"}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500">
+                    <div className="flex items-center gap-2 px-2 py-3 text-xs text-[var(--app-text-secondary)]">
                       <UserRound className="h-4 w-4" />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
-                    <div className="mb-2 space-y-1 border-t border-slate-100 pt-2">
-                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Profile</button>
-                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Settings</button>
-                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">Help &amp; Support</button>
+                    <div className="mb-2 space-y-1 border-t border-[var(--app-border)] pt-2">
+                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]">Profile</button>
+                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]">Settings</button>
+                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]">Help &amp; Support</button>
                     </div>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-lg bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
+                      className="w-full rounded-lg bg-[var(--app-surface-secondary)] px-3 py-2 text-left text-sm font-medium text-[var(--app-text)] transition-colors hover:bg-red-50 hover:text-red-700"
                     >
                       Keluar dari akun
                     </button>
