@@ -7,6 +7,15 @@
   --app-border: #e2e8f0;
   --app-text: #102a43;
   --app-text-secondary: #64748b;
+  --accent: #20b2aa;
+  --accent-contrast: #102a43;
+  --accent-border: rgb(66 199 189 / 0.35);
+  --sidebar-background: #102a43;
+  --sidebar-text: #ffffff;
+  --sidebar-muted: #cbd5e1;
+  --sidebar-border: rgb(255 255 255 / 0.1);
+  --sidebar-hover: rgb(255 255 255 / 0.1);
+  --sidebar-card: rgb(255 255 255 / 0.05);
 }
 
 :root.dark {
@@ -16,6 +25,15 @@
   --app-border: #263449;
   --app-text: #f1f5f9;
   --app-text-secondary: #a7b4c7;
+  --accent: #2dd4bf;
+  --accent-contrast: #0f172a;
+  --accent-border: rgb(94 234 212 / 0.45);
+  --sidebar-background: #0f172a;
+  --sidebar-text: #f8fafc;
+  --sidebar-muted: #cbd5e1;
+  --sidebar-border: rgb(148 163 184 / 0.2);
+  --sidebar-hover: rgb(148 163 184 / 0.12);
+  --sidebar-card: rgb(148 163 184 / 0.1);
 }
 
 :root {
