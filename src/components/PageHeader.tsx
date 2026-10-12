@@ -5,11 +5,12 @@ interface PageHeaderProps {
   title: string;
   description: string;
   icon?: LucideIcon;
+  className?: string;
 }
 
-function PageHeader({ eyebrow = "Data koperasi", title, description, icon: Icon }: PageHeaderProps) {
+function PageHeader({ eyebrow = "Data koperasi", title, description, icon: Icon, className = "" }: PageHeaderProps) {
   return (
-    <div className="mb-7 flex items-start gap-3">
+    <div className={`mb-7 flex items-start gap-3 ${className}`}>
       {Icon && (
         <span className="mt-0.5 rounded-lg bg-[#e8f7f5] p-2 text-[#168b87]">
           <Icon className="h-5 w-5" strokeWidth={1.8} />
