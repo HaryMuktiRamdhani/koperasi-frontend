@@ -35,7 +35,7 @@ function Settings() {
                   onClick={() => setTheme(option.value)}
                   aria-pressed={selected}
                   className={[
-                    "flex items-start gap-3 rounded-lg border p-4 text-left transition",
+                    "flex items-start gap-3 rounded-lg border p-4 text-left transition cursor-pointer",
                     selected
                       ? "border-[#20b2aa] bg-[#e8f7f5] text-[#102a43]"
                       : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[#20b2aa] hover:bg-[#f6fbfa]",
@@ -63,7 +63,7 @@ function Settings() {
             <span className="block text-sm font-semibold text-[#102a43]">Mode sidebar ringkas</span>
             <span className="mt-1 block text-sm text-slate-500">Preferensi ini disimpan secara lokal di browser.</span>
           </span>
-          <input type="checkbox" checked={compactSidebar} onChange={(event) => setCompactSidebar(event.target.checked)} className="mt-1 h-5 w-5 accent-[#168b87]" />
+          <input type="checkbox" checked={compactSidebar} onChange={(event) => setCompactSidebar(event.target.checked)} className="cursor-pointer mt-1 h-5 w-5 accent-[#168b87]" />
         </label>
         </section>
       </div>
