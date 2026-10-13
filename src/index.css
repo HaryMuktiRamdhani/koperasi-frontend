@@ -99,6 +99,20 @@ body {
   color: #0f172a !important;
 }
 
+.dark .bg-teal-50 {
+  background-color: #12352f !important;
+}
+
+.dark .text-teal-700,
+.dark .text-teal-600 {
+  color: #5eead4 !important;
+}
+
+.dark .bg-teal-600 {
+  background-color: #14b8a6 !important;
+  color: #0f172a !important;
+}
+
 .dark [class*="bg-[#e8f7f5]"] {
   background-color: var(--app-surface-secondary) !important;
 }

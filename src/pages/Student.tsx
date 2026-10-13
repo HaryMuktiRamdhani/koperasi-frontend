@@ -15,7 +15,7 @@ interface Student {
   Class?: { id: string; name: string; level: string; academicYear: string };
   Jurusan?: { id: string; nama: string; kode: string };
 }
-interface ClassData { id: string; name: string; level: string; academicYear: string; jurusanIds?: string[] }
+interface ClassData { id: string; name: string; level: string; academicYear: string; status: string; jurusanIds?: string[] }
 interface Major { id: string; nama: string; kode: string }
 
 const statuses = ["Aktif", "Lulus", "Pindah", "Keluar"];
@@ -103,9 +103,10 @@ function Student() {
     const relationIds = relationIdsForClass(classId);
     return relationIds.length === 0 || relationIds.includes(jurusanId);
   };
+  const availableClasses = classes.filter((item) => item.status === "Aktif" || item.id === form.classId);
   const classOptions = filters.jurusanId
-    ? classes.filter((item) => item.jurusanIds?.includes(filters.jurusanId))
-    : classes;
+    ? availableClasses.filter((item) => item.jurusanIds?.includes(filters.jurusanId))
+    : availableClasses;
   const formMajors = form.classId
     ? relationIdsForClass(form.classId).length > 0
       ? majors.filter((major) => relationIdsForClass(form.classId).includes(major.id))
@@ -187,7 +188,7 @@ function Student() {
           <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
             <input required placeholder="NIS" value={form.nis} onChange={(event) => setForm({ ...form, nis: event.target.value })} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
             <input required placeholder="Nama siswa" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
-            <select required value={form.classId} onChange={(event) => setClass(event.target.value)} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"><option value="">Pilih kelas</option>{classes.map((item) => <option key={item.id} value={item.id}>{item.name} - {item.academicYear}</option>)}</select>
+            <select required value={form.classId} onChange={(event) => setClass(event.target.value)} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"><option value="">Pilih kelas</option>{availableClasses.map((item) => <option key={item.id} value={item.id}>{item.name} - {item.academicYear}</option>)}</select>
             <select required value={form.jurusanId} onChange={(event) => setForm({ ...form, jurusanId: event.target.value })} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"><option value="">Pilih jurusan</option>{formMajors.map((item) => <option key={item.id} value={item.id}>{item.nama} ({item.kode})</option>)}</select>
             <input required placeholder="Angkatan (contoh: 2024)" value={form.generation} onChange={(event) => setForm({ ...form, generation: event.target.value })} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
             <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm">{statuses.map((status) => <option key={status}>{status}</option>)}</select>
