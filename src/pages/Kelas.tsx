@@ -7,6 +7,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
+import ConfirmModal from "../components/ConfirmModal";
 import {
   classFiltersToParams, DEFAULT_CLASS_FILTERS, normaliseClassFilters,
   toggleClassSort, type ClassFilterState, type ClassSortKey,
@@ -59,6 +60,9 @@ function Kelas() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<ClassData | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [autoName, setAutoName] = useState(true);
@@ -81,8 +85,10 @@ function Kelas() {
   }, [searchParams]);
 
   useEffect(() => {
+    const urlFilters = normaliseClassFilters(searchParams);
+    if (searchDraft === urlFilters.search) return;
     const timer = window.setTimeout(() => {
-      const next = { ...normaliseClassFilters(searchParams), search: searchDraft, page: 1 };
+      const next = { ...urlFilters, search: searchDraft, page: 1 };
       setFilters(next);
       setSearchParams(classFiltersToParams(next), { replace: true });
     }, 300);
@@ -136,6 +142,14 @@ function Kelas() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / filters.pageSize));
   const currentPage = Math.min(filters.page, pageCount);
   const pageItems = filtered.slice((currentPage - 1) * filters.pageSize, currentPage * filters.pageSize);
+
+  useEffect(() => {
+    if (filters.page === currentPage) return;
+    const next = { ...filters, page: currentPage };
+    setFilters(next);
+    setSearchParams(classFiltersToParams(next), { replace: true });
+  }, [currentPage, filters, setSearchParams]);
+
   const startYears = useMemo(() => {
     const values = classes.map((item) => parseAcademicYear(item.academicYear)?.start).filter(Boolean) as string[];
     return [...new Set(values)].sort((a, b) => Number(b) - Number(a));
@@ -227,14 +241,19 @@ function Kelas() {
     }
   }
 
-  async function handleDelete(item: ClassData) {
-    if (!window.confirm(`Hapus ${item.name}?`)) return;
+  async function handleDelete() {
+    if (!deleteTarget || deleteLoading) return;
+    setDeleteLoading(true);
+    setDeleteError("");
     try {
-      await api.delete(`/classes/${item.id}`);
+      await api.delete(`/classes/${deleteTarget.id}`);
       setNotice("Kelas berhasil dihapus.");
+      setDeleteTarget(null);
       await loadData();
     } catch (requestError: any) {
-      setError(requestError.response?.data?.message || "Kelas tidak dapat dihapus.");
+      setDeleteError(requestError.response?.data?.message || "Kelas tidak dapat dihapus.");
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -313,10 +332,11 @@ function Kelas() {
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm"><span className="text-gray-500">Menampilkan {filtered.length ? (currentPage - 1) * filters.pageSize + 1 : 0}-{Math.min(currentPage * filters.pageSize, filtered.length)} dari {filtered.length} kelas</span>{chips.map(([key, label]) => label && <button key={key} onClick={() => removeFilter(key)} className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700">{label}<X className="h-3 w-3" /></button>)}</div>
         </div>
         <div className="overflow-x-auto">
-          {loading ? <div className="p-10 text-center text-sm text-gray-500">Memuat data kelas...</div> : <table className="w-full min-w-[1050px] text-left text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="px-4 py-3">No</th>{([["name", "Nama Kelas"], ["level", "Tingkat"], ["academicYear", "Tahun Ajaran"], ["studentCount", "Jumlah Siswa"]] as const).map(([key, label]) => <th key={key} className="px-4 py-3"><button onClick={() => sortBy(key)} className="inline-flex items-center gap-1">{label}<span className="text-teal-600">{filters.sort === key ? filters.direction === "asc" ? "↑" : "↓" : "↕"}</span></button></th>)}<th className="px-4 py-3">Jurusan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Aksi</th></tr></thead><tbody className="divide-y divide-gray-200">{pageItems.map((item, index) => <tr key={item.id} className="hover:bg-gray-50"><td className="px-4 py-3 text-gray-500">{(currentPage - 1) * filters.pageSize + index + 1}</td><td className="px-4 py-3 font-medium text-gray-900">{item.name}</td><td className="px-4 py-3 text-gray-600">{item.level}</td><td className="px-4 py-3 text-gray-600">{item.academicYear}</td><td className="px-4 py-3 text-gray-600">{item.studentCount}</td><td className="px-4 py-3 text-gray-600">{item.Jurusan?.kode || (item.jurusanIds?.length ? `${item.jurusanIds.length} relasi lama` : "Belum ditentukan")}</td><td className="px-4 py-3"><span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">{item.status}</span></td><td className="px-4 py-3"><div className="flex gap-2"><button title="Edit kelas" onClick={() => startEdit(item)} className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100"><Edit3 className="h-4 w-4" /></button><button title="Hapus kelas" onClick={() => handleDelete(item)} className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100"><Trash2 className="h-4 w-4" /></button></div></td></tr>)}{!pageItems.length && <tr><td colSpan={8} className="p-10 text-center text-gray-500"><p>{filtered.length ? "Halaman ini tidak memiliki data." : "Tidak ada kelas yang cocok dengan filter."}</p><button onClick={resetFilters} className="mt-3 font-medium text-teal-600">Reset Filter</button></td></tr>}</tbody></table>}
+          {loading ? <div className="p-10 text-center text-sm text-gray-500">Memuat data kelas...</div> : <table className="w-full min-w-[1050px] text-left text-sm"><thead className="bg-gray-50 text-xs uppercase text-gray-500"><tr><th className="px-4 py-3">No</th>{([["name", "Nama Kelas"], ["level", "Tingkat"], ["academicYear", "Tahun Ajaran"], ["studentCount", "Jumlah Siswa"]] as const).map(([key, label]) => <th key={key} className="px-4 py-3"><button onClick={() => sortBy(key)} className="inline-flex items-center gap-1">{label}<span className="text-teal-600">{filters.sort === key ? filters.direction === "asc" ? "↑" : "↓" : "↕"}</span></button></th>)}<th className="px-4 py-3">Jurusan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Aksi</th></tr></thead><tbody className="divide-y divide-gray-200">{pageItems.map((item, index) => <tr key={item.id} className="hover:bg-gray-50"><td className="px-4 py-3 text-gray-500">{(currentPage - 1) * filters.pageSize + index + 1}</td><td className="px-4 py-3 font-medium text-gray-900">{item.name}</td><td className="px-4 py-3 text-gray-600">{item.level}</td><td className="px-4 py-3 text-gray-600">{item.academicYear}</td><td className="px-4 py-3 text-gray-600">{item.studentCount}</td><td className="px-4 py-3 text-gray-600">{item.Jurusan?.kode || (item.jurusanIds?.length ? `${item.jurusanIds.length} relasi lama` : "Belum ditentukan")}</td><td className="px-4 py-3"><span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">{item.status}</span></td><td className="px-4 py-3"><div className="flex gap-2"><button title="Edit kelas" onClick={() => startEdit(item)} className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100"><Edit3 className="h-4 w-4" /></button><button title="Hapus kelas" onClick={() => { setDeleteTarget(item); setDeleteError(""); }} className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100"><Trash2 className="h-4 w-4" /></button></div></td></tr>)}{!pageItems.length && <tr><td colSpan={8} className="p-10 text-center text-gray-500"><p>{filtered.length ? "Halaman ini tidak memiliki data." : "Tidak ada kelas yang cocok dengan filter."}</p><button onClick={resetFilters} className="mt-3 font-medium text-teal-600">Reset Filter</button></td></tr>}</tbody></table>}
         </div>
         <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3"><select value={filters.pageSize} onChange={(event) => updateFilters({ pageSize: Number(event.target.value), page: 1 })} className="rounded border border-gray-300 px-2 py-1 text-sm"><option value={10}>10 / halaman</option><option value={25}>25 / halaman</option><option value={50}>50 / halaman</option></select><div className="flex items-center gap-2 text-sm"><button disabled={currentPage <= 1} onClick={() => updateFilters({ page: currentPage - 1 })} className="rounded border p-1 disabled:opacity-40"><ChevronLeft className="h-4 w-4" /></button><span>Halaman {currentPage} dari {pageCount}</span><button disabled={currentPage >= pageCount} onClick={() => updateFilters({ page: currentPage + 1 })} className="rounded border p-1 disabled:opacity-40"><ChevronRight className="h-4 w-4" /></button></div></div>
       </div>
+      <ConfirmModal open={Boolean(deleteTarget)} title="Hapus Kelas?" description={deleteTarget ? `Kelas ${deleteTarget.name} akan dihapus. Tindakan ini tidak dapat dibatalkan.` : undefined} loading={deleteLoading} error={deleteError} onCancel={() => { if (!deleteLoading) setDeleteTarget(null); }} onConfirm={() => void handleDelete()} />
     </div>
   );
 }

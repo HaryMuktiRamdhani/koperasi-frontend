@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ReceiptText } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
+import ConfirmModal from "../components/ConfirmModal";
 
 interface TagihanData {
   id: string;
@@ -44,6 +45,9 @@ function Bill() {
 
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   async function getTagihan() {
     try {
@@ -123,25 +127,19 @@ function Bill() {
     setAmount("");
   }
 
-  async function handleDelete(id: string) {
-    const confirmDelete = window.confirm(
-      "Yakin ingin menghapus tagihan ini?"
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
+  async function handleDelete() {
+    if (!deleteId || deleteLoading) return;
+    setDeleteLoading(true);
+    setDeleteError("");
     try {
-      await api.delete(`/bills/${id}`);
+      await api.delete(`/bills/${deleteId}`);
+      setDeleteId(null);
       await getTagihan();
     } catch (error: any) {
       console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-          "Gagal menghapus tagihan"
-      );
+      setDeleteError(error.response?.data?.message || "Gagal menghapus tagihan");
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -302,9 +300,7 @@ function Bill() {
                       </button>
 
                       <button
-                        onClick={() =>
-                          handleDelete(item.id)
-                        }
+                        onClick={() => { setDeleteId(item.id); setDeleteError(""); }}
                         className="rounded-lg bg-red-50 px-3 py-1.5 font-medium text-red-600 hover:bg-red-100"
                       >
                         Hapus
@@ -328,6 +324,7 @@ function Bill() {
           </table>
         </div>
       </div>
+      <ConfirmModal open={Boolean(deleteId)} title="Hapus Tagihan?" description="Data tagihan yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan." loading={deleteLoading} error={deleteError} onCancel={() => { if (!deleteLoading) setDeleteId(null); }} onConfirm={() => void handleDelete()} />
     </div>
   );
 }

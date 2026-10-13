@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { GraduationCap, Pencil, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
+import ConfirmModal from "../components/ConfirmModal";
 
 interface JurusanData {
   id: string;
@@ -20,6 +21,9 @@ function Jurusan() {
   const [editId, setEditId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   async function getJurusan() {
     try {
@@ -101,13 +105,10 @@ function Jurusan() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handleDelete(id: string) {
-    const confirmed = window.confirm(
-      "Yakin ingin menghapus jurusan ini?"
-    );
-
-    if (!confirmed) return;
-
+  async function handleDelete() {
+    if (!deleteId || deleteLoading) return;
+    setDeleteLoading(true);
+    const id = deleteId;
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -119,6 +120,7 @@ function Jurusan() {
       }
 
       setSuccessMessage("Jurusan berhasil dihapus.");
+      setDeleteId(null);
       await getJurusan();
     } catch (error: unknown) {
       console.error("Gagal menghapus jurusan", error);
@@ -131,6 +133,9 @@ function Jurusan() {
         apiError.response?.data?.message ||
           "Jurusan gagal dihapus."
       );
+      setDeleteError(apiError.response?.data?.message || "Jurusan gagal dihapus.");
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -364,7 +369,7 @@ function Jurusan() {
 
                         <button
                           type="button"
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => { setDeleteId(item.id); setDeleteError(""); }}
                           aria-label={`Hapus ${item.nama}`}
                           className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
                         >
@@ -386,6 +391,7 @@ function Jurusan() {
           </div>
         )}
       </section>
+      <ConfirmModal open={Boolean(deleteId)} title="Hapus Jurusan?" description="Data jurusan yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan." loading={deleteLoading} error={deleteError} onCancel={() => { if (!deleteLoading) setDeleteId(null); }} onConfirm={() => void handleDelete()} />
     </div>
   );
 }
