@@ -54,7 +54,7 @@ function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 [
-                  "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors",
+                  "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors",
                   isActive
                     ? "border-[var(--accent-border)] bg-[var(--accent)] font-semibold text-[var(--accent-contrast)] shadow-sm"
                     : "border-transparent text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]",
@@ -76,7 +76,7 @@ function Sidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm text-[var(--sidebar-muted)] transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm text-[var(--sidebar-muted)] transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
           <span>Keluar</span>

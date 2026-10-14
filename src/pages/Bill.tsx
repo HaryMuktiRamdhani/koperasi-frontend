@@ -246,7 +246,7 @@ function Bill() {
   }
   function SortHeader({ label, sort }: { label: string; sort: SortKey }) {
     const active = filters.sort === sort;
-    return <button type="button" onClick={() => toggleSort(sort)} className="inline-flex items-center gap-1 font-semibold">
+    return <button type="button" onClick={() => toggleSort(sort)} className="inline-flex cursor-pointer items-center gap-1 font-semibold">
       {label}{active ? (filters.direction === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />) : null}
     </button>;
   }

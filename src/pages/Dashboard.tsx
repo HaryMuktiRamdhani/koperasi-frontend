@@ -90,7 +90,7 @@ function Dashboard() {
             </div>
             <span className="rounded-lg bg-[#e8f7f5] p-2.5 text-[#168b87]"><Users className="h-5 w-5" /></span>
           </div>
-          <Link to="/students" className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat data siswa <ArrowRight className="h-3.5 w-3.5" /></Link>
+          <Link to="/students" className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat data siswa <ArrowRight className="h-3.5 w-3.5" /></Link>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
@@ -101,7 +101,7 @@ function Dashboard() {
             </div>
             <span className="rounded-lg bg-amber-50 p-2.5 text-amber-600"><Package className="h-5 w-5" /></span>
           </div>
-          <Link to="/items" className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat data barang <ArrowRight className="h-3.5 w-3.5" /></Link>
+          <Link to="/items" className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat data barang <ArrowRight className="h-3.5 w-3.5" /></Link>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
@@ -112,7 +112,7 @@ function Dashboard() {
             </div>
             <span className="rounded-lg bg-orange-50 p-2.5 text-orange-600"><ReceiptText className="h-5 w-5" /></span>
           </div>
-          <Link to="/bills" className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat tagihan <ArrowRight className="h-3.5 w-3.5" /></Link>
+          <Link to="/bills" className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#168b87] hover:text-[#102a43]">Lihat tagihan <ArrowRight className="h-3.5 w-3.5" /></Link>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-[#102a43] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.08)]">
@@ -123,7 +123,7 @@ function Dashboard() {
             </div>
             <span className="rounded-lg bg-white/10 p-2.5 text-[#5ed5cc]"><Wallet className="h-5 w-5" /></span>
           </div>
-          <Link to="/payments" className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#5ed5cc] hover:text-white">Lihat pembayaran <ArrowRight className="h-3.5 w-3.5" /></Link>
+          <Link to="/payments" className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#5ed5cc] hover:text-white">Lihat pembayaran <ArrowRight className="h-3.5 w-3.5" /></Link>
         </div>
       </div>
 

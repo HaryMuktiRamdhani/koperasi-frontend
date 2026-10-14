@@ -314,7 +314,7 @@ function DashboardLayout() {
                         onMouseEnter={() => setHighlightedResult(index)}
                         onClick={() => goToPage(item.path)}
                         className={[
-                          "flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm",
+                          "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
                           index === highlightedResult
                             ? "bg-[#e8f7f5] text-[var(--app-text)]"
                             : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]",
@@ -349,7 +349,7 @@ function DashboardLayout() {
                     setProfileOpen(false);
                   }}
                   className={[
-                    "rounded-lg p-2 transition-colors",
+                    "cursor-pointer rounded-lg p-2 transition-colors",
                     notificationsOpen
                       ? "bg-[#e8f7f5] text-[#13716d]"
                       : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]",
@@ -368,7 +368,7 @@ function DashboardLayout() {
                         type="button"
                         aria-label="Tutup notifikasi"
                         onClick={() => setNotificationsOpen(false)}
-                        className="rounded-md p-1 text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]"
+                        className="cursor-pointer rounded-md p-1 text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text)]"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -386,7 +386,7 @@ function DashboardLayout() {
                     ) : (
                       <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                         {notifications.map((notification) => (
-                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full rounded-lg border border-[var(--app-border)] p-3 text-left hover:bg-[var(--app-surface-secondary)]">
+                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-[var(--app-border)] p-3 text-left hover:bg-[var(--app-surface-secondary)]">
                             <p className="text-xs font-semibold text-[var(--app-text)]">{notification.title}</p>
                             <p className="mt-1 text-xs text-[var(--app-text-secondary)]">{notification.message}</p>
                             <p className="mt-1 text-xs text-[var(--app-text-secondary)]">{notification.detail}</p>
@@ -408,7 +408,7 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-[var(--app-surface-secondary)]"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-[var(--app-surface-secondary)]"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                     {getInitials(user.name, user.email)}
