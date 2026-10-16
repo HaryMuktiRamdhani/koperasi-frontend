@@ -362,7 +362,7 @@ function DashboardLayout() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="text-sm font-semibold text-(--app-text)">Notifikasi</h2>
-                        <p className="mt-1 text-xs text-(--app-text-secondary)">Pusat informasi akun</p>
+                        <p className="mt-1 text-xs text-(--app-text-secondary)">Informasi dan aktivitas akun</p>
                       </div>
                       <button
                         type="button"
@@ -447,7 +447,7 @@ function DashboardLayout() {
                       onClick={handleLogout}
                       className="w-full rounded-lg bg-(--app-surface-secondary) px-3 py-2 text-left text-sm font-medium text-(--app-text) transition-colors hover:bg-red-50 hover:text-red-700"
                     >
-                      Keluar dari akun
+                      Logout
                     </button>
                   </div>
                 )}
