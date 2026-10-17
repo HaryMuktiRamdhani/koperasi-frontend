@@ -9,13 +9,15 @@ interface JurusanData {
   id: string;
   nama: string;
   kode: string;
-  isActive: boolean;
+  status?: "Aktif" | "Nonaktif" | "Akan Datang";
+  isActive?: boolean;
 }
 
 function Jurusan() {
   const [jurusan, setJurusan] = useState<JurusanData[]>([]);
   const [nama, setNama] = useState("");
   const [kode, setKode] = useState("");
+  const [status, setStatus] = useState<JurusanData["status"]>("Aktif");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
@@ -40,6 +42,7 @@ function Jurusan() {
   function resetForm() {
     setNama("");
     setKode("");
+    setStatus("Aktif");
     setEditId(null);
     setErrorMessage("");
     setSuccessMessage("");
@@ -65,18 +68,21 @@ function Jurusan() {
         await api.put(`/jurusan/${editId}`, {
           nama: namaValue,
           kode: kodeValue,
+          status,
         });
         setSuccessMessage("Data jurusan berhasil diperbarui.");
       } else {
         await api.post("/jurusan", {
           nama: namaValue,
           kode: kodeValue,
+          status,
         });
         setSuccessMessage("Jurusan berhasil ditambahkan.");
       }
 
       setNama("");
       setKode("");
+      setStatus("Aktif");
       setEditId(null);
       await getJurusan();
     } catch (error: unknown) {
@@ -99,6 +105,7 @@ function Jurusan() {
     setEditId(item.id);
     setNama(item.nama);
     setKode(item.kode);
+    setStatus(item.status || (item.isActive === false ? "Nonaktif" : "Aktif"));
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -208,7 +215,7 @@ function Jurusan() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 sm:p-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_220px_auto] md:items-end">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_180px_180px_auto] md:items-end">
             <div>
               <label
                 htmlFor="nama-jurusan"
@@ -245,6 +252,25 @@ function Jurusan() {
                 maxLength={20}
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm uppercase text-gray-900 outline-none transition placeholder:normal-case placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="status-jurusan"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
+                Status Jurusan
+              </label>
+              <select
+                id="status-jurusan"
+                value={status}
+                onChange={(event) => setStatus(event.target.value as JurusanData["status"])}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+                <option value="Akan Datang">Akan Datang</option>
+              </select>
             </div>
 
             <button
@@ -337,22 +363,15 @@ function Jurusan() {
                     </td>
 
                     <td className="px-5 py-4 sm:px-6">
-                      <span
-                        className={
-                          item.isActive
-                            ? "inline-flex items-center gap-1.5 text-xs font-medium text-green-700"
-                            : "inline-flex items-center gap-1.5 text-xs font-medium text-gray-500"
-                        }
-                      >
-                        <span
-                          className={
-                            item.isActive
-                              ? "h-1.5 w-1.5 rounded-full bg-green-600"
-                              : "h-1.5 w-1.5 rounded-full bg-gray-400"
-                          }
-                        />
-                        {item.isActive ? "Aktif" : "Nonaktif"}
-                      </span>
+                      {(() => {
+                        const itemStatus = item.status || (item.isActive === false ? "Nonaktif" : "Aktif");
+                        const badgeClass = itemStatus === "Aktif"
+                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                          : itemStatus === "Akan Datang"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+                        return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass}`}>{itemStatus}</span>;
+                      })()}
                     </td>
 
                     <td className="px-5 py-4 sm:px-6">
