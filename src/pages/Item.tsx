@@ -8,13 +8,14 @@ interface BarangData {
   id: string;
   name: string;
   price: number;
-  status: string;
+  status?: "Aktif" | "Nonaktif" | "Akan Datang";
 }
 
 function Item() {
   const [barang, setBarang] = useState<BarangData[]>([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [status, setStatus] = useState<NonNullable<BarangData["status"]>>("Aktif");
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -44,6 +45,7 @@ function Item() {
       const data = {
         name,
         price: Number(price),
+        status,
       };
 
       if (editId) {
@@ -67,12 +69,14 @@ function Item() {
     setEditId(item.id);
     setName(item.name);
     setPrice(String(item.price));
+    setStatus(item.status || "Aktif");
   }
 
   function resetForm() {
     setEditId(null);
     setName("");
     setPrice("");
+    setStatus("Aktif");
   }
 
   async function handleDelete() {
@@ -105,7 +109,7 @@ function Item() {
         </h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <input
               type="text"
               placeholder="Nama barang"
@@ -113,6 +117,19 @@ function Item() {
               onChange={(event) => setName(event.target.value)}
               className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
+
+            <label className="text-sm font-medium text-gray-700">
+              Status Barang
+              <select
+                value={status}
+                onChange={(event) => setStatus(event.target.value as NonNullable<BarangData["status"]>)}
+                className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 font-normal text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+                <option value="Akan Datang">Akan Datang</option>
+              </select>
+            </label>
 
             <input
               type="number"
@@ -181,8 +198,14 @@ function Item() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                      {item.status}
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      item.status === "Aktif"
+                        ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                        : item.status === "Akan Datang"
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                          : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                    }`}>
+                      {item.status || "Aktif"}
                     </span>
                   </td>
 
