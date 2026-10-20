@@ -44,7 +44,8 @@ function App() {
 
           <Route path="/payments" element={<Payment />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings" element={<Navigate to="/settings/profile" replace />} />
+          <Route path="/settings/:section" element={<Settings />} />
           <Route path="/help" element={<Help />} />
           <Route path="/users" element={role === "admin" ? <Users /> : <Navigate to="/dashboard" replace />} />
         </Route>

@@ -95,11 +95,10 @@ function DashboardLayout() {
 
   const currentPage =
     menuItems.find((item) => item.to === location.pathname)?.label ||
-    ({
+    (location.pathname.startsWith("/settings") ? "Pengaturan" : ({
       "/profile": "Profile",
-      "/settings": "Settings",
       "/help": "Help & Support",
-    }[location.pathname] || "Dashboard");
+    }[location.pathname] || "Dashboard"));
   const visibleMenuItems = useMemo(
     () => menuItems.filter((item) => !("adminOnly" in item) || user.role === "admin"),
     [user.role],

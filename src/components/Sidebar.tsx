@@ -1,8 +1,9 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, GraduationCap, School, Users, Package, ReceiptText,
-  Wallet, LogOut, UserCog,
+  Wallet, Settings, UserCog,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const menuItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -16,7 +17,7 @@ export const menuItems = [
 ] as const;
 
 function Sidebar() {
-  const navigate = useNavigate();
+  const [compact, setCompact] = useState(() => localStorage.getItem("compactSidebar") === "true");
   let role = "";
   try {
     const storedUser = localStorage.getItem("user");
@@ -25,23 +26,26 @@ function Sidebar() {
     role = "";
   }
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  }
+  useEffect(() => {
+    function handleCompactChange(event: Event) {
+      setCompact((event as CustomEvent<boolean>).detail);
+    }
+
+    window.addEventListener("compactSidebarChange", handleCompactChange);
+    return () => window.removeEventListener("compactSidebarChange", handleCompactChange);
+  }, []);
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-(--sidebar-background) px-4 py-6 text-(--sidebar-text)">
-      <div className="mb-10 px-2">
+    <aside className={`sticky top-0 flex h-screen shrink-0 flex-col bg-(--sidebar-background) py-6 text-(--sidebar-text) ${compact ? "w-20 px-2" : "w-64 px-4"}`}>
+      <div className={`mb-10 ${compact ? "px-1" : "px-2"}`}>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--accent) shadow-sm">
             <span className="text-sm font-bold tracking-wide text-(--accent-contrast)">KS</span>
           </div>
-          <div>
+          {!compact && <div>
             <h2 className="text-sm font-semibold tracking-wide">Koperasi Sekolah</h2>
             <p className="mt-0.5 text-xs text-(--sidebar-muted)">Panel administrasi</p>
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -54,7 +58,7 @@ function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 [
-                  "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors",
+                  `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${compact ? "justify-center px-2" : ""}`,
                   isActive
                     ? "border-(--accent-border) bg-(--accent) font-semibold text-[(--accent-contrast) shadow-sm"
                     : "border-transparent text-(--sidebar-muted)] hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)",
@@ -62,25 +66,32 @@ function Sidebar() {
               }
             >
               <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
-              <span>{item.label}</span>
+              {!compact && <span>{item.label}</span>}
             </NavLink>
           );
         })}
       </nav>
 
       <div className="mt-auto border-t border-(--sidebar-border) pt-5">
-        <div className="mb-4 rounded-lg bg-(--sidebar-card) px-3 py-3 text-xs text-[(--sidebar-muted)">
+        {!compact && <div className="mb-4 rounded-lg bg-(--sidebar-card) px-3 py-3 text-xs text-[(--sidebar-muted)">
           <p className="font-medium text-(--sidebar-text)">Ruang kerja koperasi</p>
           <p className="mt-1 leading-relaxed">Kelola administrasi sekolah dengan rapi.</p>
-        </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm text-(--sidebar-muted) transition-colors hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)"
+        </div>}
+        <NavLink
+          to="/settings/profile"
+          className={({ isActive }) =>
+            [
+              `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${compact ? "justify-center px-2" : ""}`,
+              isActive
+                ? "border-(--accent-border) bg-(--accent) font-semibold text-[(--accent-contrast) shadow-sm"
+                : "border-transparent text-(--sidebar-muted)] hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)",
+            ].join(" ")
+          }
+          aria-label="Pengaturan"
         >
-          <LogOut className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
-          <span>Keluar</span>
-        </button>
+          <Settings className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
+          {!compact && <span>Pengaturan</span>}
+        </NavLink>
       </div>
     </aside>
   );
