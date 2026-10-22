@@ -32,7 +32,7 @@ function Help() {
             className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
           >
             <item.icon className="h-5 w-5 text-[#168b87]" />
-            <h2 className="mt-4 text-sm font-semibold text-[#102a43]">
+            <h2 className="mt-4 text-sm font-semibold text-[#102a43] dark:text-slate-100">
               {item.title}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-[#a7b4c7]">

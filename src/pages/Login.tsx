@@ -71,7 +71,7 @@ function Login() {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#168b87]">
             Selamat datang
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#102a43]">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
             Masuk ke panel
           </h1>
           <p className="mt-2 mb-7 text-sm text-slate-500 dark:text-[#a7b4c7]">
@@ -128,7 +128,7 @@ function Login() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
                 {error}
               </p>
             )}

@@ -54,12 +54,12 @@ function Profile() {
         className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
       >
         {message && (
-          <p className="mb-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          <p className="mb-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
             {message}
           </p>
         )}
         {error && (
-          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
             {error}
           </p>
         )}
@@ -90,7 +90,7 @@ function Profile() {
         </div>
         <p className="mt-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
           Role akun:{" "}
-          <span className="font-semibold text-[#102a43]">
+          <span className="font-semibold text-[#102a43] dark:text-slate-100">
             {profile.role || "Memuat..."}
           </span>
           . Role tidak dapat diubah dari profil.

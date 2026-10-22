@@ -265,7 +265,7 @@ function DashboardLayout() {
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 dark:bg-[#111c2e]/95 px-5 py-4 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 px-5 py-4 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
@@ -290,7 +290,7 @@ function DashboardLayout() {
                   onChange={(event) => setSearch(event.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Cari menu..."
-                  className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                  className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
                 />
                 {search && (
                   <div
@@ -316,7 +316,7 @@ function DashboardLayout() {
                           "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
                           index === highlightedResult
                             ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#102a43] dark:text-slate-100"
-                            : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
+                            : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
                         ].join(" ")}
                       >
                         <Search className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
@@ -351,7 +351,7 @@ function DashboardLayout() {
                     "cursor-pointer rounded-lg p-2 transition-colors",
                     notificationsOpen
                       ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#13716d]"
-                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
+                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
                   ].join(" ")}
                 >
                   <Bell className="h-5 w-5" strokeWidth={1.8} />
@@ -367,7 +367,7 @@ function DashboardLayout() {
                         type="button"
                         aria-label="Tutup notifikasi"
                         onClick={() => setNotificationsOpen(false)}
-                        className="cursor-pointer rounded-md p-1 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100"
+                        className="cursor-pointer rounded-md p-1 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -385,7 +385,7 @@ function DashboardLayout() {
                     ) : (
                       <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                         {notifications.map((notification) => (
-                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]">
+                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d]">
                             <p className="text-xs font-semibold text-[#102a43] dark:text-slate-100">{notification.title}</p>
                             <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.message}</p>
                             <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.detail}</p>
@@ -407,7 +407,7 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                     {getInitials(user.name, user.email)}
@@ -437,14 +437,14 @@ function DashboardLayout() {
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
                     <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
-                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Profile</button>
-                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Settings</button>
-                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Help &amp; Support</button>
+                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Profile</button>
+                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Settings</button>
+                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Help &amp; Support</button>
                     </div>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 transition-colors hover:bg-red-50 hover:text-red-700"
+                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 transition-colors hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
                     >
                       Logout
                     </button>

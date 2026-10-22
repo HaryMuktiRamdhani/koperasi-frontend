@@ -114,7 +114,7 @@ function Settings() {
                     "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm",
                     isActive
                       ? "bg-slate-50 dark:bg-[#1b2a3d] font-semibold text-[#168b87]"
-                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
+                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
                   ].join(" ")
                 }
               >
@@ -176,7 +176,7 @@ function Settings() {
                       type="button"
                       onClick={() => setTheme(option.value)}
                       aria-pressed={selected}
-                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 text-left ${selected ? "border-[#20b2aa] bg-slate-50 dark:bg-[#1b2a3d]" : "border-slate-200 dark:border-[#263449] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"}`}
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 text-left ${selected ? "border-[#20b2aa] bg-slate-50 dark:bg-[#1b2a3d]" : "border-slate-200 dark:border-[#263449] hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"}`}
                     >
                       <Icon className="h-5 w-5 text-[#168b87]" />
                       <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">

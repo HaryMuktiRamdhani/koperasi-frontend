@@ -203,7 +203,7 @@ function Jurusan() {
             <button
               type="button"
               onClick={resetForm}
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:text-slate-100"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:hover:text-slate-100"
             >
               <X className="h-4 w-4" />
               Batal
@@ -380,7 +380,7 @@ function Jurusan() {
                           type="button"
                           onClick={() => startEdit(item)}
                           aria-label={`Edit ${item.nama}`}
-                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-gray-600 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:text-slate-100"
+                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-gray-600 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:hover:text-slate-100"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                           Edit

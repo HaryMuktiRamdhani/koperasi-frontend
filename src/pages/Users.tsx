@@ -152,7 +152,7 @@ function UsersPage() {
                   users.map((user) => (
                     <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-[#1b2a3d]">
                       <td className="px-5 py-4">
-                        <p className="font-medium text-[#102a43]">
+                        <p className="font-medium text-[#102a43] dark:text-slate-100">
                           {user.name}
                         </p>
                         <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
@@ -171,7 +171,7 @@ function UsersPage() {
                       </td>
                       <td className="px-5 py-4">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500 dark:text-[#a7b4c7]"}`}
+                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${user.isActive ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300"}`}
                         >
                           {user.isActive ? "Aktif" : "Nonaktif"}
                         </span>
@@ -189,7 +189,7 @@ function UsersPage() {
                                 role: user.role,
                               });
                             }}
-                            className="rounded-md p-2 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-100 hover:text-[#168b87]"
+                            className="rounded-md p-2 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#168b87]"
                             aria-label={`Edit ${user.name}`}
                           >
                             <Pencil className="h-4 w-4" />
@@ -214,7 +214,7 @@ function UsersPage() {
           onSubmit={submit}
           className="h-fit rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
         >
-          <h2 className="text-base font-semibold text-[#102a43]">
+          <h2 className="text-base font-semibold text-[#102a43] dark:text-slate-100">
             {editing ? "Edit pengguna" : "Tambah pengguna"}
           </h2>
           <div className="mt-4 space-y-4">
@@ -282,7 +282,7 @@ function UsersPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-[#a7b4c7]"
+                className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300"
               >
                 Batal
               </button>

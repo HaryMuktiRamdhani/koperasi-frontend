@@ -213,7 +213,7 @@ function Item() {
                           ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                           : item.status === "Akan Datang"
                             ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                            : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7] dark:bg-gray-800 dark:text-gray-300"
+                            : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-gray-300"
                       }`}
                     >
                       {item.status || "Aktif"}

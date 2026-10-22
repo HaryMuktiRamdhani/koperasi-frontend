@@ -1013,7 +1013,7 @@ function Bill() {
                 visibleBills.map((bill, index) => (
                   <tr
                     key={bill.id}
-                    className="hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"
+                    className="hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                   >
                     <td className="px-3 py-2">
                       {(filters.page - 1) * filters.pageSize + index + 1}

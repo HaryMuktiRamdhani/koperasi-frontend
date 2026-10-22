@@ -327,7 +327,7 @@ function Student() {
       {(unverifiableStudents.length > 0 || inconsistentStudents.length > 0) && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800"
+          className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300"
         >
           Ditemukan {inconsistentStudents.length} kombinasi Kelas–Jurusan yang
           tidak sesuai metadata relasi dan {unverifiableStudents.length} data
