@@ -71,7 +71,7 @@ function Dashboard() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#168b87]">
-           Sistem Informasi Sekolah
+            Sistem Informasi Sekolah
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#102a43]">
             Dashboard
