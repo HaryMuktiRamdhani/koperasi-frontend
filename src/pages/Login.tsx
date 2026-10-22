@@ -61,8 +61,8 @@ function Login() {
           Sistem Informasi Koperasi Sekolah
         </p>
       </div>
-      <div className="flex flex-1 items-center justify-center bg-[#f5f7fa] px-5 py-10 sm:px-8">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-[0_12px_36px_rgba(16,42,67,0.08)] sm:p-9">
+      <div className="flex flex-1 items-center justify-center bg-[#f5f7fa] dark:bg-[#0b1220] px-5 py-10 sm:px-8">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-7 shadow-[0_12px_36px_rgba(16,42,67,0.08)] sm:p-9">
           <div className="mb-8 lg:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] text-sm font-bold text-[#102a43]">
               KS
@@ -74,13 +74,13 @@ function Login() {
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#102a43]">
             Masuk ke panel
           </h1>
-          <p className="mt-2 mb-7 text-sm text-slate-500">
+          <p className="mt-2 mb-7 text-sm text-slate-500 dark:text-[#a7b4c7]">
             Gunakan akun yang telah diberikan oleh administrator.
           </p>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
                 Email
               </label>
               <div className="relative">
@@ -91,13 +91,13 @@ function Login() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="nama@sekolah.sch.id"
-                  className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-3 text-slate-900 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+                  className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-3 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
                 Password
               </label>
               <div className="relative">
@@ -108,7 +108,7 @@ function Login() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Masukkan password"
-                  className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-10 text-slate-900 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+                  className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-10 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
                 />
                 <button
                   type="button"

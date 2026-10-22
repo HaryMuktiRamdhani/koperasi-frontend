@@ -145,8 +145,8 @@ function Payment() {
         icon={Wallet}
       />
 
-      <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-5 text-lg font-semibold text-gray-900">
+      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-6 shadow-sm">
+        <h2 className="mb-5 text-lg font-semibold text-gray-900 dark:text-slate-100">
           Proses Pembayaran
         </h2>
 
@@ -155,7 +155,7 @@ function Payment() {
             <select
               value={billId}
               onChange={(event) => handleBillChange(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">Pilih tagihan</option>
 
@@ -172,13 +172,13 @@ function Payment() {
               value={amount}
               readOnly
               placeholder="Nominal pembayaran"
-              className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-gray-600 outline-none"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-gray-50 dark:bg-[#1b2a3d] px-3 py-2.5 text-gray-600 dark:text-[#a7b4c7] outline-none"
             />
 
             <select
               value={paymentMethod}
               onChange={(event) => setPaymentMethod(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">Pilih metode pembayaran</option>
               <option value="Tunai">Tunai</option>
@@ -189,7 +189,7 @@ function Payment() {
               type="date"
               value={paymentDate}
               onChange={(event) => setPaymentDate(event.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
 
             <textarea
@@ -197,7 +197,7 @@ function Payment() {
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               rows={3}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:col-span-2"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:col-span-2"
             />
           </div>
 
@@ -211,16 +211,16 @@ function Payment() {
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">
+      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+        <div className="border-b border-gray-200 dark:border-[#263449] px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Riwayat Pembayaran
           </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+            <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
               <tr>
                 <th className="px-6 py-4">No</th>
                 <th className="px-6 py-4">Tanggal</th>
@@ -230,24 +230,24 @@ function Payment() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
               {pembayaran.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-gray-600">{index + 1}</td>
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">{index + 1}</td>
 
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {item.paymentDate}
                   </td>
 
-                  <td className="px-6 py-4 font-medium text-gray-900">
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
                     Rp {item.amount.toLocaleString("id-ID")}
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {item.paymentMethod}
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {item.notes || "-"}
                   </td>
                 </tr>
@@ -257,7 +257,7 @@ function Payment() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-10 text-center text-gray-500"
+                    className="px-6 py-10 text-center text-gray-500 dark:text-[#a7b4c7]"
                   >
                     Belum ada riwayat pembayaran.
                   </td>

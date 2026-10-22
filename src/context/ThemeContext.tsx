@@ -18,6 +18,10 @@ function getStoredTheme(): Theme {
 function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.documentElement.style.colorScheme = theme;
+  document.body.classList.toggle("bg-[#f5f7fa]", theme === "light");
+  document.body.classList.toggle("text-[#102a43]", theme === "light");
+  document.body.classList.toggle("dark:bg-[#0b1220]", theme === "dark");
+  document.body.classList.toggle("dark:text-slate-100", theme === "dark");
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

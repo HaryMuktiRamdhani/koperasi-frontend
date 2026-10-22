@@ -110,18 +110,18 @@ function UsersPage() {
         </p>
       )}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
-          <div className="border-b border-slate-100 p-4">
+        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+          <div className="border-b border-slate-100 dark:border-[#263449] p-4">
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Cari nama atau email..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
             />
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+              <thead className="bg-slate-50 dark:bg-[#1b2a3d] text-xs uppercase text-slate-500 dark:text-[#a7b4c7]">
                 <tr>
                   <th className="px-5 py-3">Pengguna</th>
                   <th className="px-5 py-3">Role</th>
@@ -129,12 +129,12 @@ function UsersPage() {
                   <th className="px-5 py-3">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-[#263449]">
                 {loading ? (
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-5 py-10 text-center text-slate-500"
+                      className="px-5 py-10 text-center text-slate-500 dark:text-[#a7b4c7]"
                     >
                       Memuat pengguna...
                     </td>
@@ -143,24 +143,24 @@ function UsersPage() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-5 py-10 text-center text-slate-500"
+                      className="px-5 py-10 text-center text-slate-500 dark:text-[#a7b4c7]"
                     >
                       Belum ada pengguna.
                     </td>
                   </tr>
                 ) : (
                   users.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50">
+                    <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-[#1b2a3d]">
                       <td className="px-5 py-4">
                         <p className="font-medium text-[#102a43]">
                           {user.name}
                         </p>
-                        <p className="mt-1 text-xs text-slate-500">
+                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
                           {user.email}
                         </p>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f5] px-2.5 py-1 text-xs font-medium text-[#13716d]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f5] dark:bg-[#1b2a3d] px-2.5 py-1 text-xs font-medium text-[#13716d]">
                           {user.role === "admin" ? (
                             <ShieldCheck className="h-3.5 w-3.5" />
                           ) : (
@@ -171,7 +171,7 @@ function UsersPage() {
                       </td>
                       <td className="px-5 py-4">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
+                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500 dark:text-[#a7b4c7]"}`}
                         >
                           {user.isActive ? "Aktif" : "Nonaktif"}
                         </span>
@@ -189,7 +189,7 @@ function UsersPage() {
                                 role: user.role,
                               });
                             }}
-                            className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-[#168b87]"
+                            className="rounded-md p-2 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-100 hover:text-[#168b87]"
                             aria-label={`Edit ${user.name}`}
                           >
                             <Pencil className="h-4 w-4" />
@@ -197,7 +197,7 @@ function UsersPage() {
                           <button
                             type="button"
                             onClick={() => toggleStatus(user)}
-                            className="text-xs font-medium text-slate-500 hover:text-[#168b87]"
+                            className="text-xs font-medium text-slate-500 dark:text-[#a7b4c7] hover:text-[#168b87]"
                           >
                             {user.isActive ? "Nonaktifkan" : "Aktifkan"}
                           </button>
@@ -212,7 +212,7 @@ function UsersPage() {
         </div>
         <form
           onSubmit={submit}
-          className="h-fit rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
+          className="h-fit rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
         >
           <h2 className="text-base font-semibold text-[#102a43]">
             {editing ? "Edit pengguna" : "Tambah pengguna"}
@@ -225,7 +225,7 @@ function UsersPage() {
                 setForm({ ...form, name: event.target.value })
               }
               placeholder="Nama lengkap"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
             />
             <input
               required
@@ -235,7 +235,7 @@ function UsersPage() {
                 setForm({ ...form, email: event.target.value })
               }
               placeholder="Email"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
             />
             <input
               required={!editing}
@@ -250,7 +250,7 @@ function UsersPage() {
                   ? "Password baru (opsional)"
                   : "Password minimal 8 karakter"
               }
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
             />
             <select
               value={form.role}
@@ -260,7 +260,7 @@ function UsersPage() {
                   role: event.target.value as "admin" | "staff",
                 })
               }
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm outline-none focus:border-[#20b2aa]"
             >
               <option value="staff">Staff</option>
               <option value="admin">Admin</option>
@@ -282,7 +282,7 @@ function UsersPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600"
+                className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-[#a7b4c7]"
               >
                 Batal
               </button>

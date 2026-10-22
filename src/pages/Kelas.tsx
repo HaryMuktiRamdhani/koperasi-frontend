@@ -417,8 +417,8 @@ function Kelas() {
       </div>
 
       {formOpen && (
-        <div className="mb-4 rounded-xl bg-white p-4 shadow-sm">
-          <h2 className="mb-3 text-base font-semibold text-gray-900">
+        <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+          <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-slate-100">
             {editId ? "Edit Kelas" : "Tambah Kelas"}
           </h2>
           <form onSubmit={handleSubmit}>
@@ -427,7 +427,7 @@ function Kelas() {
                 required
                 value={form.level}
                 onChange={(event) => setFormValue("level", event.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
               >
                 <option value="">Pilih tingkat</option>
                 {levels.map((level) => (
@@ -440,7 +440,7 @@ function Kelas() {
                 onChange={(event) =>
                   setFormValue("jurusanId", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
               >
                 <option value="">Pilih jurusan</option>
                 {majors.map((major) => (
@@ -459,13 +459,13 @@ function Kelas() {
                 onChange={(event) =>
                   setFormValue("classNumber", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
               />
               <select
                 required
                 value={form.startYear}
                 onChange={(event) => handleStartYear(event.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
               >
                 <option value="">Tahun masuk</option>
                 {yearsFrom(START_YEAR, currentYear + 1).map((year) => (
@@ -478,7 +478,7 @@ function Kelas() {
                 onChange={(event) =>
                   setFormValue("endYear", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
               >
                 <option value="">Tahun selesai</option>
                 {yearsFrom(START_YEAR + 1, currentYear + 8).map((year) => (
@@ -489,7 +489,7 @@ function Kelas() {
                 required
                 value={form.status}
                 onChange={(event) => setFormValue("status", event.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
               >
                 {statuses.map((status) => (
                   <option key={status}>{status}</option>
@@ -498,7 +498,7 @@ function Kelas() {
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               {editId && (
-                <label className="inline-flex items-center gap-2 text-xs text-gray-600">
+                <label className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-[#a7b4c7]">
                   <input
                     type="checkbox"
                     checked={autoName}
@@ -507,9 +507,9 @@ function Kelas() {
                   Perbarui nama otomatis
                 </label>
               )}
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-[#a7b4c7]">
                 Preview:{" "}
-                <strong className="text-gray-900">
+                <strong className="text-gray-900 dark:text-slate-100">
                   {generatedName || form.name || "Lengkapi identitas kelas"}
                 </strong>
               </span>
@@ -528,7 +528,7 @@ function Kelas() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700"
+                    className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-4 py-2 text-sm font-semibold text-gray-700 dark:text-[#a7b4c7]"
                   >
                     Batal
                   </button>
@@ -539,14 +539,14 @@ function Kelas() {
         </div>
       )}
 
-      <div className="min-w-0 rounded-xl bg-white shadow-sm">
-        <div className="border-b border-gray-200 p-4">
+      <div className="min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+        <div className="border-b border-gray-200 dark:border-[#263449] p-4">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 Daftar Kelas
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
                 Kelola kelas, status, dan kapasitas siswa.
               </p>
             </div>
@@ -557,16 +557,16 @@ function Kelas() {
                 placeholder="Cari nama kelas..."
                 value={searchDraft}
                 onChange={(event) => setSearchDraft(event.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm"
+                className="w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm"
               />
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2 border-b border-gray-100 pb-3">
+          <div className="mt-3 flex flex-wrap gap-2 border-b border-gray-100 dark:border-[#263449] pb-3">
             {["", ...levels].map((level) => (
               <button
                 key={level || "all"}
                 onClick={() => updateFilters({ level, page: 1 })}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${filters.level === level ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-600"}`}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${filters.level === level ? "bg-teal-600 text-white" : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7]"}`}
               >
                 {level || "Semua"}
               </button>
@@ -578,7 +578,7 @@ function Kelas() {
               onChange={(event) =>
                 updateFilters({ jurusanId: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Semua jurusan</option>
               {majors.map((major) => (
@@ -592,7 +592,7 @@ function Kelas() {
               onChange={(event) =>
                 updateFilters({ startYear: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Semua tahun masuk</option>
               {startYears.map((year) => (
@@ -604,7 +604,7 @@ function Kelas() {
               onChange={(event) =>
                 updateFilters({ status: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Semua status</option>
               {statuses.map((status) => (
@@ -616,7 +616,7 @@ function Kelas() {
               onChange={(event) =>
                 updateFilters({ occupancy: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Semua jumlah siswa</option>
               <option value="empty">Kosong</option>
@@ -625,13 +625,13 @@ function Kelas() {
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
             >
               <SlidersHorizontal className="h-4 w-4" /> Reset Filter
             </button>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-gray-500">
+            <span className="text-gray-500 dark:text-[#a7b4c7]">
               Menampilkan{" "}
               {filtered.length ? (currentPage - 1) * filters.pageSize + 1 : 0}-
               {Math.min(currentPage * filters.pageSize, filtered.length)} dari{" "}
@@ -654,12 +654,12 @@ function Kelas() {
         </div>
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-10 text-center text-sm text-gray-500">
+            <div className="p-10 text-center text-sm text-gray-500 dark:text-[#a7b4c7]">
               Memuat data kelas...
             </div>
           ) : (
             <table className="w-full min-w-262.5p text-left text-sm">
-              <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+              <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
                 <tr>
                   <th className="px-4 py-3">No</th>
                   {(
@@ -691,23 +691,23 @@ function Kelas() {
                   <th className="px-4 py-3">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
                 {pageItems.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-500">
+                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
+                    <td className="px-4 py-3 text-gray-500 dark:text-[#a7b4c7]">
                       {(currentPage - 1) * filters.pageSize + index + 1}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">
                       {item.name}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{item.level}</td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">{item.level}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.academicYear}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.studentCount}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.Jurusan?.kode ||
                         (item.jurusanIds?.length
                           ? `${item.jurusanIds.length} relasi lama`
@@ -743,7 +743,7 @@ function Kelas() {
                 ))}
                 {!pageItems.length && (
                   <tr>
-                    <td colSpan={8} className="p-10 text-center text-gray-500">
+                    <td colSpan={8} className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]">
                       <p>
                         {filtered.length
                           ? "Halaman ini tidak memiliki data."
@@ -762,13 +762,13 @@ function Kelas() {
             </table>
           )}
         </div>
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-gray-200 dark:border-[#263449] px-4 py-3">
           <select
             value={filters.pageSize}
             onChange={(event) =>
               updateFilters({ pageSize: Number(event.target.value), page: 1 })
             }
-            className="rounded border border-gray-300 px-2 py-1 text-sm"
+            className="rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm"
           >
             <option value={10}>10 / halaman</option>
             <option value={25}>25 / halaman</option>

@@ -51,7 +51,7 @@ function Profile() {
       />
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
+        className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]"
       >
         {message && (
           <p className="mb-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
@@ -64,7 +64,7 @@ function Profile() {
           </p>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-slate-700 dark:text-[#a7b4c7]">
             Nama
             <input
               required
@@ -72,10 +72,10 @@ function Profile() {
               onChange={(event) =>
                 setProfile({ ...profile, name: event.target.value })
               }
-              className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+              className="mt-2 w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
             />
           </label>
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-slate-700 dark:text-[#a7b4c7]">
             Email
             <input
               required
@@ -84,11 +84,11 @@ function Profile() {
               onChange={(event) =>
                 setProfile({ ...profile, email: event.target.value })
               }
-              className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+              className="mt-2 w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
             />
           </label>
         </div>
-        <p className="mt-4 text-sm text-slate-500">
+        <p className="mt-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
           Role akun:{" "}
           <span className="font-semibold text-[#102a43]">
             {profile.role || "Memuat..."}

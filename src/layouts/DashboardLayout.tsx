@@ -261,26 +261,26 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f5f7fa]">
+    <div className="flex h-screen overflow-hidden bg-[#f5f7fa] dark:bg-[#0b1220]">
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-20 border-b border-(--app-border) bg-(--app-surface)/95 px-5 py-4 text-(--app-text) backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 dark:bg-[#111c2e]/95 px-5 py-4 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
                 KOPERASI SEKOLAH
               </p>
               <div className="mt-1 flex items-center gap-2">
-                <span className="text-sm text-(--app-text-secondary)">Administrasi</span>
-                <span className="text-(--app-border)">/</span>
-                <h1 className="truncate text-base font-semibold text-(--app-text)">{currentPage}</h1>
+                <span className="text-sm text-slate-500 dark:text-[#a7b4c7]">Administrasi</span>
+                <span className="text-slate-200 dark:text-[#263449]">/</span>
+                <h1 className="truncate text-base font-semibold text-[#102a43] dark:text-slate-100">{currentPage}</h1>
               </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
               <form className="relative hidden md:block" onSubmit={handleSearchSubmit}>
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--app-text-secondary)" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-[#a7b4c7]" />
                 <input
                   ref={searchRef}
                   aria-label="Cari halaman"
@@ -290,16 +290,16 @@ function DashboardLayout() {
                   onChange={(event) => setSearch(event.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Cari menu..."
-                  className="w-48 rounded-lg border border-(--app-border) bg-(--app-surface-secondary) py-2 pl-9 pr-3 text-sm text-(--app-text) outline-none transition focus:border-[#20b2aa] focus:bg-(--app-surface) focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                  className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
                 />
                 {search && (
                   <div
                     id="global-search-results"
                     role="listbox"
-                    className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-(--app-border) bg-(--app-surface) py-1 shadow-lg"
+                    className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] py-1 shadow-lg"
                   >
                     {searchLoading ? (
-                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-(--app-text-secondary)">
+                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
                         <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Mencari data...
                       </div>
                     ) : searchError ? (
@@ -315,23 +315,23 @@ function DashboardLayout() {
                         className={[
                           "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
                           index === highlightedResult
-                            ? "bg-[#e8f7f5] text-(--app-text)"
-                            : "text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)",
+                            ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#102a43] dark:text-slate-100"
+                            : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
                         ].join(" ")}
                       >
                         <Search className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
                         <span className="min-w-0">
                           <span className="block font-medium">{item.label}</span>
-                          <span className="block text-xs text-(--app-text-secondary)">{item.category} · {item.detail}</span>
+                          <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">{item.category} · {item.detail}</span>
                         </span>
                       </button>
                     )) : (
                       <div className="px-3 py-4 text-center">
-                        <p className="text-sm font-medium text-(--app-text)">Tidak ada halaman ditemukan</p>
-                        <p className="mt-1 text-xs text-(--app-text-secondary)">Coba kata kunci lain.</p>
+                        <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">Tidak ada halaman ditemukan</p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Coba kata kunci lain.</p>
                       </div>
                     )}
-                    <p className="border-t border-(--app-border) px-3 py-2 text-[11px] text-(--app-text-secondary)">
+                    <p className="border-t border-slate-200 dark:border-[#263449] px-3 py-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
                       Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc untuk menutup
                     </p>
                   </div>
@@ -350,45 +350,45 @@ function DashboardLayout() {
                   className={[
                     "cursor-pointer rounded-lg p-2 transition-colors",
                     notificationsOpen
-                      ? "bg-[#e8f7f5] text-[#13716d]"
-                      : "text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)",
+                      ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#13716d]"
+                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
                   ].join(" ")}
                 >
                   <Bell className="h-5 w-5" strokeWidth={1.8} />
                 </button>
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-(--app-border) bg-(--app-surface) p-4 shadow-lg">
+                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h2 className="text-sm font-semibold text-(--app-text)">Notifikasi</h2>
-                        <p className="mt-1 text-xs text-(--app-text-secondary)">Informasi dan aktivitas akun</p>
+                        <h2 className="text-sm font-semibold text-[#102a43] dark:text-slate-100">Notifikasi</h2>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Informasi dan aktivitas akun</p>
                       </div>
                       <button
                         type="button"
                         aria-label="Tutup notifikasi"
                         onClick={() => setNotificationsOpen(false)}
-                        className="cursor-pointer rounded-md p-1 text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)"
+                        className="cursor-pointer rounded-md p-1 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                     {notificationsLoading ? (
-                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-(--app-text-secondary)"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
+                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500 dark:text-[#a7b4c7]"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
                     ) : notificationsError ? (
                       <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"><CircleAlert className="h-4 w-4 shrink-0" /> {notificationsError}</div>
                     ) : notifications.length === 0 ? (
-                      <div className="mt-4 rounded-lg border border-dashed border-(--app-border) px-3 py-5 text-center">
-                        <Bell className="mx-auto h-5 w-5 text-(--app-text-secondary)" strokeWidth={1.7} />
-                        <p className="mt-2 text-sm font-medium text-(--app-text-secondary)">Belum ada notifikasi</p>
-                        <p className="mt-1 text-xs leading-relaxed text-(--app-text-secondary)">Belum ada aktivitas operasional untuk ditampilkan.</p>
+                      <div className="mt-4 rounded-lg border border-dashed border-slate-200 dark:border-[#263449] px-3 py-5 text-center">
+                        <Bell className="mx-auto h-5 w-5 text-slate-500 dark:text-[#a7b4c7]" strokeWidth={1.7} />
+                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-[#a7b4c7]">Belum ada notifikasi</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-[#a7b4c7]">Belum ada aktivitas operasional untuk ditampilkan.</p>
                       </div>
                     ) : (
                       <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                         {notifications.map((notification) => (
-                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-(--app-border) p-3 text-left hover:bg-(--app-surface-secondary)">
-                            <p className="text-xs font-semibold text-(--app-text)">{notification.title}</p>
-                            <p className="mt-1 text-xs text-(--app-text-secondary)">{notification.message}</p>
-                            <p className="mt-1 text-xs text-(--app-text-secondary)">{notification.detail}</p>
+                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]">
+                            <p className="text-xs font-semibold text-[#102a43] dark:text-slate-100">{notification.title}</p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.message}</p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.detail}</p>
                           </button>
                         ))}
                       </div>
@@ -407,44 +407,44 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-(--app-surface-secondary)"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                     {getInitials(user.name, user.email)}
                   </span>
                   <span className="hidden max-w-32 text-left sm:block">
-                    <span className="block truncate text-sm font-semibold text-(--app-text)">
+                    <span className="block truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">
                       {user.name || user.email || "Pengguna"}
                     </span>
-                    <span className="block text-xs text-(--app-text-secondary)">{formatRole(user.role)}</span>
+                    <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">{formatRole(user.role)}</span>
                   </span>
-                  <ChevronDown className="hidden h-4 w-4 text-(--app-text-secondary) sm:block" />
+                  <ChevronDown className="hidden h-4 w-4 text-slate-500 dark:text-[#a7b4c7] sm:block" />
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-(--app-border) bg-(--app-surface) p-3 shadow-lg">
-                    <div className="flex items-center gap-3 border-b border-(--app-border) px-2 pb-3">
+                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-3 shadow-lg">
+                    <div className="flex items-center gap-3 border-b border-slate-200 dark:border-[#263449] px-2 pb-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#d9f3f0] text-sm font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
                         {getInitials(user.name, user.email)}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-(--app-text)">{user.name || "Pengguna"}</p>
-                        <p className="truncate text-xs text-(--app-text-secondary)">{user.email || "Email tidak tersedia"}</p>
+                        <p className="truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">{user.name || "Pengguna"}</p>
+                        <p className="truncate text-xs text-slate-500 dark:text-[#a7b4c7]">{user.email || "Email tidak tersedia"}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 px-2 py-3 text-xs text-(--app-text-secondary)">
+                    <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
                       <UserRound className="h-4 w-4" />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
-                    <div className="mb-2 space-y-1 border-t border-(--app-border) pt-2">
-                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)">Profile</button>
-                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)">Settings</button>
-                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)">Help &amp; Support</button>
+                    <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
+                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Profile</button>
+                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Settings</button>
+                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100">Help &amp; Support</button>
                     </div>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-lg bg-(--app-surface-secondary) px-3 py-2 text-left text-sm font-medium text-(--app-text) transition-colors hover:bg-red-50 hover:text-red-700"
+                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 transition-colors hover:bg-red-50 hover:text-red-700"
                     >
                       Logout
                     </button>

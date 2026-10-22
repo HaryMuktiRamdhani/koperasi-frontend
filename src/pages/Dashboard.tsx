@@ -42,19 +42,19 @@ function Dashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Memuat dashboard...</p>
+        <p className="text-sm text-gray-500 dark:text-[#a7b4c7]">Memuat dashboard...</p>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-        <h2 className="text-lg font-semibold text-gray-900">
+      <div className="rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-8 text-center">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
           Dashboard tidak dapat dimuat
         </h2>
 
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-500 dark:text-[#a7b4c7]">
           Silakan coba muat ulang halaman.
         </p>
       </div>
@@ -76,26 +76,26 @@ function Dashboard() {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#102a43]">
             Dashboard
           </h1>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-500">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-[#a7b4c7]">
             Pantau data utama koperasi sekolah dan status pembayaran dalam satu
             tampilan.
           </p>
         </div>
-        <span className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-500">
+        <span className="inline-flex w-fit items-center rounded-full border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-[#a7b4c7]">
           Data Operasional Sekolah
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500">Total Siswa</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">Total Siswa</p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43]">
                 {data.totalStudents}
               </p>
             </div>
-            <span className="rounded-lg bg-[#e8f7f5] p-2.5 text-[#168b87]">
+            <span className="rounded-lg bg-[#e8f7f5] dark:bg-[#1b2a3d] p-2.5 text-[#168b87]">
               <Users className="h-5 w-5" />
             </span>
           </div>
@@ -107,10 +107,10 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500">Total Barang</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">Total Barang</p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43]">
                 {data.totalItems}
               </p>
@@ -127,10 +127,10 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500">Total Tagihan</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">Total Tagihan</p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43]">
                 {data.totalBills}
               </p>
@@ -147,7 +147,7 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-[#102a43] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.08)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-[#102a43] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.08)]">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm text-slate-300">Total Pemasukan</p>
@@ -155,7 +155,7 @@ function Dashboard() {
                 Rp {data.totalIncome.toLocaleString("id-ID")}
               </p>
             </div>
-            <span className="rounded-lg bg-white/10 p-2.5 text-[#5ed5cc]">
+            <span className="rounded-lg bg-white dark:bg-[#111c2e]/10 p-2.5 text-[#5ed5cc]">
               <Wallet className="h-5 w-5" />
             </span>
           </div>
@@ -169,13 +169,13 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-base font-semibold text-[#102a43]">
                 Status Pembayaran
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 Persentase tagihan yang sudah diselesaikan.
               </p>
             </div>
@@ -215,15 +215,15 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+        <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <h2 className="text-base font-semibold text-[#102a43]">Ringkasan</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
             Informasi utama koperasi saat ini.
           </p>
 
-          <div className="mt-5 divide-y divide-slate-100">
+          <div className="mt-5 divide-y divide-slate-100 dark:divide-[#263449]">
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600">Siswa terdaftar</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Siswa terdaftar</span>
 
               <span className="text-sm font-semibold text-[#102a43]">
                 {data.totalStudents}
@@ -231,7 +231,7 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600">Barang tersedia</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Barang tersedia</span>
 
               <span className="text-sm font-semibold text-[#102a43]">
                 {data.totalItems}
@@ -239,7 +239,7 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600">Total tagihan</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Total tagihan</span>
 
               <span className="text-sm font-semibold text-[#102a43]">
                 {data.totalBills}
@@ -247,7 +247,7 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600">
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">
                 Tagihan belum dibayar
               </span>
 
@@ -257,7 +257,7 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600">Total pemasukan</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Total pemasukan</span>
 
               <span className="text-sm font-semibold text-[#102a43]">
                 Rp {data.totalIncome.toLocaleString("id-ID")}
@@ -268,13 +268,13 @@ function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+      <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
         <div>
           <h2 className="text-base font-semibold text-[#102a43]">
             Akses Cepat
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
             Menu yang sering digunakan untuk mengelola koperasi.
           </p>
         </div>
@@ -282,7 +282,7 @@ function Dashboard() {
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             to="/students"
-            className="rounded-lg border border-slate-200 p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
           >
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-[#168b87]" />
@@ -290,14 +290,14 @@ function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-[#102a43]">Data Siswa</p>
 
-                <p className="mt-1 text-xs text-slate-500">Kelola siswa</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola siswa</p>
               </div>
             </div>
           </Link>
 
           <Link
             to="/items"
-            className="rounded-lg border border-slate-200 p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
           >
             <div className="flex items-center gap-3">
               <Package className="h-5 w-5 text-[#168b87]" />
@@ -307,14 +307,14 @@ function Dashboard() {
                   Data Barang
                 </p>
 
-                <p className="mt-1 text-xs text-slate-500">Kelola barang</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola barang</p>
               </div>
             </div>
           </Link>
 
           <Link
             to="/bills"
-            className="rounded-lg border border-slate-200 p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
           >
             <div className="flex items-center gap-3">
               <ReceiptText className="h-5 w-5 text-[#168b87]" />
@@ -322,14 +322,14 @@ function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-[#102a43]">Tagihan</p>
 
-                <p className="mt-1 text-xs text-slate-500">Kelola tagihan</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola tagihan</p>
               </div>
             </div>
           </Link>
 
           <Link
             to="/payments"
-            className="rounded-lg border border-slate-200 p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa]"
           >
             <div className="flex items-center gap-3">
               <Wallet className="h-5 w-5 text-[#168b87]" />
@@ -337,7 +337,7 @@ function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-[#102a43]">Pembayaran</p>
 
-                <p className="mt-1 text-xs text-slate-500">Catat pembayaran</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Catat pembayaran</p>
               </div>
             </div>
           </Link>

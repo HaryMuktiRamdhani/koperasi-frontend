@@ -90,10 +90,10 @@ function Settings() {
   return (
     <div className="mx-auto w-full max-w-6xl">
       <div className="mb-5">
-        <h1 className="text-2xl font-semibold tracking-tight text-(--app-text)">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
           Pengaturan
         </h1>
-        <p className="mt-1 text-sm text-(--app-text-secondary)">
+        <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
           Kelola profil dan preferensi aplikasi.
         </p>
       </div>
@@ -101,7 +101,7 @@ function Settings() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_1fr]">
         <nav
           aria-label="Kategori pengaturan"
-          className="h-fit rounded-xl border border-(--app-border) bg-(--app-surface) p-2"
+          className="h-fit rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-2"
         >
           {sections.map((item) => {
             const Icon = item.icon;
@@ -113,8 +113,8 @@ function Settings() {
                   [
                     "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm",
                     isActive
-                      ? "bg-(--app-surface-secondary) font-semibold text-[#168b87]"
-                      : "text-(--app-text-secondary) hover:bg-(--app-surface-secondary) hover:text-(--app-text)",
+                      ? "bg-slate-50 dark:bg-[#1b2a3d] font-semibold text-[#168b87]"
+                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d] hover:text-[#102a43] dark:text-slate-100",
                   ].join(" ")
                 }
               >
@@ -125,25 +125,25 @@ function Settings() {
           })}
         </nav>
 
-        <section className="min-w-0 rounded-xl border border-(--app-border) bg-(--app-surface) p-5 sm:p-7">
+        <section className="min-w-0 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 sm:p-7">
           {activeSection === "profile" && (
             <div className="mx-auto max-w-md text-center">
-              <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-(--accent) text-3xl font-semibold text-(--accent-contrast)">
+              <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-[#20b2aa] dark:bg-[#2dd4bf] text-3xl font-semibold text-[#102a43] dark:text-[#0f172a]">
                 {getInitials(user)}
               </div>
-              <h2 className="mt-5 text-xl font-semibold text-(--app-text)">
+              <h2 className="mt-5 text-xl font-semibold text-[#102a43] dark:text-slate-100">
                 {user.name || "Nama belum tersedia"}
               </h2>
-              <p className="mt-1 text-sm text-(--app-text-secondary)">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 {user.email || "Email belum tersedia"}
               </p>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-(--app-surface-secondary) px-3 py-1 text-xs font-semibold text-(--app-text-secondary)">
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-[#1b2a3d] px-3 py-1 text-xs font-semibold text-slate-500 dark:text-[#a7b4c7]">
                 <Shield className="h-3.5 w-3.5" />{" "}
                 {user.role
                   ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
                   : "Pengguna"}
               </span>
-              <div className="mt-8 border-t border-(--app-border) pt-5">
+              <div className="mt-8 border-t border-slate-200 dark:border-[#263449] pt-5">
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -157,10 +157,10 @@ function Settings() {
 
           {activeSection === "appearance" && (
             <div>
-              <h2 className="text-lg font-semibold text-(--app-text)">
+              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
                 Tampilan
               </h2>
-              <p className="mt-1 text-sm text-(--app-text-secondary)">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 Preferensi ini disimpan di perangkat ini.
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -176,22 +176,22 @@ function Settings() {
                       type="button"
                       onClick={() => setTheme(option.value)}
                       aria-pressed={selected}
-                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 text-left ${selected ? "border-[#20b2aa] bg-(--app-surface-secondary)" : "border-(--app-border) hover:bg-(--app-surface-secondary)"}`}
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 text-left ${selected ? "border-[#20b2aa] bg-slate-50 dark:bg-[#1b2a3d]" : "border-slate-200 dark:border-[#263449] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"}`}
                     >
                       <Icon className="h-5 w-5 text-[#168b87]" />
-                      <span className="text-sm font-semibold text-(--app-text)">
+                      <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
                         {option.label}
                       </span>
                     </button>
                   );
                 })}
               </div>
-              <label className="mt-6 flex cursor-pointer items-center justify-between gap-4 border-t border-(--app-border) pt-5">
+              <label className="mt-6 flex cursor-pointer items-center justify-between gap-4 border-t border-slate-200 dark:border-[#263449] pt-5">
                 <span>
-                  <span className="block text-sm font-semibold text-(--app-text)">
+                  <span className="block text-sm font-semibold text-[#102a43] dark:text-slate-100">
                     Mode sidebar ringkas
                   </span>
-                  <span className="mt-1 block text-sm text-(--app-text-secondary)">
+                  <span className="mt-1 block text-sm text-slate-500 dark:text-[#a7b4c7]">
                     Sembunyikan label sidebar dan simpan preferensi secara
                     lokal.
                   </span>
@@ -210,13 +210,13 @@ function Settings() {
 
           {activeSection === "help" && (
             <div>
-              <h2 className="text-lg font-semibold text-(--app-text)">
+              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
                 Bantuan & Dukungan
               </h2>
-              <p className="mt-1 text-sm text-(--app-text-secondary)">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 Petunjuk singkat penggunaan aplikasi.
               </p>
-              <div className="mt-5 space-y-3 text-sm text-(--app-text-secondary)">
+              <div className="mt-5 space-y-3 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 <p>
                   Gunakan menu sidebar untuk berpindah antara data koperasi
                   seperti siswa, barang, tagihan, dan pembayaran.
@@ -235,13 +235,13 @@ function Settings() {
 
           {activeSection === "tools" && (
             <div>
-              <h2 className="text-lg font-semibold text-(--app-text)">
+              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
                 Tools & Fitur Lainnya
               </h2>
-              <p className="mt-1 text-sm text-(--app-text-secondary)">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 Area fitur tambahan administrasi koperasi.
               </p>
-              <div className="mt-5 rounded-lg border border-dashed border-(--app-border) p-5 text-sm text-(--app-text-secondary)">
+              <div className="mt-5 rounded-lg border border-dashed border-slate-200 dark:border-[#263449] p-5 text-sm text-slate-500 dark:text-[#a7b4c7]">
                 Fitur tambahan belum tersedia.
               </div>
             </div>

@@ -492,7 +492,7 @@ function Bill() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-(--app-text-secondary)">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-[#a7b4c7]">
           <ReceiptText className="h-4 w-4" /> Tagihan
         </div>
         <button
@@ -523,7 +523,7 @@ function Bill() {
         </div>
       )}
       {formOpen && (
-        <section className="rounded-xl border border-(--app-border) bg-(--app-surface)] p-4">
+        <section className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold">
               {editId ? "Edit Tagihan" : "Tambah Tagihan"}
@@ -539,7 +539,7 @@ function Bill() {
                   value={studentSearch}
                   onChange={(event) => setStudentSearch(event.target.value)}
                   placeholder="Cari nama atau NIS siswa"
-                  className="rounded-lg border border-(--app-border)px-3 py-2 text-sm"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449]px-3 py-2 text-sm"
                 />
                 <select
                   value={studentMajor}
@@ -547,7 +547,7 @@ function Bill() {
                     setStudentMajor(event.target.value);
                     setStudentClass("");
                   }}
-                  className="rounded-lg border border-(--app-border) px-3 py-2 text-sm"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm"
                 >
                   <option value="">Semua jurusan</option>
                   {majors.map((major) => (
@@ -562,7 +562,7 @@ function Bill() {
                     setStudentLevel(event.target.value);
                     setStudentClass("");
                   }}
-                  className="rounded-lg border border-(--app-border) px-3 py-2 text-sm"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm"
                 >
                   <option value="">Semua tingkat</option>
                   {["X", "XI", "XII"].map((level) => (
@@ -572,7 +572,7 @@ function Bill() {
                 <select
                   value={studentClass}
                   onChange={(event) => setStudentClass(event.target.value)}
-                  className="rounded-lg border border-(--app-border) px-3 py-2 text-sm"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm"
                 >
                   <option value="">Semua kelas</option>
                   {classes
@@ -598,24 +598,24 @@ function Bill() {
                       filteredStudents.map((student) => student.id),
                     )
                   }
-                  className="rounded-lg border border-(--app-border) px-3 py-1.5"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-1.5"
                 >
                   Pilih Semua Hasil Filter
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStudents([])}
-                  className="rounded-lg border border-(--app-border) px-3 py-1.5"
+                  className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-1.5"
                 >
                   Hapus Pilihan
                 </button>
-                <span className="text-(--app-text-secondary)">
+                <span className="text-slate-500 dark:text-[#a7b4c7]">
                   {selectedStudents.length} siswa terpilih
                 </span>
               </div>
             )}
             {!editId && (
-              <div className="max-h-36 overflow-y-auto rounded-lg border border-(--app-border) p-2">
+              <div className="max-h-36 overflow-y-auto rounded-lg border border-slate-200 dark:border-[#263449] p-2">
                 {filteredStudents.map((student) => (
                   <label
                     key={student.id}
@@ -631,7 +631,7 @@ function Bill() {
                   </label>
                 ))}
                 {filteredStudents.length === 0 && (
-                  <p className="p-2 text-sm text-(--app-text-secondary)">
+                  <p className="p-2 text-sm text-slate-500 dark:text-[#a7b4c7]">
                     Siswa aktif tidak ditemukan.
                   </p>
                 )}
@@ -641,7 +641,7 @@ function Bill() {
               <select
                 value={itemId}
                 onChange={(event) => selectItem(event.target.value)}
-                className="rounded-lg border border-(--app-border) px-3 py-2 text-sm"
+                className="rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm"
               >
                 <option value="">Pilih barang</option>
                 {items
@@ -659,34 +659,34 @@ function Bill() {
                   value={amount}
                   onChange={(event) => setAmount(event.target.value)}
                   placeholder="Nominal"
-                  className="w-full rounded-lg border border-(--app-border) px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm"
                 />
                 {selectedItem && Number(amount) !== selectedItem.price && (
                   <span className="text-xs text-amber-600">Nominal manual</span>
                 )}
               </div>
-              <label className="text-xs font-medium text-(--app-text-secondary)">
+              <label className="text-xs font-medium text-slate-500 dark:text-[#a7b4c7]">
                 Tanggal Tagihan
                 <input
                   type="date"
                   value={billDate}
                   onChange={(event) => setBillDate(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-(--app-border) px-3 py-2 text-sm text-(--app-text)"
+                  className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm text-[#102a43] dark:text-slate-100"
                 />
               </label>
-              <label className="text-xs font-medium text-(--app-text-secondary)">
+              <label className="text-xs font-medium text-slate-500 dark:text-[#a7b4c7]">
                 Tanggal Jatuh Tempo
                 <input
                   type="date"
                   min={billDate || undefined}
                   value={dueDate}
                   onChange={(event) => setDueDate(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-(--app-border) px-3 py-2 text-sm text-(--app-text)"
+                  className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm text-[#102a43] dark:text-slate-100"
                 />
               </label>
             </div>
             {!editId && selectedStudents.length > 0 && (
-              <p className="text-sm text-(--app-text-secondary)">
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">
                 {selectedStudents.length} siswa x{" "}
                 {formatRupiah(Number(amount || 0))} ={" "}
                 <strong>{formatRupiah(studentSelectionTotal)}</strong>
@@ -707,7 +707,7 @@ function Bill() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg border border-(--app-border) px-4 py-2 text-sm"
+                className="rounded-lg border border-slate-200 dark:border-[#263449] px-4 py-2 text-sm"
               >
                 Batal
               </button>
@@ -715,7 +715,7 @@ function Bill() {
           </form>
         </section>
       )}
-      <section className="rounded-xl border border-(--app-border) bg-(--app-surface) p-3">
+      <section className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-3">
         <div className="flex flex-wrap gap-2">
           <div className="relative min-w-56 flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -723,7 +723,7 @@ function Bill() {
               value={searchDraft}
               onChange={(event) => setSearchDraft(event.target.value)}
               placeholder="Cari siswa, NIS, atau barang"
-              className="w-full rounded-lg border border-(--app-border) py-2 pl-9 pr-3 text-sm"
+              className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2 pl-9 pr-3 text-sm"
             />
           </div>
           {["", "Belum Bayar", "Lunas"].map((status) => (
@@ -731,7 +731,7 @@ function Bill() {
               key={status || "semua"}
               type="button"
               onClick={() => updateFilters({ status })}
-              className={`rounded-lg px-3 py-2 text-sm ${filters.status === status ? "bg-teal-600 text-white" : "border border-(--app-border)"}`}
+              className={`rounded-lg px-3 py-2 text-sm ${filters.status === status ? "bg-teal-600 text-white" : "border border-slate-200 dark:border-[#263449]"}`}
             >
               {status || "Semua"}
             </button>
@@ -739,7 +739,7 @@ function Bill() {
           <button
             type="button"
             onClick={() => updateFilters({ overdue: !filters.overdue })}
-            className={`rounded-lg px-3 py-2 text-sm ${filters.overdue ? "bg-amber-500 text-white" : "border border-(--app-border)"}`}
+            className={`rounded-lg px-3 py-2 text-sm ${filters.overdue ? "bg-amber-500 text-white" : "border border-slate-200 dark:border-[#263449]"}`}
           >
             Terlambat
           </button>
@@ -748,7 +748,7 @@ function Bill() {
             onClick={() =>
               updateFilters({ jurusan: "", level: "", classId: "" })
             }
-            className="inline-flex items-center gap-1 rounded-lg border border-(--app-border)px-3 py-2 text-sm"
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-[#263449]px-3 py-2 text-sm"
           >
             <SlidersHorizontal className="h-4 w-4" /> Filter
           </button>
@@ -788,7 +788,7 @@ function Bill() {
             onChange={(event) =>
               updateFilters({ jurusan: event.target.value, classId: "" })
             }
-            className="rounded border border-(--app-border) px-2 py-1.5 text-xs"
+            className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
           >
             <option value="">Jurusan</option>
             {majors.map((major) => (
@@ -802,7 +802,7 @@ function Bill() {
             onChange={(event) =>
               updateFilters({ level: event.target.value, classId: "" })
             }
-            className="rounded border border-(--app-border) px-2 py-1.5 text-xs"
+            className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
           >
             <option value="">Tingkat</option>
             {["X", "XI", "XII"].map((level) => (
@@ -812,7 +812,7 @@ function Bill() {
           <select
             value={filters.classId}
             onChange={(event) => updateFilters({ classId: event.target.value })}
-            className="rounded border border-(--app-border) px-2 py-1.5 text-xs"
+            className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
           >
             <option value="">Kelas</option>
             {availableClasses.map((item) => (
@@ -826,7 +826,7 @@ function Bill() {
             onChange={(event) =>
               updateFilters({ generation: event.target.value })
             }
-            className="rounded border border-(--app-border) px-2 py-1.5 text-xs"
+            className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
           >
             <option value="">Angkatan</option>
             {generations.map((generation) => (
@@ -836,7 +836,7 @@ function Bill() {
           <select
             value={filters.itemId}
             onChange={(event) => updateFilters({ itemId: event.target.value })}
-            className="rounded border border-(--app-border) px-2 py-1.5 text-xs"
+            className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
           >
             <option value="">Barang</option>
             {items.map((item) => (
@@ -851,27 +851,27 @@ function Bill() {
               value={filters.min}
               onChange={(event) => updateFilters({ min: event.target.value })}
               placeholder="Min"
-              className="w-1/2 rounded border border-(--app-border) px-2 py-1.5 text-xs"
+              className="w-1/2 rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
             />
             <input
               type="number"
               value={filters.max}
               onChange={(event) => updateFilters({ max: event.target.value })}
               placeholder="Maks"
-              className="w-1/2 rounded border border-(--app-border) px-2 py-1.5 text-xs"
+              className="w-1/2 rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs"
             />
           </div>
         </div>
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-          <fieldset className="rounded-lg border border-(--app-border) p-2">
+          <fieldset className="rounded-lg border border-slate-200 dark:border-[#263449] p-2">
             <legend className="px-1 text-xs font-semibold">
               Tanggal Tagihan
             </legend>
-            <p className="mb-2 text-[11px] text-(--app-text-secondary)">
+            <p className="mb-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
               Cari berdasarkan tanggal tagihan dibuat atau diterbitkan.
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <label className="text-xs text-(--app-text-secondary)">
+              <label className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                 Dari tanggal
                 <input
                   type="date"
@@ -879,10 +879,10 @@ function Bill() {
                   onChange={(event) =>
                     updateFilters({ billFrom: event.target.value })
                   }
-                  className="mt-1 w-full rounded border border-(--app-border) px-2 py-1.5 text-xs text-(--app-text)"
+                  className="mt-1 w-full rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs text-[#102a43] dark:text-slate-100"
                 />
               </label>
-              <label className="text-xs text-(--app-text-secondary)">
+              <label className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                 Sampai tanggal
                 <input
                   type="date"
@@ -890,20 +890,20 @@ function Bill() {
                   onChange={(event) =>
                     updateFilters({ billTo: event.target.value })
                   }
-                  className="mt-1 w-full rounded border border-(--app-border) px-2 py-1.5 text-xs text-(--app-text)"
+                  className="mt-1 w-full rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs text-[#102a43] dark:text-slate-100"
                 />
               </label>
             </div>
           </fieldset>
-          <fieldset className="rounded-lg border border-(--app-border) p-2">
+          <fieldset className="rounded-lg border border-slate-200 dark:border-[#263449] p-2">
             <legend className="px-1 text-xs font-semibold">
               Tanggal Jatuh Tempo
             </legend>
-            <p className="mb-2 text-[11px] text-(--app-text-secondary)">
+            <p className="mb-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
               Cari berdasarkan batas waktu pembayaran tagihan.
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <label className="text-xs text-(--app-text-secondary)">
+              <label className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                 Dari tanggal
                 <input
                   type="date"
@@ -911,10 +911,10 @@ function Bill() {
                   onChange={(event) =>
                     updateFilters({ dueFrom: event.target.value })
                   }
-                  className="mt-1 w-full rounded border border-(--app-border) px-2 py-1.5 text-xs text-(--app-text)"
+                  className="mt-1 w-full rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs text-[#102a43] dark:text-slate-100"
                 />
               </label>
-              <label className="text-xs text-(--app-text-secondary)">
+              <label className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                 Sampai tanggal
                 <input
                   type="date"
@@ -922,7 +922,7 @@ function Bill() {
                   onChange={(event) =>
                     updateFilters({ dueTo: event.target.value })
                   }
-                  className="mt-1 w-full rounded border border-(--app-border) px-2 py-1.5 text-xs text-(--app-text)"
+                  className="mt-1 w-full rounded border border-slate-200 dark:border-[#263449] px-2 py-1.5 text-xs text-[#102a43] dark:text-slate-100"
                 />
               </label>
             </div>
@@ -943,15 +943,15 @@ function Bill() {
         ].map(([label, value]) => (
           <div
             key={String(label)}
-            className="rounded-xl border border-(--app-border) bg-(--app-surface) p-3"
+            className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-3"
           >
-            <p className="text-xs text-(--app-text-secondary)">{label}</p>
+            <p className="text-xs text-slate-500 dark:text-[#a7b4c7]">{label}</p>
             <p className="mt-1 text-xl font-semibold">{value}</p>
           </div>
         ))}
       </div>
-      <section className="overflow-hidden rounded-xl border border-(--app-border) bg-(--app-surface)">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-(--app-border) px-4 py-3 text-sm">
+      <section className="overflow-hidden rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-[#263449] px-4 py-3 text-sm">
           <span>
             Menampilkan{" "}
             {visibleBills.length
@@ -970,7 +970,7 @@ function Bill() {
                   false,
                 )
               }
-              className="rounded border border-(--app-border) px-2 py-1"
+              className="rounded border border-slate-200 dark:border-[#263449] px-2 py-1"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
@@ -980,7 +980,7 @@ function Bill() {
         </div>
         <div className="max-h-[55vh] overflow-auto">
           <table className="w-full min-w-215 text-left text-sm">
-            <thead className="sticky top-0 z-10 bg-(--app-surface-secondary) text-xs text-(--app-text-secondary)">
+            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#1b2a3d] text-xs text-slate-500 dark:text-[#a7b4c7]">
               <tr>
                 <th className="px-3 py-2">No</th>
                 <th className="px-3 py-2">
@@ -1002,7 +1002,7 @@ function Bill() {
                 <th className="px-3 py-2">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-(--app-border)">
+            <tbody className="divide-y divide-slate-200 dark:divide-[#263449]">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="p-8 text-center">
@@ -1013,7 +1013,7 @@ function Bill() {
                 visibleBills.map((bill, index) => (
                   <tr
                     key={bill.id}
-                    className="hover:bg-(--app-surface-secondary)"
+                    className="hover:bg-slate-50 dark:hover:bg-[#1b2a3d] dark:bg-[#1b2a3d]"
                   >
                     <td className="px-3 py-2">
                       {(filters.page - 1) * filters.pageSize + index + 1}
@@ -1022,7 +1022,7 @@ function Bill() {
                       <div className="font-medium">
                         {bill.Student?.name || "-"}
                       </div>
-                      <div className="text-xs text-(--app-text-secondary)">
+                      <div className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                         {bill.Student?.nis || "-"}
                       </div>
                     </td>
@@ -1069,7 +1069,7 @@ function Bill() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="p-10 text-center text-(--app-text-secondary)"
+                    className="p-10 text-center text-slate-500 dark:text-[#a7b4c7]"
                   >
                     Tidak ada hasil tagihan.
                     {hasFilters && (
@@ -1087,12 +1087,12 @@ function Bill() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-end gap-2 border-t border-(--app-border) px-4 py-3 text-sm">
+        <div className="flex items-center justify-end gap-2 border-t border-slate-200 dark:border-[#263449] px-4 py-3 text-sm">
           <button
             type="button"
             disabled={filters.page <= 1}
             onClick={() => updateFilters({ page: filters.page - 1 }, false)}
-            className="rounded border border-(--app-border) p-1 disabled:opacity-40"
+            className="rounded border border-slate-200 dark:border-[#263449] p-1 disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -1103,7 +1103,7 @@ function Bill() {
             type="button"
             disabled={filters.page >= totalPages}
             onClick={() => updateFilters({ page: filters.page + 1 }, false)}
-            className="rounded border border-(--app-border) p-1 disabled:opacity-40"
+            className="rounded border border-slate-200 dark:border-[#263449] p-1 disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>

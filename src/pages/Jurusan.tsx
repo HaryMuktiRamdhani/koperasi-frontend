@@ -159,9 +159,9 @@ function Jurusan() {
           icon={GraduationCap}
         />
 
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-[#a7b4c7]">
           Total{" "}
-          <span className="font-semibold text-gray-900">{jurusan.length}</span>{" "}
+          <span className="font-semibold text-gray-900 dark:text-slate-100">{jurusan.length}</span>{" "}
           jurusan
         </div>
       </div>
@@ -186,13 +186,13 @@ function Jurusan() {
       )}
 
       {/* Form */}
-      <section className="rounded-lg border border-gray-200 bg-white">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+      <section className="rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-[#263449] px-5 py-4 sm:px-6">
           <div>
-            <h2 className="text-base font-semibold text-gray-900">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
               {editId ? "Edit Jurusan" : "Tambah Jurusan"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
               {editId
                 ? "Perbarui informasi jurusan."
                 : "Masukkan nama dan kode jurusan baru."}
@@ -203,7 +203,7 @@ function Jurusan() {
             <button
               type="button"
               onClick={resetForm}
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:text-slate-100"
             >
               <X className="h-4 w-4" />
               Batal
@@ -216,7 +216,7 @@ function Jurusan() {
             <div>
               <label
                 htmlFor="nama-jurusan"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
               >
                 Nama Jurusan
               </label>
@@ -228,14 +228,14 @@ function Jurusan() {
                 onChange={(event) => setNama(event.target.value)}
                 required
                 maxLength={100}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
             <div>
               <label
                 htmlFor="kode-jurusan"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
               >
                 Kode Jurusan
               </label>
@@ -247,14 +247,14 @@ function Jurusan() {
                 onChange={(event) => setKode(event.target.value)}
                 required
                 maxLength={20}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm uppercase text-gray-900 outline-none transition placeholder:normal-case placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm uppercase text-gray-900 dark:text-slate-100 outline-none transition placeholder:normal-case placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
             <div>
               <label
                 htmlFor="status-jurusan"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
               >
                 Status Jurusan
               </label>
@@ -264,7 +264,7 @@ function Jurusan() {
                 onChange={(event) =>
                   setStatus(event.target.value as JurusanData["status"])
                 }
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="Aktif">Aktif</option>
                 <option value="Nonaktif">Nonaktif</option>
@@ -293,19 +293,19 @@ function Jurusan() {
       </section>
 
       {/* Data table */}
-      <section className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold text-gray-900">
+      <section className="overflow-hidden rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
+        <div className="border-b border-gray-100 dark:border-[#263449] px-5 py-4 sm:px-6">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
             Daftar Jurusan
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
             Informasi jurusan yang tersimpan dalam sistem.
           </p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-600px text-left text-sm">
-            <thead className="bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500">
+            <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-[#a7b4c7]">
               <tr>
                 <th className="w-16 px-5 py-3.5 sm:px-6">No.</th>
                 <th className="px-5 py-3.5 sm:px-6">Nama Jurusan</th>
@@ -315,12 +315,12 @@ function Jurusan() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-[#263449]">
               {fetching ? (
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-12 text-center text-sm text-gray-500"
+                    className="px-6 py-12 text-center text-sm text-gray-500 dark:text-[#a7b4c7]"
                   >
                     Memuat data jurusan...
                   </td>
@@ -328,27 +328,27 @@ function Jurusan() {
               ) : jurusan.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
-                    <p className="font-medium text-gray-700">
+                    <p className="font-medium text-gray-700 dark:text-[#a7b4c7]">
                       Belum ada data jurusan
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
                       Tambahkan jurusan melalui formulir di atas.
                     </p>
                   </td>
                 </tr>
               ) : (
                 jurusan.map((item, index) => (
-                  <tr key={item.id} className="transition hover:bg-gray-50/70">
-                    <td className="px-5 py-4 text-gray-500 sm:px-6">
+                  <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-[#1b2a3d]/70">
+                    <td className="px-5 py-4 text-gray-500 dark:text-[#a7b4c7] sm:px-6">
                       {index + 1}
                     </td>
 
-                    <td className="px-5 py-4 font-medium text-gray-900 sm:px-6">
+                    <td className="px-5 py-4 font-medium text-gray-900 dark:text-slate-100 sm:px-6">
                       {item.nama}
                     </td>
 
                     <td className="px-5 py-4 sm:px-6">
-                      <span className="inline-flex rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs text-gray-700">
+                      <span className="inline-flex rounded border border-gray-200 dark:border-[#263449] bg-gray-50 dark:bg-[#1b2a3d] px-2 py-1 font-mono text-xs text-gray-700 dark:text-[#a7b4c7]">
                         {item.kode}
                       </span>
                     </td>
@@ -363,7 +363,7 @@ function Jurusan() {
                             ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                             : itemStatus === "Akan Datang"
                               ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+                              : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7] dark:bg-gray-800 dark:text-gray-300";
                         return (
                           <span
                             className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass}`}
@@ -380,7 +380,7 @@ function Jurusan() {
                           type="button"
                           onClick={() => startEdit(item)}
                           aria-label={`Edit ${item.nama}`}
-                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-gray-600 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:text-slate-100"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                           Edit
@@ -408,7 +408,7 @@ function Jurusan() {
         </div>
 
         {!fetching && jurusan.length > 0 && (
-          <div className="border-t border-gray-100 px-5 py-3 text-xs text-gray-500 sm:px-6">
+          <div className="border-t border-gray-100 dark:border-[#263449] px-5 py-3 text-xs text-gray-500 dark:text-[#a7b4c7] sm:px-6">
             Menampilkan {jurusan.length} data jurusan
           </div>
         )}

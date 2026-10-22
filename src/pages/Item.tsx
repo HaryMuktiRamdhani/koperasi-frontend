@@ -108,8 +108,8 @@ function Item() {
         icon={Package}
       />
 
-      <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-5 text-lg font-semibold text-gray-900">
+      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-6 shadow-sm">
+        <h2 className="mb-5 text-lg font-semibold text-gray-900 dark:text-slate-100">
           {editId ? "Edit Barang" : "Tambah Barang"}
         </h2>
 
@@ -120,10 +120,10 @@ function Item() {
               placeholder="Nama barang"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
 
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-[#a7b4c7]">
               Status Barang
               <select
                 value={status}
@@ -132,7 +132,7 @@ function Item() {
                     event.target.value as NonNullable<BarangData["status"]>,
                   )
                 }
-                className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 font-normal text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="mt-1 w-full rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 font-normal text-gray-900 dark:text-slate-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="Aktif">Aktif</option>
                 <option value="Nonaktif">Nonaktif</option>
@@ -146,7 +146,7 @@ function Item() {
               min="0"
               value={price}
               onChange={(event) => setPrice(event.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -167,7 +167,7 @@ function Item() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg bg-gray-100 px-5 py-2.5 font-semibold text-gray-700 hover:bg-gray-200"
+                className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200"
               >
                 Batal
               </button>
@@ -176,14 +176,14 @@ function Item() {
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">Daftar Barang</h2>
+      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+        <div className="border-b border-gray-200 dark:border-[#263449] px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Daftar Barang</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+            <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
               <tr>
                 <th className="px-6 py-4">No</th>
                 <th className="px-6 py-4">Nama Barang</th>
@@ -193,16 +193,16 @@ function Item() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
               {barang.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-gray-600">{index + 1}</td>
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">{index + 1}</td>
 
-                  <td className="px-6 py-4 font-medium text-gray-900">
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
                     {item.name}
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     Rp {item.price.toLocaleString("id-ID")}
                   </td>
 
@@ -213,7 +213,7 @@ function Item() {
                           ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                           : item.status === "Akan Datang"
                             ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                            : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7] dark:bg-gray-800 dark:text-gray-300"
                       }`}
                     >
                       {item.status || "Aktif"}
@@ -247,7 +247,7 @@ function Item() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-10 text-center text-gray-500"
+                    className="px-6 py-10 text-center text-gray-500 dark:text-[#a7b4c7]"
                   >
                     Belum ada data barang.
                   </td>

@@ -36,15 +36,15 @@ function Sidebar() {
   }, []);
 
   return (
-    <aside className={`sticky top-0 flex h-screen shrink-0 flex-col bg-(--sidebar-background) py-6 text-(--sidebar-text) ${compact ? "w-20 px-2" : "w-64 px-4"}`}>
+    <aside className={`sticky top-0 flex h-screen shrink-0 flex-col bg-[#102a43] dark:bg-[#0f172a] py-6 text-white dark:text-slate-50 ${compact ? "w-20 px-2" : "w-64 px-4"}`}>
       <div className={`mb-10 ${compact ? "px-1" : "px-2"}`}>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--accent) shadow-sm">
-            <span className="text-sm font-bold tracking-wide text-(--accent-contrast)">KS</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] dark:bg-[#2dd4bf] shadow-sm">
+            <span className="text-sm font-bold tracking-wide text-[#102a43] dark:text-[#0f172a]">KS</span>
           </div>
           {!compact && <div>
             <h2 className="text-sm font-semibold tracking-wide">Koperasi Sekolah</h2>
-            <p className="mt-0.5 text-xs text-(--sidebar-muted)">Panel administrasi</p>
+            <p className="mt-0.5 text-xs text-slate-300">Panel administrasi</p>
           </div>}
         </div>
       </div>
@@ -60,8 +60,8 @@ function Sidebar() {
                 [
                   `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${compact ? "justify-center px-2" : ""}`,
                   isActive
-                    ? "border-(--accent-border) bg-(--accent) font-semibold text-[(--accent-contrast) shadow-sm"
-                    : "border-transparent text-(--sidebar-muted)] hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)",
+                    ? "border-teal-300 dark:border-teal-400 bg-[#20b2aa] dark:bg-[#2dd4bf] font-semibold text-[#102a43] dark:text-[#0f172a] shadow-sm"
+                    : "border-transparent text-slate-300 hover:bg-white/10 dark:hover:bg-slate-400/10 hover:text-white",
                 ].join(" ")
               }
             >
@@ -72,9 +72,9 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto border-t border-(--sidebar-border) pt-5">
-        {!compact && <div className="mb-4 rounded-lg bg-(--sidebar-card) px-3 py-3 text-xs text-[(--sidebar-muted)">
-          <p className="font-medium text-(--sidebar-text)">Ruang kerja koperasi</p>
+      <div className="mt-auto border-t border-white/10 dark:border-slate-400/20 pt-5">
+        {!compact && <div className="mb-4 rounded-lg bg-white/5 dark:bg-slate-400/10 px-3 py-3 text-xs text-slate-300">
+          <p className="font-medium text-white dark:text-slate-50">Ruang kerja koperasi</p>
           <p className="mt-1 leading-relaxed">Kelola administrasi sekolah dengan rapi.</p>
         </div>}
         <NavLink
@@ -83,8 +83,8 @@ function Sidebar() {
             [
               `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${compact ? "justify-center px-2" : ""}`,
               isActive
-                ? "border-(--accent-border) bg-(--accent) font-semibold text-[(--accent-contrast) shadow-sm"
-                : "border-transparent text-(--sidebar-muted)] hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)",
+                ? "border-teal-300 dark:border-teal-400 bg-[#20b2aa] dark:bg-[#2dd4bf] font-semibold text-[#102a43] dark:text-[#0f172a] shadow-sm"
+                : "border-transparent text-slate-300 hover:bg-white/10 dark:hover:bg-slate-400/10 hover:text-white",
             ].join(" ")
           }
           aria-label="Pengaturan"

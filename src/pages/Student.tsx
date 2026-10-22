@@ -335,8 +335,8 @@ function Student() {
           periksa relasi pada sumber data.
         </div>
       )}
-      <div className="mb-4 rounded-xl bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-base font-semibold text-gray-900">
+      <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+        <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-slate-100">
           {editId ? "Edit Siswa" : "Tambah Siswa"}
         </h2>
         <form onSubmit={handleSubmit}>
@@ -348,7 +348,7 @@ function Student() {
               onChange={(event) =>
                 setForm({ ...form, nis: event.target.value })
               }
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
             />
             <input
               required
@@ -357,13 +357,13 @@ function Student() {
               onChange={(event) =>
                 setForm({ ...form, name: event.target.value })
               }
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
             />
             <select
               required
               value={form.classId}
               onChange={(event) => setClass(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Pilih kelas</option>
               {availableClasses.map((item) => (
@@ -378,7 +378,7 @@ function Student() {
               onChange={(event) =>
                 setForm({ ...form, jurusanId: event.target.value })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               <option value="">Pilih jurusan</option>
               {formMajors.map((item) => (
@@ -394,14 +394,14 @@ function Student() {
               onChange={(event) =>
                 setForm({ ...form, generation: event.target.value })
               }
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
             />
             <select
               value={form.status}
               onChange={(event) =>
                 setForm({ ...form, status: event.target.value })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
             >
               {statuses.map((status) => (
                 <option key={status}>{status}</option>
@@ -409,7 +409,7 @@ function Student() {
             </select>
           </div>
           {form.classId && relationIdsForClass(form.classId).length === 0 && (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
               Kelas ini belum memiliki jurusan yang tersimpan pada data siswa.
               Pilih jurusan untuk menetapkan relasi pertama kelas ini.
             </p>
@@ -425,7 +425,7 @@ function Student() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700"
+                className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-4 py-2 text-sm font-semibold text-gray-700 dark:text-[#a7b4c7]"
               >
                 Batal
               </button>
@@ -434,10 +434,10 @@ function Student() {
         </form>
       </div>
 
-      <div className="min-w-0 rounded-xl bg-white shadow-sm">
-        <div className="border-b border-gray-200 p-4">
+      <div className="min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+        <div className="border-b border-gray-200 dark:border-[#263449] p-4">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Daftar Siswa
             </h2>
             <div className="relative w-full lg:max-w-sm">
@@ -447,7 +447,7 @@ function Student() {
                 placeholder="Cari nama atau NIS..."
                 value={searchDraft}
                 onChange={(event) => setSearchDraft(event.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm"
+                className="w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm"
               />
             </div>
           </div>
@@ -461,7 +461,7 @@ function Student() {
                   page: 1,
                 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2"
             >
               <option value="">Semua jurusan</option>
               {majors.map((item) => (
@@ -475,7 +475,7 @@ function Student() {
               onChange={(event) =>
                 updateFilters({ classId: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2"
             >
               <option value="">Semua kelas</option>
               {classOptions.map((item) => (
@@ -489,7 +489,7 @@ function Student() {
               onChange={(event) =>
                 updateFilters({ generation: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2"
             >
               <option value="">Semua angkatan</option>
               {generations.map((item) => (
@@ -501,7 +501,7 @@ function Student() {
               onChange={(event) =>
                 updateFilters({ status: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2"
             >
               <option value="">Semua status</option>
               {statuses.map((item) => (
@@ -511,13 +511,13 @@ function Student() {
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
             >
               <SlidersHorizontal className="h-4 w-4" /> Reset Filter
             </button>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-gray-500">
+            <span className="text-gray-500 dark:text-[#a7b4c7]">
               Menampilkan{" "}
               {filtered.length ? (currentPage - 1) * filters.pageSize + 1 : 0}-
               {Math.min(currentPage * filters.pageSize, filtered.length)} dari{" "}
@@ -540,12 +540,12 @@ function Student() {
         </div>
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-10 text-center text-sm text-gray-500">
+            <div className="p-10 text-center text-sm text-gray-500 dark:text-[#a7b4c7]">
               Memuat data siswa...
             </div>
           ) : (
             <table className="w-full min-w-212.5 text-left text-sm">
-              <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+              <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
                 <tr>
                   <th className="px-5 py-3">No</th>
                   {(
@@ -577,23 +577,23 @@ function Student() {
                   <th className="px-5 py-3">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
                 {pageItems.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-3 text-gray-500">
+                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
+                    <td className="px-5 py-3 text-gray-500 dark:text-[#a7b4c7]">
                       {(currentPage - 1) * filters.pageSize + index + 1}
                     </td>
                     <td className="px-5 py-3">{item.nis}</td>
-                    <td className="px-5 py-3 font-medium text-gray-900">
+                    <td className="px-5 py-3 font-medium text-gray-900 dark:text-slate-100">
                       {item.name}
                     </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.Class?.name || "-"}
                     </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.generation}
                     </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.Jurusan?.kode || "-"}
                     </td>
                     <td className="px-5 py-3">
@@ -624,7 +624,7 @@ function Student() {
                 ))}
                 {!pageItems.length && (
                   <tr>
-                    <td colSpan={8} className="p-10 text-center text-gray-500">
+                    <td colSpan={8} className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]">
                       <p>
                         {filtered.length
                           ? "Halaman ini tidak memiliki data."
@@ -643,13 +643,13 @@ function Student() {
             </table>
           )}
         </div>
-        <div className="flex items-center justify-between border-t border-gray-200 px-5 py-3">
+        <div className="flex items-center justify-between border-t border-gray-200 dark:border-[#263449] px-5 py-3">
           <select
             value={filters.pageSize}
             onChange={(event) =>
               updateFilters({ pageSize: Number(event.target.value), page: 1 })
             }
-            className="rounded border border-gray-300 px-2 py-1 text-sm"
+            className="rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm"
           >
             <option value={10}>10 / halaman</option>
             <option value={25}>25 / halaman</option>
