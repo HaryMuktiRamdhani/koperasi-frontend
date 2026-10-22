@@ -15,7 +15,8 @@ function Item() {
   const [barang, setBarang] = useState<BarangData[]>([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [status, setStatus] = useState<NonNullable<BarangData["status"]>>("Aktif");
+  const [status, setStatus] =
+    useState<NonNullable<BarangData["status"]>>("Aktif");
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -101,7 +102,11 @@ function Item() {
 
   return (
     <div>
-      <PageHeader title="Barang" description="Kelola data barang koperasi" icon={Package} />
+      <PageHeader
+        title="Barang"
+        description="Kelola data barang koperasi"
+        icon={Package}
+      />
 
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-5 text-lg font-semibold text-gray-900">
@@ -122,7 +127,11 @@ function Item() {
               Status Barang
               <select
                 value={status}
-                onChange={(event) => setStatus(event.target.value as NonNullable<BarangData["status"]>)}
+                onChange={(event) =>
+                  setStatus(
+                    event.target.value as NonNullable<BarangData["status"]>,
+                  )
+                }
                 className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 font-normal text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="Aktif">Aktif</option>
@@ -198,13 +207,15 @@ function Item() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      item.status === "Aktif"
-                        ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
-                        : item.status === "Akan Datang"
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                          : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                    }`}>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        item.status === "Aktif"
+                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                          : item.status === "Akan Datang"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                      }`}
+                    >
                       {item.status || "Aktif"}
                     </span>
                   </td>
@@ -219,7 +230,10 @@ function Item() {
                       </button>
 
                       <button
-                        onClick={() => { setDeleteId(item.id); setDeleteError(""); }}
+                        onClick={() => {
+                          setDeleteId(item.id);
+                          setDeleteError("");
+                        }}
                         className="rounded-lg bg-red-50 px-3 py-1.5 font-medium text-red-600 hover:bg-red-100"
                       >
                         Hapus
@@ -243,7 +257,17 @@ function Item() {
           </table>
         </div>
       </div>
-      <ConfirmModal open={Boolean(deleteId)} title="Hapus Barang?" description="Data barang yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan." loading={deleteLoading} error={deleteError} onCancel={() => { if (!deleteLoading) setDeleteId(null); }} onConfirm={() => void handleDelete()} />
+      <ConfirmModal
+        open={Boolean(deleteId)}
+        title="Hapus Barang?"
+        description="Data barang yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
+        loading={deleteLoading}
+        error={deleteError}
+        onCancel={() => {
+          if (!deleteLoading) setDeleteId(null);
+        }}
+        onConfirm={() => void handleDelete()}
+      />
     </div>
   );
 }

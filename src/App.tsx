@@ -19,7 +19,8 @@ function App() {
   let role = "";
   try {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) role = (JSON.parse(storedUser) as { role?: string }).role || "";
+    if (storedUser)
+      role = (JSON.parse(storedUser) as { role?: string }).role || "";
   } catch {
     role = "";
   }
@@ -44,10 +45,22 @@ function App() {
 
           <Route path="/payments" element={<Payment />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Navigate to="/settings/profile" replace />} />
+          <Route
+            path="/settings"
+            element={<Navigate to="/settings/profile" replace />}
+          />
           <Route path="/settings/:section" element={<Settings />} />
           <Route path="/help" element={<Help />} />
-          <Route path="/users" element={role === "admin" ? <Users /> : <Navigate to="/dashboard" replace />} />
+          <Route
+            path="/users"
+            element={
+              role === "admin" ? (
+                <Users />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { GraduationCap, Pencil, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
@@ -93,8 +92,7 @@ function Jurusan() {
       };
 
       setErrorMessage(
-        apiError.response?.data?.message ||
-          "Data jurusan gagal disimpan."
+        apiError.response?.data?.message || "Data jurusan gagal disimpan.",
       );
     } finally {
       setLoading(false);
@@ -137,10 +135,11 @@ function Jurusan() {
       };
 
       setErrorMessage(
-        apiError.response?.data?.message ||
-          "Jurusan gagal dihapus."
+        apiError.response?.data?.message || "Jurusan gagal dihapus.",
       );
-      setDeleteError(apiError.response?.data?.message || "Jurusan gagal dihapus.");
+      setDeleteError(
+        apiError.response?.data?.message || "Jurusan gagal dihapus.",
+      );
     } finally {
       setDeleteLoading(false);
     }
@@ -162,9 +161,7 @@ function Jurusan() {
 
         <div className="text-sm text-gray-500">
           Total{" "}
-          <span className="font-semibold text-gray-900">
-            {jurusan.length}
-          </span>{" "}
+          <span className="font-semibold text-gray-900">{jurusan.length}</span>{" "}
           jurusan
         </div>
       </div>
@@ -264,7 +261,9 @@ function Jurusan() {
               <select
                 id="status-jurusan"
                 value={status}
-                onChange={(event) => setStatus(event.target.value as JurusanData["status"])}
+                onChange={(event) =>
+                  setStatus(event.target.value as JurusanData["status"])
+                }
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="Aktif">Aktif</option>
@@ -312,9 +311,7 @@ function Jurusan() {
                 <th className="px-5 py-3.5 sm:px-6">Nama Jurusan</th>
                 <th className="px-5 py-3.5 sm:px-6">Kode</th>
                 <th className="px-5 py-3.5 sm:px-6">Status</th>
-                <th className="px-5 py-3.5 text-right sm:px-6">
-                  Aksi
-                </th>
+                <th className="px-5 py-3.5 text-right sm:px-6">Aksi</th>
               </tr>
             </thead>
 
@@ -330,10 +327,7 @@ function Jurusan() {
                 </tr>
               ) : jurusan.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-12 text-center"
-                  >
+                  <td colSpan={5} className="px-6 py-12 text-center">
                     <p className="font-medium text-gray-700">
                       Belum ada data jurusan
                     </p>
@@ -344,10 +338,7 @@ function Jurusan() {
                 </tr>
               ) : (
                 jurusan.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className="transition hover:bg-gray-50/70"
-                  >
+                  <tr key={item.id} className="transition hover:bg-gray-50/70">
                     <td className="px-5 py-4 text-gray-500 sm:px-6">
                       {index + 1}
                     </td>
@@ -364,13 +355,22 @@ function Jurusan() {
 
                     <td className="px-5 py-4 sm:px-6">
                       {(() => {
-                        const itemStatus = item.status || (item.isActive === false ? "Nonaktif" : "Aktif");
-                        const badgeClass = itemStatus === "Aktif"
-                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
-                          : itemStatus === "Akan Datang"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
-                        return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass}`}>{itemStatus}</span>;
+                        const itemStatus =
+                          item.status ||
+                          (item.isActive === false ? "Nonaktif" : "Aktif");
+                        const badgeClass =
+                          itemStatus === "Aktif"
+                            ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                            : itemStatus === "Akan Datang"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+                        return (
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass}`}
+                          >
+                            {itemStatus}
+                          </span>
+                        );
                       })()}
                     </td>
 
@@ -388,7 +388,10 @@ function Jurusan() {
 
                         <button
                           type="button"
-                          onClick={() => { setDeleteId(item.id); setDeleteError(""); }}
+                          onClick={() => {
+                            setDeleteId(item.id);
+                            setDeleteError("");
+                          }}
                           aria-label={`Hapus ${item.nama}`}
                           className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
                         >
@@ -410,7 +413,17 @@ function Jurusan() {
           </div>
         )}
       </section>
-      <ConfirmModal open={Boolean(deleteId)} title="Hapus Jurusan?" description="Data jurusan yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan." loading={deleteLoading} error={deleteError} onCancel={() => { if (!deleteLoading) setDeleteId(null); }} onConfirm={() => void handleDelete()} />
+      <ConfirmModal
+        open={Boolean(deleteId)}
+        title="Hapus Jurusan?"
+        description="Data jurusan yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
+        loading={deleteLoading}
+        error={deleteError}
+        onCancel={() => {
+          if (!deleteLoading) setDeleteId(null);
+        }}
+        onConfirm={() => void handleDelete()}
+      />
     </div>
   );
 }

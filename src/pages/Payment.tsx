@@ -73,9 +73,7 @@ function Payment() {
   function handleBillChange(value: string) {
     setBillId(value);
 
-    const selectedBill = tagihan.find(
-      (item) => item.id === value
-    );
+    const selectedBill = tagihan.find((item) => item.id === value);
 
     if (selectedBill) {
       setAmount(String(selectedBill.amount));
@@ -95,12 +93,7 @@ function Payment() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (
-      !billId ||
-      !amount ||
-      !paymentMethod ||
-      !paymentDate
-    ) {
+    if (!billId || !amount || !paymentMethod || !paymentDate) {
       alert("Data pembayaran belum lengkap");
       return;
     }
@@ -125,10 +118,7 @@ function Payment() {
     } catch (error: any) {
       console.error(error);
 
-      alert(
-        error.response?.data?.message ||
-          "Gagal memproses pembayaran"
-      );
+      alert(error.response?.data?.message || "Gagal memproses pembayaran");
     } finally {
       setLoading(false);
     }
@@ -138,20 +128,22 @@ function Payment() {
     getTagihan();
     getPembayaran();
 
-    const today = new Date()
-      .toISOString()
-      .split("T")[0];
+    const today = new Date().toISOString().split("T")[0];
 
     setPaymentDate(today);
   }, []);
 
   const tagihanBelumBayar = tagihan.filter(
-    (item) => item.status === "Belum Bayar"
+    (item) => item.status === "Belum Bayar",
   );
 
   return (
     <div>
-      <PageHeader title="Pembayaran" description="Kelola pembayaran tagihan siswa" icon={Wallet} />
+      <PageHeader
+        title="Pembayaran"
+        description="Kelola pembayaran tagihan siswa"
+        icon={Wallet}
+      />
 
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-5 text-lg font-semibold text-gray-900">
@@ -162,21 +154,15 @@ function Payment() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <select
               value={billId}
-              onChange={(event) =>
-                handleBillChange(event.target.value)
-              }
+              onChange={(event) => handleBillChange(event.target.value)}
               className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
-              <option value="">
-                Pilih tagihan
-              </option>
+              <option value="">Pilih tagihan</option>
 
               {tagihanBelumBayar.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.Student?.nis} -{" "}
-                  {item.Student?.name} -{" "}
-                  {item.Item?.name} - Rp{" "}
-                  {item.amount.toLocaleString("id-ID")}
+                  {item.Student?.nis} - {item.Student?.name} - {item.Item?.name}{" "}
+                  - Rp {item.amount.toLocaleString("id-ID")}
                 </option>
               ))}
             </select>
@@ -191,14 +177,10 @@ function Payment() {
 
             <select
               value={paymentMethod}
-              onChange={(event) =>
-                setPaymentMethod(event.target.value)
-              }
+              onChange={(event) => setPaymentMethod(event.target.value)}
               className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
-              <option value="">
-                Pilih metode pembayaran
-              </option>
+              <option value="">Pilih metode pembayaran</option>
               <option value="Tunai">Tunai</option>
               <option value="Transfer">Transfer</option>
             </select>
@@ -206,18 +188,14 @@ function Payment() {
             <input
               type="date"
               value={paymentDate}
-              onChange={(event) =>
-                setPaymentDate(event.target.value)
-              }
+              onChange={(event) => setPaymentDate(event.target.value)}
               className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
 
             <textarea
               placeholder="Catatan (opsional)"
               value={notes}
-              onChange={(event) =>
-                setNotes(event.target.value)
-              }
+              onChange={(event) => setNotes(event.target.value)}
               rows={3}
               className="rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:col-span-2"
             />
@@ -228,9 +206,7 @@ function Payment() {
             disabled={loading}
             className="mt-4 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading
-              ? "Memproses..."
-              : "Proses Pembayaran"}
+            {loading ? "Memproses..." : "Proses Pembayaran"}
           </button>
         </form>
       </div>
@@ -256,21 +232,15 @@ function Payment() {
 
             <tbody className="divide-y divide-gray-200">
               {pembayaran.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 text-gray-600">
-                    {index + 1}
-                  </td>
+                <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-600">{index + 1}</td>
 
                   <td className="px-6 py-4 text-gray-600">
                     {item.paymentDate}
                   </td>
 
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    Rp{" "}
-                    {item.amount.toLocaleString("id-ID")}
+                    Rp {item.amount.toLocaleString("id-ID")}
                   </td>
 
                   <td className="px-6 py-4 text-gray-600">
