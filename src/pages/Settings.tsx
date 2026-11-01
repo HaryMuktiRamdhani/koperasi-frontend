@@ -88,7 +88,7 @@ function Settings() {
   if (!activeSection) return <Navigate to="/settings/profile" replace />;
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div className="w-full">
       <div className="mb-5">
         <h1 className="text-2xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
           Pengaturan
@@ -98,7 +98,7 @@ function Settings() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_1fr]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
         <nav
           aria-label="Kategori pengaturan"
           className="h-fit rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-2"
@@ -125,32 +125,36 @@ function Settings() {
           })}
         </nav>
 
-        <section className="min-w-0 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 sm:p-7">
+        <section className="min-w-0 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 sm:p-8">
           {activeSection === "profile" && (
-            <div className="mx-auto max-w-md text-center">
-              <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-[#20b2aa] dark:bg-[#2dd4bf] text-3xl font-semibold text-[#102a43] dark:text-[#0f172a]">
-                {getInitials(user)}
+            <div className="grid w-full gap-8 md:grid-cols-[180px_minmax(0,1fr)] md:items-start">
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#20b2aa] text-3xl font-semibold text-[#102a43] dark:bg-[#2dd4bf] dark:text-[#0f172a]">
+                  {getInitials(user)}
+                </div>
+                <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-[#1b2a3d] px-3 py-1 text-xs font-semibold text-slate-500 dark:text-[#a7b4c7]">
+                  <Shield className="h-3.5 w-3.5" />{" "}
+                  {user.role
+                    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+                    : "Pengguna"}
+                </span>
               </div>
-              <h2 className="mt-5 text-xl font-semibold text-[#102a43] dark:text-slate-100">
-                {user.name || "Nama belum tersedia"}
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                {user.email || "Email belum tersedia"}
-              </p>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-[#1b2a3d] px-3 py-1 text-xs font-semibold text-slate-500 dark:text-[#a7b4c7]">
-                <Shield className="h-3.5 w-3.5" />{" "}
-                {user.role
-                  ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-                  : "Pengguna"}
-              </span>
-              <div className="mt-8 border-t border-slate-200 dark:border-[#263449] pt-5">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-                >
-                  <LogOut className="h-4 w-4" /> Keluar dari akun
-                </button>
+              <div className="min-w-0 md:pt-2">
+                <h2 className="text-xl font-semibold text-[#102a43] dark:text-slate-100">
+                  {user.name || "Nama belum tersedia"}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
+                  {user.email || "Email belum tersedia"}
+                </p>
+                <div className="mt-8 border-t border-slate-200 dark:border-[#263449] pt-5">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+                  >
+                    <LogOut className="h-4 w-4" /> Keluar dari akun
+                  </button>
+                </div>
               </div>
             </div>
           )}

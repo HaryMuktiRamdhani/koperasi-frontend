@@ -362,7 +362,7 @@ function Jurusan() {
                           itemStatus === "Aktif"
                             ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                             : itemStatus === "Akan Datang"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                               : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7] dark:bg-gray-800 dark:text-gray-300";
                         return (
                           <span
@@ -380,10 +380,9 @@ function Jurusan() {
                           type="button"
                           onClick={() => startEdit(item)}
                           aria-label={`Edit ${item.nama}`}
-                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-gray-600 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:hover:text-slate-100"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                         >
-                          <Pencil className="h-3.5 w-3.5" />
-                          Edit
+                          <Pencil className="h-4 w-4" />
                         </button>
 
                         <button
@@ -393,10 +392,9 @@ function Jurusan() {
                             setDeleteError("");
                           }}
                           aria-label={`Hapus ${item.nama}`}
-                          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          Hapus
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>

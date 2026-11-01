@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Package } from "lucide-react";
+import { Package, Pencil, Trash2 } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
@@ -212,7 +212,7 @@ function Item() {
                         item.status === "Aktif"
                           ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                           : item.status === "Akan Datang"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                             : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-gray-300"
                       }`}
                     >
@@ -223,20 +223,26 @@ function Item() {
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={() => startEdit(item)}
-                        className="rounded-lg bg-blue-50 px-3 py-1.5 font-medium text-blue-600 hover:bg-blue-100"
+                        aria-label={`Edit ${item.name}`}
+                        title="Edit barang"
+                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                       >
-                        Edit
+                        <Pencil className="h-4 w-4" />
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => {
                           setDeleteId(item.id);
                           setDeleteError("");
                         }}
-                        className="rounded-lg bg-red-50 px-3 py-1.5 font-medium text-red-600 hover:bg-red-100"
+                        aria-label={`Hapus ${item.name}`}
+                        title="Hapus barang"
+                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                       >
-                        Hapus
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </td>

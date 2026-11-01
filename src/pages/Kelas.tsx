@@ -714,7 +714,13 @@ function Kelas() {
                           : "Belum ditentukan")}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        item.status === "Aktif"
+                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                          : item.status === "Akan datang"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                      }`}>
                         {item.status}
                       </span>
                     </td>
@@ -723,7 +729,7 @@ function Kelas() {
                         <button
                           title="Edit kelas"
                           onClick={() => startEdit(item)}
-                          className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                         >
                           <Edit3 className="h-4 w-4" />
                         </button>
@@ -733,7 +739,7 @@ function Kelas() {
                             setDeleteTarget(item);
                             setDeleteError("");
                           }}
-                          className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

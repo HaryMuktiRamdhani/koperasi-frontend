@@ -105,7 +105,7 @@ function UsersPage() {
         </button>
       </div>
       {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
           {error}
         </p>
       )}
@@ -189,7 +189,7 @@ function UsersPage() {
                                 role: user.role,
                               });
                             }}
-                            className="rounded-md p-2 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#168b87]"
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                             aria-label={`Edit ${user.name}`}
                           >
                             <Pencil className="h-4 w-4" />

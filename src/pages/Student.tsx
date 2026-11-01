@@ -3,8 +3,10 @@ import type { FormEvent } from "react";
 import {
   ChevronLeft,
   ChevronRight,
+  Pencil,
   Search,
   SlidersHorizontal,
+  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -597,7 +599,13 @@ function Student() {
                       {item.Jurusan?.kode || "-"}
                     </td>
                     <td className="px-5 py-3">
-                      <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        item.status === "Aktif"
+                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                          : item.status === "Akan Datang"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                      }`}>
                         {item.status}
                       </span>
                     </td>
@@ -605,18 +613,24 @@ function Student() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => startEdit(item)}
-                          className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600"
+                          type="button"
+                          aria-label={`Edit ${item.name}`}
+                          title="Edit siswa"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                         >
-                          Edit
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => {
                             setDeleteId(item.id);
                             setDeleteError("");
                           }}
-                          className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600"
+                          type="button"
+                          aria-label={`Hapus ${item.name}`}
+                          title="Hapus siswa"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
-                          Hapus
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
