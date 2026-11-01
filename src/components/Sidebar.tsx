@@ -3,7 +3,8 @@ import {
   LayoutDashboard, GraduationCap, School, Users, Package, ReceiptText,
   Wallet, Settings, UserCog,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export const menuItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -17,7 +18,10 @@ export const menuItems = [
 ] as const;
 
 function Sidebar() {
-  const [compact, setCompact] = useState(() => localStorage.getItem("compactSidebar") === "true");
+  const { appearance } = useTheme();
+  const { t } = useLanguage();
+  const compact = appearance.compactSidebar || appearance.autoHideSidebar;
+  const labels: Record<string, string> = { "/dashboard": t("dashboard"), "/jurusan": t("majors"), "/classes": t("classes"), "/students": t("students"), "/items": t("items"), "/bills": t("bills"), "/payments": t("payments"), "/users": t("users") };
   let role = "";
   try {
     const storedUser = localStorage.getItem("user");
@@ -26,23 +30,14 @@ function Sidebar() {
     role = "";
   }
 
-  useEffect(() => {
-    function handleCompactChange(event: Event) {
-      setCompact((event as CustomEvent<boolean>).detail);
-    }
-
-    window.addEventListener("compactSidebarChange", handleCompactChange);
-    return () => window.removeEventListener("compactSidebarChange", handleCompactChange);
-  }, []);
-
   return (
-    <aside className={`sticky top-0 flex h-screen shrink-0 flex-col bg-[#102a43] dark:bg-[#0f172a] py-6 text-white dark:text-slate-50 ${compact ? "w-20 px-2" : "w-64 px-4"}`}>
+    <aside className={`group/sidebar sticky top-0 flex h-screen shrink-0 flex-col overflow-hidden bg-[#102a43] dark:bg-[#0f172a] py-6 text-white dark:text-slate-50 ${appearance.autoHideSidebar ? "w-16 hover:w-64" : compact ? "w-20" : "w-64"} ${compact ? "px-2" : "px-4"}`}>
       <div className={`mb-10 ${compact ? "px-1" : "px-2"}`}>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] dark:bg-[#2dd4bf] shadow-sm">
             <span className="text-sm font-bold tracking-wide text-[#102a43] dark:text-[#0f172a]">KS</span>
           </div>
-          {!compact && <div>
+          {(!compact || appearance.autoHideSidebar) && <div className={appearance.autoHideSidebar ? "hidden group-hover/sidebar:block" : ""}>
             <h2 className="text-sm font-semibold tracking-wide">Koperasi Sekolah</h2>
             <p className="mt-0.5 text-xs text-slate-300">Panel administrasi</p>
           </div>}
@@ -66,14 +61,14 @@ function Sidebar() {
               }
             >
               <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
-              {!compact && <span>{item.label}</span>}
+              {(!compact || appearance.autoHideSidebar) && <span className={appearance.autoHideSidebar ? "hidden group-hover/sidebar:inline" : ""}>{labels[item.to] || item.label}</span>}
             </NavLink>
           );
         })}
       </nav>
 
       <div className="mt-auto border-t border-white/10 dark:border-slate-400/20 pt-5">
-        {!compact && <div className="mb-4 rounded-lg bg-white/5 dark:bg-slate-400/10 px-3 py-3 text-xs text-slate-300">
+        {appearance.showWorkspaceCard && (!compact || appearance.autoHideSidebar) && <div className={`mb-4 rounded-lg bg-white/5 dark:bg-slate-400/10 px-3 py-3 text-xs text-slate-300 ${appearance.autoHideSidebar ? "hidden group-hover/sidebar:block" : ""}`}>
           <p className="font-medium text-white dark:text-slate-50">Ruang kerja koperasi</p>
           <p className="mt-1 leading-relaxed">Kelola administrasi sekolah dengan rapi.</p>
         </div>}
@@ -90,7 +85,7 @@ function Sidebar() {
           aria-label="Pengaturan"
         >
           <Settings className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
-          {!compact && <span>Pengaturan</span>}
+          {(!compact || appearance.autoHideSidebar) && <span className={appearance.autoHideSidebar ? "hidden group-hover/sidebar:inline" : ""}>{t("settings")}</span>}
         </NavLink>
       </div>
     </aside>

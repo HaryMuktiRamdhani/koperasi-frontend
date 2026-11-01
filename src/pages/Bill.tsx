@@ -16,6 +16,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import ConfirmModal from "../components/ConfirmModal";
+import { useLanguage } from "../context/LanguageContext";
 
 interface Major {
   id: string;
@@ -98,7 +99,6 @@ const defaults: FilterState = {
   page: 1,
   pageSize: 10,
 };
-const formatRupiah = (value: number) => `Rp ${value.toLocaleString("id-ID")}`;
 const dateValue = (value?: string | null) => (value ? value.slice(0, 10) : "");
 const errorMessage = (error: unknown, fallback: string) =>
   (error as { response?: { data?: { message?: string } } }).response?.data
@@ -139,6 +139,8 @@ function writeParams(filters: FilterState) {
 }
 
 function Bill() {
+  const { formatCurrency, formatDate } = useLanguage();
+  const formatRupiah = formatCurrency;
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() => readParams(searchParams));
   const [searchDraft, setSearchDraft] = useState(filters.search);
@@ -1038,10 +1040,10 @@ function Bill() {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      {dateValue(bill.billDate) || "Belum diatur"}
+                      {bill.billDate ? formatDate(bill.billDate) : "Belum diatur"}
                     </td>
                     <td className="px-3 py-2">
-                      {dateValue(bill.dueDate) || "Belum diatur"}
+                      {bill.dueDate ? formatDate(bill.dueDate) : "Belum diatur"}
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex gap-2">

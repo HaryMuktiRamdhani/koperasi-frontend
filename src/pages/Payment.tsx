@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
+import { useLanguage } from "../context/LanguageContext";
 
 interface TagihanData {
   id: string;
@@ -41,6 +42,7 @@ interface PembayaranData {
 }
 
 function Payment() {
+  const { formatCurrency, formatDate } = useLanguage();
   const [tagihan, setTagihan] = useState<TagihanData[]>([]);
   const [pembayaran, setPembayaran] = useState<PembayaranData[]>([]);
 
@@ -162,7 +164,7 @@ function Payment() {
               {tagihanBelumBayar.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.Student?.nis} - {item.Student?.name} - {item.Item?.name}{" "}
-                  - Rp {item.amount.toLocaleString("id-ID")}
+                  - {formatCurrency(item.amount)}
                 </option>
               ))}
             </select>
@@ -236,11 +238,11 @@ function Payment() {
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">{index + 1}</td>
 
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
-                    {item.paymentDate}
+                    {formatDate(item.paymentDate)}
                   </td>
 
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
-                    Rp {item.amount.toLocaleString("id-ID")}
+                    {formatCurrency(item.amount)}
                   </td>
 
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">

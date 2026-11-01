@@ -1,83 +1,122 @@
-import { useEffect, useMemo, useState } from "react";
 import {
+  Archive,
+  Building2,
   CircleHelp,
+  FileText,
+  Languages,
+  LockKeyhole,
   LogOut,
-  Moon,
+  MonitorCog,
+  ReceiptText,
   Settings as SettingsIcon,
-  Shield,
-  Sun,
+  ShieldCheck,
+  UserCog,
   UserRound,
-  Wrench,
+  UsersRound,
+  WalletCards,
 } from "lucide-react";
 import { NavLink, Navigate, useNavigate, useParams } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
+import type { LucideIcon } from "lucide-react";
+import EmptyState from "../components/settings/EmptyState";
+import PageHeader from "../components/settings/PageHeader";
+import ProfileSettings from "../components/settings/ProfileSettings";
+import AppearanceSettings from "../components/settings/AppearanceSettings";
+import LanguageSettings from "../components/settings/LanguageSettings";
+import { useLanguage } from "../context/LanguageContext";
 
-type SettingsSection = "profile" | "appearance" | "help" | "tools";
+type SettingsRoute =
+  | "profile"
+  | "security"
+  | "sessions"
+  | "appearance"
+  | "language"
+  | "notifications"
+  | "identity"
+  | "finance"
+  | "payment-methods"
+  | "users"
+  | "roles"
+  | "audit-log"
+  | "help"
+  | "about";
 
-interface AuthUser {
-  name?: string;
-  email?: string;
-  role?: string;
+interface SettingsMenuItem {
+  id: SettingsRoute;
+  label: string;
+  icon: LucideIcon;
 }
 
-const sections: {
-  id: SettingsSection;
+interface SettingsGroup {
   label: string;
-  icon: typeof UserRound;
-}[] = [
-  { id: "profile", label: "Profil", icon: UserRound },
-  { id: "appearance", label: "Tampilan", icon: SettingsIcon },
-  { id: "help", label: "Bantuan & Dukungan", icon: CircleHelp },
-  { id: "tools", label: "Tools & Fitur Lainnya", icon: Wrench },
+  items: SettingsMenuItem[];
+}
+
+const groups: SettingsGroup[] = [
+  {
+    label: "Akun",
+    items: [
+      { id: "profile", label: "Profil", icon: UserRound },
+      { id: "security", label: "Keamanan", icon: LockKeyhole },
+      { id: "sessions", label: "Sesi Aktif", icon: ShieldCheck },
+    ],
+  },
+  {
+    label: "Aplikasi",
+    items: [
+      { id: "appearance", label: "Tampilan", icon: MonitorCog },
+      { id: "language", label: "Bahasa & Regional", icon: Languages },
+      { id: "notifications", label: "Notifikasi", icon: CircleHelp },
+    ],
+  },
+  {
+    label: "Koperasi",
+    items: [
+      { id: "identity", label: "Identitas Koperasi", icon: Building2 },
+      { id: "finance", label: "Keuangan", icon: WalletCards },
+      { id: "payment-methods", label: "Metode Pembayaran", icon: ReceiptText },
+    ],
+  },
+  {
+    label: "Administrasi",
+    items: [
+      { id: "users", label: "Pengguna", icon: UserCog },
+      { id: "roles", label: "Peran & Hak Akses", icon: UsersRound },
+      { id: "audit-log", label: "Log Aktivitas", icon: FileText },
+    ],
+  },
+  {
+    label: "Bantuan",
+    items: [
+      { id: "help", label: "Bantuan & Dukungan", icon: CircleHelp },
+      { id: "about", label: "Tentang Aplikasi", icon: Archive },
+    ],
+  },
 ];
 
-function getUser(): AuthUser {
-  try {
-    const stored = localStorage.getItem("user");
-    const value: unknown = stored ? JSON.parse(stored) : null;
-    if (!value || typeof value !== "object") return {};
-    const user = value as Record<string, unknown>;
-    return {
-      name: typeof user.name === "string" ? user.name : undefined,
-      email: typeof user.email === "string" ? user.email : undefined,
-      role: typeof user.role === "string" ? user.role : undefined,
-    };
-  } catch {
-    return {};
-  }
-}
+const routeDetails: Record<SettingsRoute, { title: string; description: string; icon: LucideIcon }> = {
+  profile: { title: "Profil", description: "Kelola informasi akun pengguna.", icon: UserRound },
+  security: { title: "Keamanan", description: "Pengaturan keamanan akun dan autentikasi.", icon: LockKeyhole },
+  sessions: { title: "Sesi Aktif", description: "Kelola perangkat yang sedang menggunakan akun.", icon: ShieldCheck },
+  appearance: { title: "Tampilan", description: "Preferensi tema dan tampilan aplikasi.", icon: MonitorCog },
+  language: { title: "Bahasa & Regional", description: "Bahasa, format tanggal, dan preferensi regional.", icon: Languages },
+  notifications: { title: "Notifikasi", description: "Preferensi pemberitahuan aplikasi.", icon: CircleHelp },
+  identity: { title: "Identitas Koperasi", description: "Informasi identitas dan profil koperasi.", icon: Building2 },
+  finance: { title: "Keuangan", description: "Preferensi dan konfigurasi keuangan koperasi.", icon: WalletCards },
+  "payment-methods": { title: "Metode Pembayaran", description: "Pengaturan metode pembayaran yang tersedia.", icon: ReceiptText },
+  users: { title: "Pengguna", description: "Pengaturan pengelolaan pengguna aplikasi.", icon: UserCog },
+  roles: { title: "Peran & Hak Akses", description: "Pengaturan peran dan hak akses pengguna.", icon: UsersRound },
+  "audit-log": { title: "Log Aktivitas", description: "Riwayat aktivitas administrasi aplikasi.", icon: FileText },
+  help: { title: "Bantuan & Dukungan", description: "Petunjuk dan dukungan penggunaan aplikasi.", icon: CircleHelp },
+  about: { title: "Tentang Aplikasi", description: "Informasi versi dan sistem aplikasi.", icon: Archive },
+};
 
-function getInitials(user: AuthUser) {
-  const source = user.name?.trim() || user.email?.split("@")[0] || "KS";
-  const words = source.split(/\s+/).filter(Boolean);
-  return (
-    words.length > 1 ? `${words[0][0]}${words[1][0]}` : source.slice(0, 2)
-  ).toUpperCase();
-}
+const routeIds = groups.flatMap((group) => group.items.map((item) => item.id));
 
 function Settings() {
+  const { t } = useLanguage();
   const { section } = useParams<{ section: string }>();
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
-  const user = useMemo(getUser, []);
-  const activeSection = sections.some((item) => item.id === section)
-    ? (section as SettingsSection)
-    : null;
-  const [compactSidebar, setCompactSidebar] = useState(
-    () => localStorage.getItem("compactSidebar") === "true",
-  );
-
-  useEffect(() => {
-    if (!activeSection) navigate("/settings/profile", { replace: true });
-  }, [activeSection, navigate]);
-
-  function updateCompactSidebar(value: boolean) {
-    setCompactSidebar(value);
-    localStorage.setItem("compactSidebar", String(value));
-    window.dispatchEvent(
-      new CustomEvent("compactSidebarChange", { detail: value }),
-    );
-  }
+  const activeSection = routeIds.includes(section as SettingsRoute) ? section as SettingsRoute : null;
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -86,171 +125,59 @@ function Settings() {
   }
 
   if (!activeSection) return <Navigate to="/settings/profile" replace />;
+  const detail = routeDetails[activeSection];
+  const Icon = detail.icon;
 
   return (
     <div className="w-full">
-      <div className="mb-5">
-        <h1 className="text-2xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
-          Pengaturan
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-          Kelola profil dan preferensi aplikasi.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
-        <nav
-          aria-label="Kategori pengaturan"
-          className="h-fit rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-2"
-        >
-          {sections.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.id}
-                to={`/settings/${item.id}`}
-                className={({ isActive }) =>
-                  [
-                    "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm",
-                    isActive
-                      ? "bg-slate-50 dark:bg-[#1b2a3d] font-semibold text-[#168b87]"
-                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
-                  ].join(" ")
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        <section className="min-w-0 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 sm:p-8">
-          {activeSection === "profile" && (
-            <div className="grid w-full gap-8 md:grid-cols-[180px_minmax(0,1fr)] md:items-start">
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#20b2aa] text-3xl font-semibold text-[#102a43] dark:bg-[#2dd4bf] dark:text-[#0f172a]">
-                  {getInitials(user)}
-                </div>
-                <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-[#1b2a3d] px-3 py-1 text-xs font-semibold text-slate-500 dark:text-[#a7b4c7]">
-                  <Shield className="h-3.5 w-3.5" />{" "}
-                  {user.role
-                    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-                    : "Pengguna"}
-                </span>
-              </div>
-              <div className="min-w-0 md:pt-2">
-                <h2 className="text-xl font-semibold text-[#102a43] dark:text-slate-100">
-                  {user.name || "Nama belum tersedia"}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                  {user.email || "Email belum tersedia"}
-                </p>
-                <div className="mt-8 border-t border-slate-200 dark:border-[#263449] pt-5">
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-                  >
-                    <LogOut className="h-4 w-4" /> Keluar dari akun
-                  </button>
+      <PageHeader title={t("settings")} description={t("settingsDescription")} icon={SettingsIcon} />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <aside className="h-fit rounded-xl border border-slate-200 bg-white p-3 dark:border-[#263449] dark:bg-[#111c2e]">
+          <nav aria-label="Navigasi pengaturan" className="space-y-4">
+            {groups.map((group) => (
+              <div key={group.label}>
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{group.label}</p>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const ItemIcon = item.icon;
+                    return (
+                      <NavLink
+                        key={item.id}
+                        to={`/settings/${item.id}`}
+                        className={({ isActive }) => `flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${
+                          isActive
+                            ? "bg-[#e8f7f5] font-semibold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-[#102a43] dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] dark:hover:text-slate-100"
+                        }`}
+                      >
+                        <ItemIcon className="h-4 w-4 shrink-0" />
+                        {item.label}
+                      </NavLink>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+          </nav>
+          <button type="button" onClick={handleLogout} className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-lg border-t border-slate-200 px-3 pt-4 text-sm font-medium text-red-600 hover:text-red-700 dark:border-[#263449] dark:text-red-300 dark:hover:text-red-200">
+            <LogOut className="h-4 w-4" /> Keluar
+          </button>
+        </aside>
 
-          {activeSection === "appearance" && (
+        <main className="min-w-0 rounded-xl border border-slate-200 bg-white p-6 dark:border-[#263449] dark:bg-[#111c2e] sm:p-8">
+          <div className="flex items-start gap-3 border-b border-slate-200 pb-5 dark:border-[#263449]">
+            <span className="rounded-lg bg-[#e8f7f5] p-2.5 text-[#168b87] dark:bg-[#164e63] dark:text-[#5eead4]">
+              <Icon className="h-5 w-5" />
+            </span>
             <div>
-              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
-                Tampilan
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                Preferensi ini disimpan di perangkat ini.
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {[
-                  { value: "light" as const, label: "Mode terang", icon: Sun },
-                  { value: "dark" as const, label: "Mode gelap", icon: Moon },
-                ].map((option) => {
-                  const Icon = option.icon;
-                  const selected = theme === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setTheme(option.value)}
-                      aria-pressed={selected}
-                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 text-left ${selected ? "border-[#20b2aa] bg-slate-50 dark:bg-[#1b2a3d]" : "border-slate-200 dark:border-[#263449] hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"}`}
-                    >
-                      <Icon className="h-5 w-5 text-[#168b87]" />
-                      <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
-                        {option.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <label className="mt-6 flex cursor-pointer items-center justify-between gap-4 border-t border-slate-200 dark:border-[#263449] pt-5">
-                <span>
-                  <span className="block text-sm font-semibold text-[#102a43] dark:text-slate-100">
-                    Mode sidebar ringkas
-                  </span>
-                  <span className="mt-1 block text-sm text-slate-500 dark:text-[#a7b4c7]">
-                    Sembunyikan label sidebar dan simpan preferensi secara
-                    lokal.
-                  </span>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={compactSidebar}
-                  onChange={(event) =>
-                    updateCompactSidebar(event.target.checked)
-                  }
-                  className="h-5 w-5 cursor-pointer accent-[#168b87]"
-                />
-              </label>
+              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">{detail.title}</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">{detail.description}</p>
             </div>
-          )}
-
-          {activeSection === "help" && (
-            <div>
-              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
-                Bantuan & Dukungan
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                Petunjuk singkat penggunaan aplikasi.
-              </p>
-              <div className="mt-5 space-y-3 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                <p>
-                  Gunakan menu sidebar untuk berpindah antara data koperasi
-                  seperti siswa, barang, tagihan, dan pembayaran.
-                </p>
-                <p>
-                  Gunakan pencarian pada header untuk menemukan menu atau data
-                  yang tersedia.
-                </p>
-                <p>
-                  Pengaturan tampilan dapat diubah melalui kategori Tampilan dan
-                  tersimpan di browser ini.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activeSection === "tools" && (
-            <div>
-              <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">
-                Tools & Fitur Lainnya
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                Area fitur tambahan administrasi koperasi.
-              </p>
-              <div className="mt-5 rounded-lg border border-dashed border-slate-200 dark:border-[#263449] p-5 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                Fitur tambahan belum tersedia.
-              </div>
-            </div>
-          )}
-        </section>
+          </div>
+          <div className="pt-6">
+            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : <EmptyState title={detail.title} />}
+          </div>
+        </main>
       </div>
     </div>
   );

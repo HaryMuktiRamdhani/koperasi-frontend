@@ -4,6 +4,8 @@ import { Bell, ChevronDown, Search, UserRound, X, LoaderCircle, CircleAlert } fr
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar, { menuItems } from "../components/Sidebar";
 import api from "../services/api";
+import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 interface AuthUser {
   name?: string;
@@ -76,6 +78,8 @@ function getInitials(name?: string, email?: string) {
 }
 
 function DashboardLayout() {
+  const { appearance } = useTheme();
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -95,10 +99,10 @@ function DashboardLayout() {
 
   const currentPage =
     menuItems.find((item) => item.to === location.pathname)?.label ||
-    (location.pathname.startsWith("/settings") ? "Pengaturan" : ({
-      "/profile": "Profile",
+    (location.pathname.startsWith("/settings") ? t("settings") : ({
+      "/profile": t("profile"),
       "/help": "Help & Support",
-    }[location.pathname] || "Dashboard"));
+    }[location.pathname] || t("dashboard")));
   const visibleMenuItems = useMemo(
     () => menuItems.filter((item) => !("adminOnly" in item) || user.role === "admin"),
     [user.role],
@@ -271,15 +275,15 @@ function DashboardLayout() {
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
                 KOPERASI SEKOLAH
               </p>
-              <div className="mt-1 flex items-center gap-2">
+              {appearance.showBreadcrumb && <div className="mt-1 flex items-center gap-2">
                 <span className="text-sm text-slate-500 dark:text-[#a7b4c7]">Administrasi</span>
                 <span className="text-slate-200 dark:text-[#263449]">/</span>
                 <h1 className="truncate text-base font-semibold text-[#102a43] dark:text-slate-100">{currentPage}</h1>
-              </div>
+              </div>}
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
-              <form className="relative hidden md:block" onSubmit={handleSearchSubmit}>
+              {appearance.showSearch && <form className="relative hidden md:block" onSubmit={handleSearchSubmit}>
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-[#a7b4c7]" />
                 <input
                   ref={searchRef}
@@ -289,7 +293,7 @@ function DashboardLayout() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   onKeyDown={handleSearchKeyDown}
-                  placeholder="Cari menu..."
+                  placeholder={t("search")}
                   className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
                 />
                 {search && (
@@ -336,7 +340,7 @@ function DashboardLayout() {
                     </p>
                   </div>
                 )}
-              </form>
+              </form>}
 
               <div ref={notificationRef} className="relative">
                 <button
@@ -455,7 +459,7 @@ function DashboardLayout() {
           </div>
         </header>
 
-        <main className="min-w-0 p-5 lg:p-8">
+        <main className={`min-w-0 p-5 lg:p-8 ${appearance.contentWidth === "centered" ? "mx-auto w-full max-w-7xl" : ""} ${appearance.density === "compact" ? "text-sm" : appearance.density === "dense" ? "text-xs" : ""}`}>
           <Outlet />
         </main>
       </div>

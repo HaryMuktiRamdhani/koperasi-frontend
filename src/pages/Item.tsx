@@ -3,6 +3,7 @@ import { Package, Pencil, Trash2 } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
+import { useLanguage } from "../context/LanguageContext";
 
 interface BarangData {
   id: string;
@@ -12,6 +13,7 @@ interface BarangData {
 }
 
 function Item() {
+  const { formatCurrency } = useLanguage();
   const [barang, setBarang] = useState<BarangData[]>([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -203,7 +205,7 @@ function Item() {
                   </td>
 
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
-                    Rp {item.price.toLocaleString("id-ID")}
+                    {formatCurrency(item.price)}
                   </td>
 
                   <td className="px-6 py-4">
