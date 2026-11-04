@@ -23,6 +23,7 @@ import ProfileSettings from "../components/settings/ProfileSettings";
 import AppearanceSettings from "../components/settings/AppearanceSettings";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { useLanguage } from "../context/LanguageContext";
+import CooperativeProfileSettings from "../components/settings/CooperativeProfileSettings";
 
 type SettingsRoute =
   | "profile"
@@ -175,7 +176,7 @@ function Settings() {
             </div>
           </div>
           <div className="pt-6">
-            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : <EmptyState title={detail.title} />}
+            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : activeSection === "identity" ? <CooperativeProfileSettings /> : <EmptyState title={detail.title} />}
           </div>
         </main>
       </div>

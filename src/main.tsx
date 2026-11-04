@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { CooperativeProvider } from "./context/CooperativeContext";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
@@ -15,7 +16,9 @@ createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
       <LanguageProvider>
-        <App />
+        <CooperativeProvider>
+          <App />
+        </CooperativeProvider>
       </LanguageProvider>
     </ThemeProvider>
   </StrictMode>,
