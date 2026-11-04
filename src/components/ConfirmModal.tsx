@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AlertTriangle, LoaderCircle, X } from "lucide-react";
+import IconBadge from "./IconBadge";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -89,9 +90,7 @@ function ConfirmModal({
         className="w-full max-w-md rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 text-[#102a43] dark:text-slate-100 shadow-2xl"
       >
         <div className="flex items-start gap-4">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-300">
-            <AlertTriangle className="h-5 w-5" />
-          </span>
+          <IconBadge icon={AlertTriangle} tone="red" className="rounded-full" />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <h2 id="confirm-modal-title" className="text-base font-semibold">{title}</h2>

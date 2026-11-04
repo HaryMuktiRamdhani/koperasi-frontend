@@ -40,6 +40,16 @@ function Sidebar() {
     "/payments": t("payments"),
     "/users": t("users"),
   };
+  const iconStyles: Record<string, string> = {
+    "/dashboard": "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300",
+    "/jurusan": "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300",
+    "/classes": "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-300",
+    "/students": "bg-sky-100 text-sky-600 dark:bg-sky-950/50 dark:text-sky-300",
+    "/items": "bg-violet-100 text-violet-600 dark:bg-violet-950/50 dark:text-violet-300",
+    "/bills": "bg-orange-100 text-orange-600 dark:bg-orange-950/50 dark:text-orange-300",
+    "/payments": "bg-green-100 text-green-600 dark:bg-green-950/50 dark:text-green-300",
+    "/users": "bg-cyan-100 text-cyan-600 dark:bg-cyan-950/50 dark:text-cyan-300",
+  };
   let role = "";
   try {
     const storedUser = localStorage.getItem("user");
@@ -101,7 +111,9 @@ function Sidebar() {
                   ].join(" ")
                 }
               >
-                <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconStyles[item.to]}`}>
+                  <Icon className="h-4 w-4" strokeWidth={1.8} />
+                </span>
                 {(!compact || appearance.autoHideSidebar) && (
                   <span
                     className={
@@ -144,7 +156,9 @@ function Sidebar() {
           }
           aria-label="Pengaturan"
         >
-          <Settings className="h-4.5 w-4.5 shrink-0" strokeWidth={1.8} />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            <Settings className="h-4 w-4" strokeWidth={1.8} />
+          </span>
           {(!compact || appearance.autoHideSidebar) && (
             <span
               className={

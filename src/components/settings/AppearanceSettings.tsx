@@ -7,6 +7,7 @@ import SegmentedControl from "./SegmentedControl";
 import SettingRow from "./SettingRow";
 import SettingSection from "./SettingSection";
 import Toggle from "./Toggle";
+import IconBadge from "../IconBadge";
 
 const themeOptions = [
   { value: "light" as const, label: "Terang", icon: Sun },
@@ -31,7 +32,7 @@ function AppearanceSettings() {
               const Icon = option.icon;
               return (
                 <button key={option.value} type="button" onClick={() => setTheme(option.value)} className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${appearance.themeMode === option.value ? "border-[#20b2aa] bg-[#e8f7f5] text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]" : "border-slate-200 text-slate-500 dark:border-[#263449] dark:text-[#a7b4c7]"}`}>
-                  <Icon className="h-4 w-4" /> {option.label}
+                  <IconBadge icon={Icon} tone={option.value === "light" ? "orange" : option.value === "dark" ? "slate" : "blue"} className="h-7 w-7 rounded-lg" iconClassName="h-3.5 w-3.5" /> {option.label}
                 </button>
               );
             })}

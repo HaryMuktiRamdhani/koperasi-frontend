@@ -455,7 +455,7 @@ function Student() {
               Daftar Siswa
             </h2>
             <div className="relative w-full lg:max-w-sm">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-blue-500 dark:text-blue-300" />
               <input
                 aria-label="Cari nama atau NIS"
                 placeholder="Cari nama atau NIS..."

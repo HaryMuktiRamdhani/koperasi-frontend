@@ -12,6 +12,7 @@ import {
 import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import IconBadge from "../components/IconBadge";
 
 interface DashboardData {
   totalStudents: number;
@@ -98,9 +99,7 @@ function Dashboard() {
                 {data.totalStudents}
               </p>
             </div>
-            <span className="rounded-lg bg-[#e8f7f5] dark:bg-[#1b2a3d] p-2.5 text-[#168b87]">
-              <Users className="h-5 w-5" />
-            </span>
+            <IconBadge icon={Users} tone="blue" />
           </div>
           <Link
             to="/students"
@@ -118,9 +117,7 @@ function Dashboard() {
                 {data.totalItems}
               </p>
             </div>
-            <span className="rounded-lg bg-amber-50 p-2.5 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300">
-              <Package className="h-5 w-5" />
-            </span>
+            <IconBadge icon={Package} tone="violet" />
           </div>
           <Link
             to="/items"
@@ -138,9 +135,7 @@ function Dashboard() {
                 {data.totalBills}
               </p>
             </div>
-            <span className="rounded-lg bg-orange-50 p-2.5 text-orange-600 dark:bg-orange-950/40 dark:text-orange-300">
-              <ReceiptText className="h-5 w-5" />
-            </span>
+            <IconBadge icon={ReceiptText} tone="orange" />
           </div>
           <Link
             to="/bills"
@@ -158,9 +153,7 @@ function Dashboard() {
                 {formatCurrency(data.totalIncome)}
               </p>
             </div>
-            <span className="rounded-lg bg-white/10 p-2.5 text-[#5ed5cc]">
-              <Wallet className="h-5 w-5" />
-            </span>
+            <IconBadge icon={Wallet} tone="green" className="bg-emerald-400/15 text-emerald-300 dark:bg-emerald-400/15 dark:text-emerald-300" />
           </div>
           <Link
             to="/payments"

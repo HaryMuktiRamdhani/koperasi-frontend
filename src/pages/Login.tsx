@@ -84,7 +84,7 @@ function Login() {
                 Email
               </label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-300" />
                 <input
                   required
                   type="email"
@@ -101,7 +101,7 @@ function Login() {
                 Password
               </label>
               <div className="relative">
-                <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-500 dark:text-violet-300" />
                 <input
                   required
                   type={showPassword ? "text" : "password"}

@@ -24,6 +24,7 @@ import AppearanceSettings from "../components/settings/AppearanceSettings";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { useLanguage } from "../context/LanguageContext";
 import CooperativeProfileSettings from "../components/settings/CooperativeProfileSettings";
+import IconBadge, { type IconTone } from "../components/IconBadge";
 
 type SettingsRoute =
   | "profile"
@@ -112,6 +113,10 @@ const routeDetails: Record<SettingsRoute, { title: string; description: string; 
 };
 
 const routeIds = groups.flatMap((group) => group.items.map((item) => item.id));
+const settingsIconTones: Record<SettingsRoute, IconTone> = {
+  profile: "blue", security: "red", sessions: "cyan", appearance: "violet", language: "blue", notifications: "orange",
+  identity: "teal", finance: "green", "payment-methods": "orange", users: "cyan", roles: "violet", "audit-log": "slate", help: "orange", about: "slate",
+};
 
 function Settings() {
   const { t } = useLanguage();
@@ -151,7 +156,7 @@ function Settings() {
                             : "text-slate-500 hover:bg-slate-50 hover:text-[#102a43] dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] dark:hover:text-slate-100"
                         }`}
                       >
-                        <ItemIcon className="h-4 w-4 shrink-0" />
+                        <IconBadge icon={ItemIcon} tone={settingsIconTones[item.id]} className="h-8 w-8 rounded-lg" iconClassName="h-4 w-4" />
                         {item.label}
                       </NavLink>
                     );
@@ -167,9 +172,7 @@ function Settings() {
 
         <main className="min-w-0 rounded-xl border border-slate-200 bg-white p-6 dark:border-[#263449] dark:bg-[#111c2e] sm:p-8">
           <div className="flex items-start gap-3 border-b border-slate-200 pb-5 dark:border-[#263449]">
-            <span className="rounded-lg bg-[#e8f7f5] p-2.5 text-[#168b87] dark:bg-[#164e63] dark:text-[#5eead4]">
-              <Icon className="h-5 w-5" />
-            </span>
+            <IconBadge icon={Icon} tone={settingsIconTones[activeSection]} />
             <div>
               <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">{detail.title}</h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">{detail.description}</p>

@@ -14,6 +14,7 @@ import Sidebar, { menuItems } from "../components/Sidebar";
 import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import IconBadge from "../components/IconBadge";
 
 interface AuthUser {
   name?: string;
@@ -310,7 +311,7 @@ function DashboardLayout() {
                   className="relative hidden md:block"
                   onSubmit={handleSearchSubmit}
                 >
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-[#a7b4c7]" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-300" />
                   <input
                     ref={searchRef}
                     aria-label="Cari halaman"
@@ -402,7 +403,7 @@ function DashboardLayout() {
                       : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
                   ].join(" ")}
                 >
-                  <Bell className="h-5 w-5" strokeWidth={1.8} />
+                  <IconBadge icon={Bell} tone="orange" className="h-9 w-9 rounded-lg" iconClassName="h-4 w-4" />
                 </button>
                 {notificationsOpen && (
                   <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
@@ -488,7 +489,7 @@ function DashboardLayout() {
                   aria-expanded={profileOpen}
                   className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9f3f0] text-xs font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-xs font-bold text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300">
                     {getInitials(user.name, user.email)}
                   </span>
                   <span className="hidden max-w-32 text-left sm:block">
@@ -518,7 +519,7 @@ function DashboardLayout() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
-                      <UserRound className="h-4 w-4" />
+                      <IconBadge icon={UserRound} tone="cyan" className="h-7 w-7 rounded-lg" iconClassName="h-3.5 w-3.5" />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
                     <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
