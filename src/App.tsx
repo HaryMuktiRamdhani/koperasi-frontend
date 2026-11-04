@@ -6,6 +6,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import Jurusan from "./pages/Jurusan";
 import Classes from "./pages/Kelas";
 import Student from "./pages/Student";
+import StudentDetail from "./pages/StudentDetail";
 import Item from "./pages/Item";
 import Bill from "./pages/Bill";
 import Payment from "./pages/Payment";
@@ -38,6 +39,7 @@ function App() {
           <Route path="/classes" element={<Classes />} />
 
           <Route path="/students" element={<Student />} />
+          <Route path="/students/:id" element={<StudentDetail />} />
 
           <Route path="/items" element={<Item />} />
 

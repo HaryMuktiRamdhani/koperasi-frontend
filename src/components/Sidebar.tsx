@@ -76,9 +76,6 @@ function Sidebar() {
             <h2 className="mt-3 max-w-47.5 truncate text-sm font-semibold tracking-wide">
               {profile.name}
             </h2>
-            <p className="mt-1 max-w-47.5 truncate text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
-              {profile.subtitle}
-            </p>
           </div>
         )}
       </div>

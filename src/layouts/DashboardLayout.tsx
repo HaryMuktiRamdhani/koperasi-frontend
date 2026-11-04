@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import { Bell, ChevronDown, Search, UserRound, X, LoaderCircle, CircleAlert } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  Search,
+  UserRound,
+  X,
+  LoaderCircle,
+  CircleAlert,
+} from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar, { menuItems } from "../components/Sidebar";
 import api from "../services/api";
@@ -99,12 +107,17 @@ function DashboardLayout() {
 
   const currentPage =
     menuItems.find((item) => item.to === location.pathname)?.label ||
-    (location.pathname.startsWith("/settings") ? t("settings") : ({
-      "/profile": t("profile"),
-      "/help": "Help & Support",
-    }[location.pathname] || t("dashboard")));
+    (location.pathname.startsWith("/settings")
+      ? t("settings")
+      : {
+          "/profile": t("profile"),
+          "/help": "Help & Support",
+        }[location.pathname] || t("dashboard"));
   const visibleMenuItems = useMemo(
-    () => menuItems.filter((item) => !("adminOnly" in item) || user.role === "admin"),
+    () =>
+      menuItems.filter(
+        (item) => !("adminOnly" in item) || user.role === "admin",
+      ),
     [user.role],
   );
   const matchingPages = useMemo(
@@ -173,7 +186,9 @@ function DashboardLayout() {
       setNotificationsLoading(true);
       setNotificationsError("");
       try {
-        const response = await api.get<{ items: NotificationItem[] }>("/notifications");
+        const response = await api.get<{ items: NotificationItem[] }>(
+          "/notifications",
+        );
         if (!cancelled) setNotifications(response.data.items);
       } catch {
         if (!cancelled) setNotificationsError("Notifikasi gagal dimuat.");
@@ -243,7 +258,8 @@ function DashboardLayout() {
     if (event.key === "ArrowUp" && combinedResults.length > 0) {
       event.preventDefault();
       setHighlightedResult(
-        (current) => (current - 1 + combinedResults.length) % combinedResults.length,
+        (current) =>
+          (current - 1 + combinedResults.length) % combinedResults.length,
       );
     }
 
@@ -275,72 +291,100 @@ function DashboardLayout() {
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
                 KOPERASI SEKOLAH
               </p>
-              {appearance.showBreadcrumb && <div className="mt-1 flex items-center gap-2">
-                <span className="text-sm text-slate-500 dark:text-[#a7b4c7]">Administrasi</span>
-                <span className="text-slate-200 dark:text-[#263449]">/</span>
-                <h1 className="truncate text-base font-semibold text-[#102a43] dark:text-slate-100">{currentPage}</h1>
-              </div>}
+              {appearance.showBreadcrumb && (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-sm text-slate-500 dark:text-[#a7b4c7]">
+                    Administrasi
+                  </span>
+                  <span className="text-slate-200 dark:text-[#263449]">/</span>
+                  <h1 className="truncate text-base font-semibold text-[#102a43] dark:text-slate-100">
+                    {currentPage}
+                  </h1>
+                </div>
+              )}
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
-              {appearance.showSearch && <form className="relative hidden md:block" onSubmit={handleSearchSubmit}>
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-[#a7b4c7]" />
-                <input
-                  ref={searchRef}
-                  aria-label="Cari halaman"
-                  aria-controls="global-search-results"
-                  aria-expanded={Boolean(search)}
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  onKeyDown={handleSearchKeyDown}
-                  placeholder={t("search")}
-                  className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
-                />
-                {search && (
-                  <div
-                    id="global-search-results"
-                    role="listbox"
-                    className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] py-1 shadow-lg"
-                  >
-                    {searchLoading ? (
-                      <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                        <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Mencari data...
-                      </div>
-                    ) : searchError ? (
-                      <div className="px-3 py-4 text-center text-sm text-red-600">{searchError}</div>
-                    ) : combinedResults.length > 0 ? combinedResults.map((item, index) => (
-                      <button
-                        key={`${item.category}-${item.id}`}
-                        type="button"
-                        role="option"
-                        aria-selected={index === highlightedResult}
-                        onMouseEnter={() => setHighlightedResult(index)}
-                        onClick={() => goToPage(item.path)}
-                        className={[
-                          "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
-                          index === highlightedResult
-                            ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#102a43] dark:text-slate-100"
-                            : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
-                        ].join(" ")}
-                      >
-                        <Search className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
-                        <span className="min-w-0">
-                          <span className="block font-medium">{item.label}</span>
-                          <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">{item.category} · {item.detail}</span>
-                        </span>
-                      </button>
-                    )) : (
-                      <div className="px-3 py-4 text-center">
-                        <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">Tidak ada halaman ditemukan</p>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Coba kata kunci lain.</p>
-                      </div>
-                    )}
-                    <p className="border-t border-slate-200 dark:border-[#263449] px-3 py-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
-                      Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc untuk menutup
-                    </p>
-                  </div>
-                )}
-              </form>}
+              {appearance.showSearch && (
+                <form
+                  className="relative hidden md:block"
+                  onSubmit={handleSearchSubmit}
+                >
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-[#a7b4c7]" />
+                  <input
+                    ref={searchRef}
+                    aria-label="Cari halaman"
+                    aria-controls="global-search-results"
+                    aria-expanded={Boolean(search)}
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder={t("search")}
+                    className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                  />
+                  {search && (
+                    <div
+                      id="global-search-results"
+                      role="listbox"
+                      className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] py-1 shadow-lg"
+                    >
+                      {searchLoading ? (
+                        <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
+                          <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" />{" "}
+                          Mencari data...
+                        </div>
+                      ) : searchError ? (
+                        <div className="px-3 py-4 text-center text-sm text-red-600">
+                          {searchError}
+                        </div>
+                      ) : combinedResults.length > 0 ? (
+                        combinedResults.map((item, index) => (
+                          <button
+                            key={`${item.category}-${item.id}`}
+                            type="button"
+                            role="option"
+                            aria-selected={index === highlightedResult}
+                            onMouseEnter={() => setHighlightedResult(index)}
+                            onClick={() => goToPage(item.path)}
+                            className={[
+                              "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
+                              index === highlightedResult
+                                ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#102a43] dark:text-slate-100"
+                                : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
+                            ].join(" ")}
+                          >
+                            <Search
+                              className="h-4 w-4 text-[#168b87]"
+                              strokeWidth={1.8}
+                            />
+                            <span className="min-w-0">
+                              <span className="block font-medium">
+                                {item.label}
+                              </span>
+                              <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">
+                                {item.category} · {item.detail}
+                              </span>
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-4 text-center">
+                          <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">
+                            Tidak ada halaman ditemukan
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                            Coba kata kunci lain.
+                          </p>
+                        </div>
+                      )}
+                      <p className="border-t border-slate-200 dark:border-[#263449] px-3 py-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
+                        Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc
+                        untuk menutup
+                      </p>
+                    </div>
+                  )}
+                </form>
+              )}
 
               <div ref={notificationRef} className="relative">
                 <button
@@ -364,8 +408,12 @@ function DashboardLayout() {
                   <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h2 className="text-sm font-semibold text-[#102a43] dark:text-slate-100">Notifikasi</h2>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Informasi dan aktivitas akun</p>
+                        <h2 className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
+                          Notifikasi
+                        </h2>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                          Informasi dan aktivitas akun
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -377,22 +425,49 @@ function DashboardLayout() {
                       </button>
                     </div>
                     {notificationsLoading ? (
-                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500 dark:text-[#a7b4c7]"><LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" /> Memuat notifikasi...</div>
+                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500 dark:text-[#a7b4c7]">
+                        <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" />{" "}
+                        Memuat notifikasi...
+                      </div>
                     ) : notificationsError ? (
-                      <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"><CircleAlert className="h-4 w-4 shrink-0" /> {notificationsError}</div>
+                      <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700">
+                        <CircleAlert className="h-4 w-4 shrink-0" />{" "}
+                        {notificationsError}
+                      </div>
                     ) : notifications.length === 0 ? (
                       <div className="mt-4 rounded-lg border border-dashed border-slate-200 dark:border-[#263449] px-3 py-5 text-center">
-                        <Bell className="mx-auto h-5 w-5 text-slate-500 dark:text-[#a7b4c7]" strokeWidth={1.7} />
-                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-[#a7b4c7]">Belum ada notifikasi</p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-[#a7b4c7]">Belum ada aktivitas operasional untuk ditampilkan.</p>
+                        <Bell
+                          className="mx-auto h-5 w-5 text-slate-500 dark:text-[#a7b4c7]"
+                          strokeWidth={1.7}
+                        />
+                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-[#a7b4c7]">
+                          Belum ada notifikasi
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-[#a7b4c7]">
+                          Belum ada aktivitas operasional untuk ditampilkan.
+                        </p>
                       </div>
                     ) : (
                       <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                         {notifications.map((notification) => (
-                          <button key={notification.id} type="button" onClick={() => { goToPage(notification.path); setNotificationsOpen(false); }} className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d]">
-                            <p className="text-xs font-semibold text-[#102a43] dark:text-slate-100">{notification.title}</p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.message}</p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">{notification.detail}</p>
+                          <button
+                            key={notification.id}
+                            type="button"
+                            onClick={() => {
+                              goToPage(notification.path);
+                              setNotificationsOpen(false);
+                            }}
+                            className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
+                          >
+                            <p className="text-xs font-semibold text-[#102a43] dark:text-slate-100">
+                              {notification.title}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                              {notification.message}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                              {notification.detail}
+                            </p>
                           </button>
                         ))}
                       </div>
@@ -420,7 +495,9 @@ function DashboardLayout() {
                     <span className="block truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">
                       {user.name || user.email || "Pengguna"}
                     </span>
-                    <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">{formatRole(user.role)}</span>
+                    <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">
+                      {formatRole(user.role)}
+                    </span>
                   </span>
                   <ChevronDown className="hidden h-4 w-4 text-slate-500 dark:text-[#a7b4c7] sm:block" />
                 </button>
@@ -432,8 +509,12 @@ function DashboardLayout() {
                         {getInitials(user.name, user.email)}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">{user.name || "Pengguna"}</p>
-                        <p className="truncate text-xs text-slate-500 dark:text-[#a7b4c7]">{user.email || "Email tidak tersedia"}</p>
+                        <p className="truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">
+                          {user.name || "Pengguna"}
+                        </p>
+                        <p className="truncate text-xs text-slate-500 dark:text-[#a7b4c7]">
+                          {user.email || "Email tidak tersedia"}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
@@ -441,9 +522,36 @@ function DashboardLayout() {
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
                     <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
-                      <button type="button" onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Profile</button>
-                      <button type="button" onClick={() => { navigate("/settings"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Settings</button>
-                      <button type="button" onClick={() => { navigate("/help"); setProfileOpen(false); }} className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100">Help &amp; Support</button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate("/profile");
+                          setProfileOpen(false);
+                        }}
+                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
+                      >
+                        Profile
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate("/settings");
+                          setProfileOpen(false);
+                        }}
+                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
+                      >
+                        Settings
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate("/help");
+                          setProfileOpen(false);
+                        }}
+                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
+                      >
+                        Help &amp; Support
+                      </button>
                     </div>
                     <button
                       type="button"
@@ -459,7 +567,9 @@ function DashboardLayout() {
           </div>
         </header>
 
-        <main className={`min-w-0 p-5 lg:p-8 ${appearance.contentWidth === "centered" ? "mx-auto w-full max-w-7xl" : ""} ${appearance.density === "compact" ? "text-sm" : appearance.density === "dense" ? "text-xs" : ""}`}>
+        <main
+          className={`min-w-0 p-5 lg:p-8 ${appearance.contentWidth === "centered" ? "mx-auto w-full max-w-7xl" : ""} ${appearance.density === "compact" ? "text-sm" : appearance.density === "dense" ? "text-xs" : ""}`}
+        >
           <Outlet />
         </main>
       </div>

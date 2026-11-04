@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import {
   ChevronLeft,
   ChevronRight,
+  Eye,
   Pencil,
   Search,
   SlidersHorizontal,
@@ -10,7 +11,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
@@ -122,6 +123,17 @@ function Student() {
   useEffect(() => {
     void loadData();
   }, []);
+
+  useEffect(() => {
+    const editStudentId = searchParams.get("edit");
+    if (!editStudentId || !students.length) return;
+    const student = students.find((item) => item.id === editStudentId);
+    if (!student) return;
+    startEdit(student);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("edit");
+    setSearchParams(nextParams, { replace: true });
+  }, [students, searchParams, setSearchParams]);
 
   const generations = useMemo(
     () =>
@@ -611,6 +623,14 @@ function Student() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex gap-2">
+                        <Link
+                          to={`/students/${item.id}`}
+                          aria-label={`Lihat detail ${item.name}`}
+                          title="Lihat detail siswa"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-300 dark:hover:bg-teal-900/60"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                         <button
                           onClick={() => startEdit(item)}
                           type="button"
