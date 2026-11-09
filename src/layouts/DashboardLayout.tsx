@@ -15,6 +15,7 @@ import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import IconBadge from "../components/IconBadge";
+import SessionTimeoutMonitor from "../components/SessionTimeoutMonitor";
 
 interface AuthUser {
   name?: string;
@@ -275,14 +276,21 @@ function DashboardLayout() {
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+  async function handleLogout() {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // The local credentials are cleared even if the network is unavailable.
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/");
+    }
   }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7fa] dark:bg-[#0b1220]">
+      <SessionTimeoutMonitor />
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">

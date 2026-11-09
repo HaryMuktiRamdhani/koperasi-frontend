@@ -6,9 +6,15 @@ import api from "../services/api";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => {
+    const message = sessionStorage.getItem("authMessage") || "";
+    sessionStorage.removeItem("authMessage");
+    return message;
+  });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [pendingToken, setPendingToken] = useState("");
+  const [twoFactorCode, setTwoFactorCode] = useState("");
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
@@ -21,6 +27,11 @@ function Login() {
         password,
       });
 
+      if (response.data.requires2fa) {
+        setPendingToken(response.data.pendingToken);
+        setError("");
+        return;
+      }
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
@@ -30,6 +41,22 @@ function Login() {
     } finally {
       setLoading(false);
     }
+
+  }
+
+  async function handleTwoFactor(event: FormEvent) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const payload = twoFactorCode.length === 6 ? { code: twoFactorCode } : { recoveryCode: twoFactorCode };
+      const response = await api.post("/auth/2fa/verify", payload, { headers: { Authorization: `Bearer ${pendingToken}` } });
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      window.location.assign("/dashboard");
+    } catch (verifyError: any) {
+      setError(verifyError.response?.data?.message || "Verifikasi 2FA gagal");
+    } finally { setLoading(false); }
   }
 
   return (
@@ -78,7 +105,12 @@ function Login() {
             Gunakan akun yang telah diberikan oleh administrator.
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          {pendingToken ? <form onSubmit={handleTwoFactor} className="space-y-5">
+            <p className="text-sm text-slate-600 dark:text-[#a7b4c7]">Masukkan kode dari aplikasi authenticator.</p>
+            <input required autoFocus value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.trim().toUpperCase())} placeholder="Kode 6 digit atau recovery code" className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-center text-lg tracking-[0.15em] dark:border-[#263449] dark:bg-[#1b2a3d] dark:text-slate-100" />
+            {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
+            <button type="submit" disabled={loading || twoFactorCode.length < 6} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#168b87] px-4 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"><ShieldCheck className="h-4 w-4" />{loading ? "Memverifikasi..." : "Verifikasi"}</button>
+          </form> : <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
                 Email
@@ -141,7 +173,7 @@ function Login() {
               <ShieldCheck className="h-4 w-4" />
               {loading ? "Memproses..." : "Masuk ke aplikasi"}
             </button>
-          </form>
+          </form>}
         </div>
       </div>
     </div>

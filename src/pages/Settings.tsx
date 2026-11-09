@@ -25,6 +25,9 @@ import LanguageSettings from "../components/settings/LanguageSettings";
 import { useLanguage } from "../context/LanguageContext";
 import CooperativeProfileSettings from "../components/settings/CooperativeProfileSettings";
 import IconBadge, { type IconTone } from "../components/IconBadge";
+import SecuritySettings from "../components/settings/SecuritySettings";
+import ActiveSessionsSettings from "../components/settings/ActiveSessionsSettings";
+import api from "../services/api";
 
 type SettingsRoute =
   | "profile"
@@ -124,10 +127,16 @@ function Settings() {
   const navigate = useNavigate();
   const activeSection = routeIds.includes(section as SettingsRoute) ? section as SettingsRoute : null;
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+  async function handleLogout() {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // Clear local credentials even when the session is already unavailable.
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/");
+    }
   }
 
   if (!activeSection) return <Navigate to="/settings/profile" replace />;
@@ -179,7 +188,7 @@ function Settings() {
             </div>
           </div>
           <div className="pt-6">
-            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : activeSection === "identity" ? <CooperativeProfileSettings /> : <EmptyState title={detail.title} />}
+            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "security" ? <SecuritySettings /> : activeSection === "sessions" ? <ActiveSessionsSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : activeSection === "identity" ? <CooperativeProfileSettings /> : <EmptyState title={detail.title} />}
           </div>
         </main>
       </div>

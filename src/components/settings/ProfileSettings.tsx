@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Camera, Eye, EyeOff, KeyRound, LogOut, Trash2, UserRound } from "lucide-react";
+import { Camera, Eye, EyeOff, KeyRound, Trash2, UserRound } from "lucide-react";
 import api from "../../services/api";
 import ConfirmDialog from "./ConfirmDialog";
 import EmptyState from "./EmptyState";
-import { useLanguage } from "../../context/LanguageContext";
-import SettingRow from "./SettingRow";
 import SettingSection from "./SettingSection";
 
 interface ProfileData {
@@ -17,14 +15,6 @@ interface ProfileData {
   bio: string | null;
   avatarUrl: string | null;
   role: string;
-}
-
-interface LoginSession {
-  id: string;
-  userAgent?: string;
-  ipAddress?: string;
-  createdAt: string;
-  expiresAt: string;
 }
 
 const emptyProfile: ProfileData = { id: "", name: "", username: null, email: "", phone: null, bio: null, avatarUrl: null, role: "" };
@@ -48,10 +38,8 @@ async function cropSquare(file: File): Promise<string> {
 }
 
 function ProfileSettings() {
-  const { formatDateTime } = useLanguage();
   const [profile, setProfile] = useState<ProfileData>(emptyProfile);
   const [draft, setDraft] = useState<ProfileData>(emptyProfile);
-  const [sessions, setSessions] = useState<LoginSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -61,7 +49,6 @@ function ProfileSettings() {
   const [showPasswords, setShowPasswords] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [sessionsError, setSessionsError] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteUsername, setDeleteUsername] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
@@ -78,10 +65,9 @@ function ProfileSettings() {
 
   async function load() {
     try {
-      const [profileResponse, sessionsResponse] = await Promise.all([api.get<ProfileData>("/profile"), api.get<LoginSession[]>("/profile/sessions")]);
+      const profileResponse = await api.get<ProfileData>("/profile");
       setProfile(profileResponse.data);
       setDraft(profileResponse.data);
-      setSessions(sessionsResponse.data);
     } catch (loadError) {
       setError(getError(loadError, "Gagal memuat profil."));
     } finally {
@@ -180,24 +166,6 @@ function ProfileSettings() {
     }
   }
 
-  async function revokeSession(id: string) {
-    try {
-      await api.delete(`/profile/sessions/${id}`);
-      setSessions((current) => current.filter((session) => session.id !== id));
-    } catch (sessionError) {
-      setSessionsError(getError(sessionError, "Gagal mengeluarkan sesi."));
-    }
-  }
-
-  async function revokeAll() {
-    try {
-      await api.delete("/profile/sessions");
-      setSessions([]);
-    } catch (sessionError) {
-      setSessionsError(getError(sessionError, "Gagal mengeluarkan semua sesi."));
-    }
-  }
-
   async function deleteAccount() {
     try {
       await api.delete("/profile", { data: { username: deleteUsername, password: deletePassword } });
@@ -247,12 +215,6 @@ function ProfileSettings() {
           {(["currentPassword", "newPassword", "confirmPassword"] as const).map((field) => <label key={field} className="block text-sm font-medium text-slate-700 dark:text-[#a7b4c7]">{field === "currentPassword" ? "Password lama" : field === "newPassword" ? "Password baru" : "Konfirmasi password"}<div className="relative"><input type={showPasswords ? "text" : "password"} value={passwords[field]} onChange={(event) => setPasswords((current) => ({ ...current, [field]: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 pr-10 text-sm outline-none focus:border-[#20b2aa] dark:border-[#263449] dark:bg-[#1b2a3d] dark:text-slate-100" required />{field === "currentPassword" && <button type="button" onClick={() => setShowPasswords((value) => !value)} className="absolute right-3 top-3 cursor-pointer text-slate-400">{showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>}</div>{field === "newPassword" && <span className={`mt-1 block text-xs ${passwordStrength.className}`}>{passwordStrength.label || "Minimal 8 karakter"}</span>}</label>)}
           <button type="submit" className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white hover:bg-[#13716d]"><KeyRound className="h-4 w-4" /> Simpan password</button>
         </form>
-      </SettingSection>
-
-      <SettingSection title="Sesi Login" description="Sesi aktif berasal dari token login yang tercatat di server.">
-        {sessionsError && <p className="mb-3 text-sm text-red-600 dark:text-red-300">{sessionsError}</p>}
-        {sessions.length === 0 ? <EmptyState title="Tidak ada sesi aktif" description="Login ulang untuk membuat sesi baru." /> : <div>{sessions.map((session) => <SettingRow key={session.id} title={session.userAgent || "Perangkat tidak diketahui"} description={`${session.ipAddress || "IP tidak tersedia"} · ${formatDateTime(session.createdAt)}`}><button type="button" onClick={() => void revokeSession(session.id)} className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 dark:border-red-900 dark:text-red-300"><LogOut className="h-4 w-4" /> Keluar</button></SettingRow>)}</div>}
-        {sessions.length > 0 && <button type="button" onClick={() => void revokeAll()} className="mt-4 cursor-pointer text-sm font-semibold text-red-600 dark:text-red-300">Keluar dari semua perangkat</button>}
       </SettingSection>
 
       <SettingSection title="Hapus Akun" description="Tindakan ini permanen dan memerlukan konfirmasi username serta password.">

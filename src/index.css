@@ -1,3 +1,68 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --select-background: #ffffff;
+  --select-foreground: #102a43;
+  --select-border: #e2e8f0;
+  --select-option-hover: #d9f3f0;
+  --select-option-selected: #168b87;
+  --select-option-selected-foreground: #ffffff;
+}
+
+.dark {
+  --select-background: #1b2a3d;
+  --select-foreground: #f1f5f9;
+  --select-border: #263449;
+  --select-option-hover: #164e63;
+  --select-option-selected: #168b87;
+  --select-option-selected-foreground: #f8fafc;
+}
+
+select,
+.theme-select {
+  color-scheme: light;
+  background-color: var(--select-background);
+  color: var(--select-foreground);
+  border-color: var(--select-border);
+}
+
+.dark select,
+.dark .theme-select {
+  color-scheme: dark;
+}
+
+select option,
+.theme-select option {
+  background-color: var(--select-background);
+  color: var(--select-foreground);
+}
+
+select option:hover,
+.theme-select option:hover {
+  background-color: var(--select-option-hover);
+  color: var(--select-foreground);
+}
+
+select option:checked,
+.theme-select option:checked {
+  background-color: var(--select-option-selected);
+  color: var(--select-option-selected-foreground);
+}
+
+select option:disabled,
+.theme-select option:disabled {
+  color: #94a3b8;
+}
+
+.dark select option:disabled,
+.dark .theme-select option:disabled {
+  color: #64748b;
+}
+
+select:disabled,
+.theme-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
