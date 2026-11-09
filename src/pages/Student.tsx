@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import type { AxiosError } from "axios";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
@@ -262,25 +263,34 @@ function Student() {
   }
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    const payload = {
+      nis: form.nis.trim(),
+      name: form.name.trim(),
+      classId: form.classId,
+      jurusanId: form.jurusanId,
+      generation: form.generation.trim(),
+      status: form.status,
+    };
     if (
-      !form.nis.trim() ||
-      !form.name.trim() ||
-      !form.classId ||
-      !form.jurusanId ||
-      !form.generation.trim()
+      !payload.nis ||
+      !payload.name ||
+      !payload.classId ||
+      !payload.jurusanId ||
+      !payload.generation
     ) {
       setError("NIS, nama, kelas, jurusan, dan angkatan wajib diisi.");
       return;
     }
     setSaving(true);
     try {
-      if (editId) await api.put(`/students/${editId}`, form);
-      else await api.post("/students", form);
+      if (editId) await api.put(`/students/${editId}`, payload);
+      else await api.post("/students", payload);
       resetForm();
       await loadData();
-    } catch (requestError: any) {
+    } catch (requestError) {
+      const errorResponse = (requestError as AxiosError<{ message?: string }>).response;
       setError(
-        requestError.response?.data?.message || "Gagal menyimpan data siswa.",
+        errorResponse?.data?.message || "Gagal menyimpan data siswa.",
       );
     } finally {
       setSaving(false);

@@ -17,6 +17,7 @@ import Users from "./pages/Users";
 
 function App() {
   const token = localStorage.getItem("token");
+  const isAuthenticated = Boolean(token);
   let role = "";
   try {
     const storedUser = localStorage.getItem("user");
@@ -31,7 +32,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
 
-        <Route element={token ? <DashboardLayout /> : <Navigate to="/" />}>
+        <Route element={isAuthenticated ? <DashboardLayout /> : <Navigate to="/" replace />}>
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/jurusan" element={<Jurusan />} />

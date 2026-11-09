@@ -7,8 +7,11 @@ function SessionTimeoutMonitor() {
   const [remaining, setRemaining] = useState(0);
   const [open, setOpen] = useState(false);
   const lastSent = useRef(0);
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (!localStorage.getItem("token") || initialized.current) return;
+    initialized.current = true;
     api.get<{ sessionTimeoutMinutes: number }>("/security/settings").then((response) => setTimeoutMinutes(response.data.sessionTimeoutMinutes)).catch(() => undefined);
   }, []);
 
