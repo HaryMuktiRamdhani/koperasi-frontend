@@ -14,7 +14,6 @@ import Sidebar, { menuItems } from "../components/Sidebar";
 import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import IconBadge from "../components/IconBadge";
 import SessionTimeoutMonitor from "../components/SessionTimeoutMonitor";
 
 interface AuthUser {
@@ -289,12 +288,12 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f5f7fa] dark:bg-[#0b1220]">
+    <div className="app-root flex h-screen overflow-hidden bg-[#f5f7fa] dark:bg-[#0b1220]">
       <SessionTimeoutMonitor />
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 px-5 py-4 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 px-5 py-3.5 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
@@ -329,7 +328,7 @@ function DashboardLayout() {
                     onChange={(event) => setSearch(event.target.value)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder={t("search")}
-                    className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                    className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
                   />
                   {search && (
                     <div
@@ -339,7 +338,7 @@ function DashboardLayout() {
                     >
                       {searchLoading ? (
                         <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                          <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" />{" "}
+                          <LoaderCircle className="h-4 w-4 text-[#168b87]" />{" "}
                           Mencari data...
                         </div>
                       ) : searchError ? (
@@ -405,13 +404,13 @@ function DashboardLayout() {
                     setProfileOpen(false);
                   }}
                   className={[
-                    "cursor-pointer rounded-lg p-2 transition-colors",
+                    "cursor-pointer rounded-lg p-2",
                     notificationsOpen
                       ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#13716d]"
                       : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
                   ].join(" ")}
                 >
-                  <IconBadge icon={Bell} tone="orange" className="h-9 w-9 rounded-lg" iconClassName="h-4 w-4" />
+                  <Bell className="h-5 w-5" strokeWidth={1.8} />
                 </button>
                 {notificationsOpen && (
                   <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
@@ -435,7 +434,7 @@ function DashboardLayout() {
                     </div>
                     {notificationsLoading ? (
                       <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                        <LoaderCircle className="h-4 w-4 animate-spin text-[#168b87]" />{" "}
+                        <LoaderCircle className="h-4 w-4 text-[#168b87]" />{" "}
                         Memuat notifikasi...
                       </div>
                     ) : notificationsError ? (
@@ -495,7 +494,7 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 transition-colors hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-xs font-bold text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300">
                     {getInitials(user.name, user.email)}
@@ -527,14 +526,14 @@ function DashboardLayout() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
-                      <IconBadge icon={UserRound} tone="cyan" className="h-7 w-7 rounded-lg" iconClassName="h-3.5 w-3.5" />
+                      <UserRound className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
                     <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
                       <button
                         type="button"
                         onClick={() => {
-                          navigate("/profile");
+                          navigate("/settings/profile");
                           setProfileOpen(false);
                         }}
                         className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
@@ -551,21 +550,11 @@ function DashboardLayout() {
                       >
                         Settings
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigate("/help");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
-                      >
-                        Help &amp; Support
-                      </button>
                     </div>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 transition-colors hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
+                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
                     >
                       Logout
                     </button>

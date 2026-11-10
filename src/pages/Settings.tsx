@@ -14,7 +14,6 @@ import ProfileSettings from "../components/settings/ProfileSettings";
 import AppearanceSettings from "../components/settings/AppearanceSettings";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { useLanguage } from "../context/LanguageContext";
-import IconBadge, { type IconTone } from "../components/IconBadge";
 import SecuritySettings from "../components/settings/SecuritySettings";
 import ActiveSessionsSettings from "../components/settings/ActiveSessionsSettings";
 import api from "../services/api";
@@ -64,10 +63,6 @@ const routeDetails: Record<SettingsRoute, { title: string; description: string; 
 };
 
 const routeIds = groups.flatMap((group) => group.items.map((item) => item.id));
-const settingsIconTones: Record<SettingsRoute, IconTone> = {
-  profile: "blue", security: "red", sessions: "cyan", appearance: "violet", language: "blue",
-};
-
 function Settings() {
   const { t } = useLanguage();
   const { section } = useParams<{ section: string }>();
@@ -112,7 +107,7 @@ function Settings() {
                             : "text-slate-500 hover:bg-slate-50 hover:text-[#102a43] dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] dark:hover:text-slate-100"
                         }`}
                       >
-                        <IconBadge icon={ItemIcon} tone={settingsIconTones[item.id]} className="h-8 w-8 rounded-lg" iconClassName="h-4 w-4" />
+                        <ItemIcon className="h-4 w-4 text-slate-500 dark:text-slate-300" strokeWidth={1.8} />
                         {item.label}
                       </NavLink>
                     );
@@ -128,7 +123,7 @@ function Settings() {
 
         <main className="min-w-0 rounded-xl border border-slate-200 bg-white p-6 dark:border-[#263449] dark:bg-[#111c2e] sm:p-8">
           <div className="flex items-start gap-3 border-b border-slate-200 pb-5 dark:border-[#263449]">
-            <IconBadge icon={Icon} tone={settingsIconTones[activeSection]} />
+            <Icon className="mt-1 h-5 w-5 shrink-0 text-[#168b87]" strokeWidth={1.8} />
             <div>
               <h2 className="text-lg font-semibold text-[#102a43] dark:text-slate-100">{detail.title}</h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">{detail.description}</p>

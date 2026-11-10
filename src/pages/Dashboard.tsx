@@ -12,7 +12,6 @@ import {
 import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import IconBadge from "../components/IconBadge";
 
 interface DashboardData {
   totalStudents: number;
@@ -99,7 +98,7 @@ function Dashboard() {
                 {data.totalStudents}
               </p>
             </div>
-            <IconBadge icon={Users} tone="blue" />
+            <Users className="h-5 w-5 text-[#168b87]" strokeWidth={1.8} />
           </div>
           <Link
             to="/students"
@@ -117,7 +116,7 @@ function Dashboard() {
                 {data.totalItems}
               </p>
             </div>
-            <IconBadge icon={Package} tone="violet" />
+            <Package className="h-5 w-5 text-[#168b87]" strokeWidth={1.8} />
           </div>
           <Link
             to="/items"
@@ -135,7 +134,7 @@ function Dashboard() {
                 {data.totalBills}
               </p>
             </div>
-            <IconBadge icon={ReceiptText} tone="orange" />
+            <ReceiptText className="h-5 w-5 text-[#168b87]" strokeWidth={1.8} />
           </div>
           <Link
             to="/bills"
@@ -153,7 +152,7 @@ function Dashboard() {
                 {formatCurrency(data.totalIncome)}
               </p>
             </div>
-            <IconBadge icon={Wallet} tone="green" className="bg-emerald-400/15 text-emerald-300 dark:bg-emerald-400/15 dark:text-emerald-300" />
+            <Wallet className="h-5 w-5 text-teal-200" strokeWidth={1.8} />
           </div>
           <Link
             to="/payments"
@@ -182,7 +181,7 @@ function Dashboard() {
 
           <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
             <div
-              className="h-full rounded-full bg-[#20b2aa] transition-all duration-500"
+              className="h-full rounded-full bg-[#20b2aa]"
               style={{
                 width: `${paymentPercentage}%`,
               }}
@@ -278,7 +277,7 @@ function Dashboard() {
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             to="/students"
-            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
           >
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-[#168b87]" />
@@ -293,7 +292,7 @@ function Dashboard() {
 
           <Link
             to="/items"
-            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
           >
             <div className="flex items-center gap-3">
               <Package className="h-5 w-5 text-[#168b87]" />
@@ -310,7 +309,7 @@ function Dashboard() {
 
           <Link
             to="/bills"
-            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
           >
             <div className="flex items-center gap-3">
               <ReceiptText className="h-5 w-5 text-[#168b87]" />
@@ -325,7 +324,7 @@ function Dashboard() {
 
           <Link
             to="/payments"
-            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 transition hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
+            className="rounded-lg border border-slate-200 dark:border-[#263449] p-4 hover:border-[#20b2aa] hover:bg-[#f6fbfa] dark:hover:bg-[#162b3d]"
           >
             <div className="flex items-center gap-3">
               <Wallet className="h-5 w-5 text-[#168b87]" />

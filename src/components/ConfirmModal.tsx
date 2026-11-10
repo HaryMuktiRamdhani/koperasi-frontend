@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { AlertTriangle, LoaderCircle, X } from "lucide-react";
-import IconBadge from "./IconBadge";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -90,7 +89,7 @@ function ConfirmModal({
         className="w-full max-w-md rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 text-[#102a43] dark:text-slate-100 shadow-2xl"
       >
         <div className="flex items-start gap-4">
-          <IconBadge icon={AlertTriangle} tone="red" className="rounded-full" />
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-300" strokeWidth={1.8} />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <h2 id="confirm-modal-title" className="text-base font-semibold">{title}</h2>
@@ -105,7 +104,7 @@ function ConfirmModal({
         <div className="mt-6 flex justify-end gap-2">
           <button ref={cancelRef} type="button" onClick={onCancel} disabled={loading} className="cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] px-4 py-2 text-sm font-semibold text-[#102a43] dark:text-slate-100 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50">Batal</button>
           <button type="button" onClick={onConfirm} disabled={loading} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60">
-            {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+            {loading && <LoaderCircle className="h-4 w-4" />}
             {loading ? "Menghapus..." : "Ya, Hapus"}
           </button>
         </div>

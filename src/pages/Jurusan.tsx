@@ -203,7 +203,7 @@ function Jurusan() {
             <button
               type="button"
               onClick={resetForm}
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 dark:text-[#a7b4c7] transition hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:hover:text-slate-100"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-500 dark:text-[#a7b4c7] hover:bg-gray-100 dark:hover:bg-[#1b2a3d] hover:text-gray-900 dark:hover:text-slate-100"
             >
               <X className="h-4 w-4" />
               Batal
@@ -228,7 +228,7 @@ function Jurusan() {
                 onChange={(event) => setNama(event.target.value)}
                 required
                 maxLength={100}
-                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
@@ -247,7 +247,7 @@ function Jurusan() {
                 onChange={(event) => setKode(event.target.value)}
                 required
                 maxLength={20}
-                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm uppercase text-gray-900 dark:text-slate-100 outline-none transition placeholder:normal-case placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm uppercase text-gray-900 dark:text-slate-100 outline-none placeholder:normal-case placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
@@ -264,7 +264,7 @@ function Jurusan() {
                 onChange={(event) =>
                   setStatus(event.target.value as JurusanData["status"])
                 }
-                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="Aktif">Aktif</option>
                 <option value="Nonaktif">Nonaktif</option>
@@ -275,7 +275,7 @@ function Jurusan() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {editId ? (
                 <Pencil className="h-4 w-4" />
@@ -338,7 +338,7 @@ function Jurusan() {
                 </tr>
               ) : (
                 jurusan.map((item, index) => (
-                  <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-[#1b2a3d]/70">
+                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]/70">
                     <td className="px-5 py-4 text-gray-500 dark:text-[#a7b4c7] sm:px-6">
                       {index + 1}
                     </td>
