@@ -1,29 +1,19 @@
 import {
-  Archive,
-  Building2,
-  CircleHelp,
-  FileText,
   Languages,
   LockKeyhole,
   LogOut,
   MonitorCog,
-  ReceiptText,
   Settings as SettingsIcon,
   ShieldCheck,
-  UserCog,
   UserRound,
-  UsersRound,
-  WalletCards,
 } from "lucide-react";
 import { NavLink, Navigate, useNavigate, useParams } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import EmptyState from "../components/settings/EmptyState";
 import PageHeader from "../components/settings/PageHeader";
 import ProfileSettings from "../components/settings/ProfileSettings";
 import AppearanceSettings from "../components/settings/AppearanceSettings";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { useLanguage } from "../context/LanguageContext";
-import CooperativeProfileSettings from "../components/settings/CooperativeProfileSettings";
 import IconBadge, { type IconTone } from "../components/IconBadge";
 import SecuritySettings from "../components/settings/SecuritySettings";
 import ActiveSessionsSettings from "../components/settings/ActiveSessionsSettings";
@@ -34,16 +24,7 @@ type SettingsRoute =
   | "security"
   | "sessions"
   | "appearance"
-  | "language"
-  | "notifications"
-  | "identity"
-  | "finance"
-  | "payment-methods"
-  | "users"
-  | "roles"
-  | "audit-log"
-  | "help"
-  | "about";
+  | "language";
 
 interface SettingsMenuItem {
   id: SettingsRoute;
@@ -70,30 +51,6 @@ const groups: SettingsGroup[] = [
     items: [
       { id: "appearance", label: "Tampilan", icon: MonitorCog },
       { id: "language", label: "Bahasa & Regional", icon: Languages },
-      { id: "notifications", label: "Notifikasi", icon: CircleHelp },
-    ],
-  },
-  {
-    label: "Koperasi",
-    items: [
-      { id: "identity", label: "Identitas Koperasi", icon: Building2 },
-      { id: "finance", label: "Keuangan", icon: WalletCards },
-      { id: "payment-methods", label: "Metode Pembayaran", icon: ReceiptText },
-    ],
-  },
-  {
-    label: "Administrasi",
-    items: [
-      { id: "users", label: "Pengguna", icon: UserCog },
-      { id: "roles", label: "Peran & Hak Akses", icon: UsersRound },
-      { id: "audit-log", label: "Log Aktivitas", icon: FileText },
-    ],
-  },
-  {
-    label: "Bantuan",
-    items: [
-      { id: "help", label: "Bantuan & Dukungan", icon: CircleHelp },
-      { id: "about", label: "Tentang Aplikasi", icon: Archive },
     ],
   },
 ];
@@ -104,21 +61,11 @@ const routeDetails: Record<SettingsRoute, { title: string; description: string; 
   sessions: { title: "Sesi Aktif", description: "Kelola perangkat yang sedang menggunakan akun.", icon: ShieldCheck },
   appearance: { title: "Tampilan", description: "Preferensi tema dan tampilan aplikasi.", icon: MonitorCog },
   language: { title: "Bahasa & Regional", description: "Bahasa, format tanggal, dan preferensi regional.", icon: Languages },
-  notifications: { title: "Notifikasi", description: "Preferensi pemberitahuan aplikasi.", icon: CircleHelp },
-  identity: { title: "Identitas Koperasi", description: "Informasi identitas dan profil koperasi.", icon: Building2 },
-  finance: { title: "Keuangan", description: "Preferensi dan konfigurasi keuangan koperasi.", icon: WalletCards },
-  "payment-methods": { title: "Metode Pembayaran", description: "Pengaturan metode pembayaran yang tersedia.", icon: ReceiptText },
-  users: { title: "Pengguna", description: "Pengaturan pengelolaan pengguna aplikasi.", icon: UserCog },
-  roles: { title: "Peran & Hak Akses", description: "Pengaturan peran dan hak akses pengguna.", icon: UsersRound },
-  "audit-log": { title: "Log Aktivitas", description: "Riwayat aktivitas administrasi aplikasi.", icon: FileText },
-  help: { title: "Bantuan & Dukungan", description: "Petunjuk dan dukungan penggunaan aplikasi.", icon: CircleHelp },
-  about: { title: "Tentang Aplikasi", description: "Informasi versi dan sistem aplikasi.", icon: Archive },
 };
 
 const routeIds = groups.flatMap((group) => group.items.map((item) => item.id));
 const settingsIconTones: Record<SettingsRoute, IconTone> = {
-  profile: "blue", security: "red", sessions: "cyan", appearance: "violet", language: "blue", notifications: "orange",
-  identity: "teal", finance: "green", "payment-methods": "orange", users: "cyan", roles: "violet", "audit-log": "slate", help: "orange", about: "slate",
+  profile: "blue", security: "red", sessions: "cyan", appearance: "violet", language: "blue",
 };
 
 function Settings() {
@@ -188,7 +135,7 @@ function Settings() {
             </div>
           </div>
           <div className="pt-6">
-            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "security" ? <SecuritySettings /> : activeSection === "sessions" ? <ActiveSessionsSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : activeSection === "language" ? <LanguageSettings /> : activeSection === "identity" ? <CooperativeProfileSettings /> : <EmptyState title={detail.title} />}
+            {activeSection === "profile" ? <ProfileSettings /> : activeSection === "security" ? <SecuritySettings /> : activeSection === "sessions" ? <ActiveSessionsSettings /> : activeSection === "appearance" ? <AppearanceSettings /> : <LanguageSettings />}
           </div>
         </main>
       </div>
