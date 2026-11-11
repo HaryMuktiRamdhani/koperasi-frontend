@@ -14,7 +14,7 @@ const translations = {
     settings: "Pengaturan",
     settingsDescription: "Kelola preferensi dan konfigurasi aplikasi.",
     language: "Bahasa & Regional",
-    languageDescription: "Bahasa, format tanggal, dan preferensi regional.",
+    languageDescription: "Pilih bahasa yang digunakan di aplikasi.",
     profile: "Profil",
     dashboard: "Dashboard",
     logout: "Keluar",
@@ -65,13 +65,13 @@ const translations = {
     usDollar: "Dolar AS (USD)",
     hour24: "24 jam",
     hour12: "12 jam",
-    languageSaved: "Preferensi bahasa dan wilayah tersimpan di perangkat ini.",
+    languageSaved: "Preferensi bahasa tersimpan di perangkat ini.",
   },
   en: {
     settings: "Settings",
     settingsDescription: "Manage application preferences and configuration.",
     language: "Language & Regional",
-    languageDescription: "Language, date formats, and regional preferences.",
+    languageDescription: "Choose the language used in the application.",
     profile: "Profile",
     dashboard: "Dashboard",
     logout: "Log out",
@@ -123,8 +123,7 @@ const translations = {
     usDollar: "US dollar (USD)",
     hour24: "24-hour",
     hour12: "12-hour",
-    languageSaved:
-      "Language and regional preferences are saved on this device.",
+    languageSaved: "Language preference is saved on this device.",
   },
 } as const;
 
