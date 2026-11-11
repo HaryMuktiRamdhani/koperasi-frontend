@@ -18,7 +18,9 @@ function Toggle({ checked, onChange, label, disabled = false }: ToggleProps) {
         checked ? "bg-[#168b87]" : "bg-slate-300 dark:bg-slate-600"
       } disabled:cursor-not-allowed disabled:opacity-50`}
     >
-      <span className={`h-4 w-4 rounded-full bg-white ${checked ? "translate-x-5" : "translate-x-0"}`} />
+      <span
+        className={`h-4 w-4 rounded-full bg-white ${checked ? "translate-x-5" : "translate-x-0"}`}
+      />
     </button>
   );
 }

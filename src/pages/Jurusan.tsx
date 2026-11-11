@@ -161,7 +161,9 @@ function Jurusan() {
 
         <div className="text-sm text-gray-500 dark:text-[#a7b4c7]">
           Total{" "}
-          <span className="font-semibold text-gray-900 dark:text-slate-100">{jurusan.length}</span>{" "}
+          <span className="font-semibold text-gray-900 dark:text-slate-100">
+            {jurusan.length}
+          </span>{" "}
           jurusan
         </div>
       </div>
@@ -338,7 +340,10 @@ function Jurusan() {
                 </tr>
               ) : (
                 jurusan.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]/70">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]/70"
+                  >
                     <td className="px-5 py-4 text-gray-500 dark:text-[#a7b4c7] sm:px-6">
                       {index + 1}
                     </td>

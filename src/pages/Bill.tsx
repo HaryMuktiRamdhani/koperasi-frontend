@@ -947,7 +947,9 @@ function Bill() {
             key={String(label)}
             className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-3"
           >
-            <p className="text-xs text-slate-500 dark:text-[#a7b4c7]">{label}</p>
+            <p className="text-xs text-slate-500 dark:text-[#a7b4c7]">
+              {label}
+            </p>
             <p className="mt-1 text-xl font-semibold">{value}</p>
           </div>
         ))}
@@ -1040,7 +1042,9 @@ function Bill() {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      {bill.billDate ? formatDate(bill.billDate) : "Belum diatur"}
+                      {bill.billDate
+                        ? formatDate(bill.billDate)
+                        : "Belum diatur"}
                     </td>
                     <td className="px-3 py-2">
                       {bill.dueDate ? formatDate(bill.dueDate) : "Belum diatur"}

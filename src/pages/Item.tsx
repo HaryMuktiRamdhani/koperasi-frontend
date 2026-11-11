@@ -180,7 +180,9 @@ function Item() {
 
       <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Daftar Barang</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            Daftar Barang
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
@@ -197,8 +199,13 @@ function Item() {
 
             <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
               {barang.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
-                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">{index + 1}</td>
+                <tr
+                  key={item.id}
+                  className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                >
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
+                    {index + 1}
+                  </td>
 
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
                     {item.name}
@@ -214,7 +221,7 @@ function Item() {
                         item.status === "Aktif"
                           ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                           : item.status === "Akan Datang"
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                             : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-gray-300"
                       }`}
                     >

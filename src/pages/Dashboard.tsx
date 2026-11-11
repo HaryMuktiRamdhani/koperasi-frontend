@@ -46,7 +46,9 @@ function Dashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <p className="text-sm text-gray-500 dark:text-[#a7b4c7]">{t("dashboard")}...</p>
+        <p className="text-sm text-gray-500 dark:text-[#a7b4c7]">
+          {t("dashboard")}...
+        </p>
       </div>
     );
   }
@@ -93,7 +95,9 @@ function Dashboard() {
         <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">{t("totalStudents")}</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">
+                {t("totalStudents")}
+              </p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
                 {data.totalStudents}
               </p>
@@ -111,7 +115,9 @@ function Dashboard() {
         <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">{t("totalItems")}</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">
+                {t("totalItems")}
+              </p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
                 {data.totalItems}
               </p>
@@ -129,7 +135,9 @@ function Dashboard() {
         <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">{t("totalBills")}</p>
+              <p className="text-sm text-slate-500 dark:text-[#a7b4c7]">
+                {t("totalBills")}
+              </p>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-[#102a43] dark:text-slate-100">
                 {data.totalBills}
               </p>
@@ -144,81 +152,89 @@ function Dashboard() {
           </Link>
         </div>
 
-        {appearance.dashboardWidgets.cashSummary && <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-[#102a43] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.08)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-slate-300">{t("totalIncome")}</p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-white">
-                {formatCurrency(data.totalIncome)}
-              </p>
+        {appearance.dashboardWidgets.cashSummary && (
+          <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-[#102a43] p-5 shadow-[0_4px_18px_rgba(16,42,67,0.08)]">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-slate-300">{t("totalIncome")}</p>
+                <p className="mt-3 text-2xl font-semibold tracking-tight text-white">
+                  {formatCurrency(data.totalIncome)}
+                </p>
+              </div>
+              <Wallet className="h-5 w-5 text-teal-200" strokeWidth={1.8} />
             </div>
-            <Wallet className="h-5 w-5 text-teal-200" strokeWidth={1.8} />
+            <Link
+              to="/payments"
+              className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#5ed5cc] hover:text-white dark:hover:text-[#d5fffb]"
+            >
+              {t("viewPayments")} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link
-            to="/payments"
-            className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#5ed5cc] hover:text-white dark:hover:text-[#d5fffb]"
-          >
-            {t("viewPayments")} <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>}
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {appearance.dashboardWidgets.chart && <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-[#102a43] dark:text-slate-100">
-                {t("paymentStatus")}
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                {t("paymentStatusDescription")}
-              </p>
-            </div>
-            <span className="text-lg font-semibold text-[#168b87]">
-              {paymentPercentage}%
-            </span>
-          </div>
-
-          <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
-            <div
-              className="h-full rounded-full bg-[#20b2aa]"
-              style={{
-                width: `${paymentPercentage}%`,
-              }}
-            />
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/70 dark:bg-emerald-950/40 p-4">
-              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
-                <CheckCircle2 className="h-4 w-4" />
-                <p className="text-sm font-medium">{t("paid")}</p>
+        {appearance.dashboardWidgets.chart && (
+          <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-[#102a43] dark:text-slate-100">
+                  {t("paymentStatus")}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
+                  {t("paymentStatusDescription")}
+                </p>
               </div>
-              <p className="mt-2 text-xl font-semibold text-[#102a43] dark:text-slate-100">
-                {data.paidBills}
-              </p>
+              <span className="text-lg font-semibold text-[#168b87]">
+                {paymentPercentage}%
+              </span>
             </div>
-            <div className="rounded-lg border border-amber-200 bg-amber-50/60 dark:border-amber-900/70 dark:bg-amber-950/40 p-4">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                <Clock3 className="h-4 w-4" />
-                <p className="text-sm font-medium">{t("unpaid")}</p>
+
+            <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+              <div
+                className="h-full rounded-full bg-[#20b2aa]"
+                style={{
+                  width: `${paymentPercentage}%`,
+                }}
+              />
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/70 dark:bg-emerald-950/40 p-4">
+                <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <p className="text-sm font-medium">{t("paid")}</p>
+                </div>
+                <p className="mt-2 text-xl font-semibold text-[#102a43] dark:text-slate-100">
+                  {data.paidBills}
+                </p>
               </div>
-              <p className="mt-2 text-xl font-semibold text-[#102a43] dark:text-slate-100">
-                {data.unpaidBills}
-              </p>
+              <div className="rounded-lg border border-amber-200 bg-amber-50/60 dark:border-amber-900/70 dark:bg-amber-950/40 p-4">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                  <Clock3 className="h-4 w-4" />
+                  <p className="text-sm font-medium">{t("unpaid")}</p>
+                </div>
+                <p className="mt-2 text-xl font-semibold text-[#102a43] dark:text-slate-100">
+                  {data.unpaidBills}
+                </p>
+              </div>
             </div>
           </div>
-        </div>}
+        )}
 
         <div className="rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-6 shadow-[0_4px_18px_rgba(16,42,67,0.04)]">
-          <h2 className="text-base font-semibold text-[#102a43] dark:text-slate-100">{t("summary")}</h2>
+          <h2 className="text-base font-semibold text-[#102a43] dark:text-slate-100">
+            {t("summary")}
+          </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
             {t("summaryDescription")}
           </p>
 
           <div className="mt-5 divide-y divide-slate-100 dark:divide-[#263449]">
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Siswa terdaftar</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">
+                Siswa terdaftar
+              </span>
 
               <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
                 {data.totalStudents}
@@ -226,7 +242,9 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Barang tersedia</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">
+                Barang tersedia
+              </span>
 
               <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
                 {data.totalItems}
@@ -234,7 +252,9 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Total tagihan</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">
+                Total tagihan
+              </span>
 
               <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
                 {data.totalBills}
@@ -252,7 +272,9 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">Total pemasukan</span>
+              <span className="text-sm text-slate-600 dark:text-[#a7b4c7]">
+                Total pemasukan
+              </span>
 
               <span className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
                 {formatCurrency(data.totalIncome)}
@@ -283,9 +305,13 @@ function Dashboard() {
               <Users className="h-5 w-5 text-[#168b87]" />
 
               <div>
-                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">Data Siswa</p>
+                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">
+                  Data Siswa
+                </p>
 
-                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola siswa</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Kelola siswa
+                </p>
               </div>
             </div>
           </Link>
@@ -302,7 +328,9 @@ function Dashboard() {
                   Data Barang
                 </p>
 
-                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola barang</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Kelola barang
+                </p>
               </div>
             </div>
           </Link>
@@ -315,9 +343,13 @@ function Dashboard() {
               <ReceiptText className="h-5 w-5 text-[#168b87]" />
 
               <div>
-                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">Tagihan</p>
+                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">
+                  Tagihan
+                </p>
 
-                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Kelola tagihan</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Kelola tagihan
+                </p>
               </div>
             </div>
           </Link>
@@ -330,9 +362,13 @@ function Dashboard() {
               <Wallet className="h-5 w-5 text-[#168b87]" />
 
               <div>
-                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">Pembayaran</p>
+                <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">
+                  Pembayaran
+                </p>
 
-                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">Catat pembayaran</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Catat pembayaran
+                </p>
               </div>
             </div>
           </Link>

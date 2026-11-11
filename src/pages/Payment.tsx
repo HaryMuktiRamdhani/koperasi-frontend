@@ -234,8 +234,13 @@ function Payment() {
 
             <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
               {pembayaran.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
-                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">{index + 1}</td>
+                <tr
+                  key={item.id}
+                  className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                >
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
+                    {index + 1}
+                  </td>
 
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {formatDate(item.paymentDate)}

@@ -288,10 +288,9 @@ function Student() {
       resetForm();
       await loadData();
     } catch (requestError) {
-      const errorResponse = (requestError as AxiosError<{ message?: string }>).response;
-      setError(
-        errorResponse?.data?.message || "Gagal menyimpan data siswa.",
-      );
+      const errorResponse = (requestError as AxiosError<{ message?: string }>)
+        .response;
+      setError(errorResponse?.data?.message || "Gagal menyimpan data siswa.");
     } finally {
       setSaving(false);
     }
@@ -603,7 +602,10 @@ function Student() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
                 {pageItems.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                  >
                     <td className="px-5 py-3 text-gray-500 dark:text-[#a7b4c7]">
                       {(currentPage - 1) * filters.pageSize + index + 1}
                     </td>
@@ -621,13 +623,15 @@ function Student() {
                       {item.Jurusan?.kode || "-"}
                     </td>
                     <td className="px-5 py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        item.status === "Aktif"
-                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
-                          : item.status === "Akan Datang"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
-                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                      }`}>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          item.status === "Aktif"
+                            ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                            : item.status === "Akan Datang"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                        }`}
+                      >
                         {item.status}
                       </span>
                     </td>
@@ -668,7 +672,10 @@ function Student() {
                 ))}
                 {!pageItems.length && (
                   <tr>
-                    <td colSpan={8} className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]">
+                    <td
+                      colSpan={8}
+                      className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]"
+                    >
                       <p>
                         {filtered.length
                           ? "Halaman ini tidak memiliki data."

@@ -40,8 +40,14 @@ function SecuritySettings() {
   const [error, setError] = useState("");
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
-  const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [visiblePasswords, setVisiblePasswords] = useState<
+    Record<string, boolean>
+  >({});
 
   async function changePassword(event: FormEvent) {
     event.preventDefault();
@@ -52,9 +58,16 @@ function SecuritySettings() {
     }
     setPasswordSaving(true);
     try {
-      const response = await api.patch<{ message: string }>("/profile/password", passwords);
+      const response = await api.patch<{ message: string }>(
+        "/profile/password",
+        passwords,
+      );
       setMessage(response.data.message);
-      setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswords({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
       setPasswordOpen(false);
     } catch (passwordError) {
       setError(errorMessage(passwordError, "Gagal mengubah password."));
@@ -135,8 +148,18 @@ function SecuritySettings() {
         </p>
       )}
 
-      <SettingSection title="Ganti Password" description="Perbarui password akun secara berkala untuk menjaga keamanan.">
-        <button type="button" onClick={() => { setPasswordOpen(true); setError(""); }} className="inline-flex items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white">
+      <SettingSection
+        title="Ganti Password"
+        description="Perbarui password akun secara berkala untuk menjaga keamanan."
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setPasswordOpen(true);
+            setError("");
+          }}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white"
+        >
           <KeyRound className="h-4 w-4" /> Ubah Password
         </button>
       </SettingSection>
@@ -243,32 +266,91 @@ function SecuritySettings() {
 
       {passwordOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 dark:border-[#294254] dark:bg-[#122333]" role="dialog" aria-modal="true" aria-labelledby="password-title">
+          <div
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 dark:border-[#294254] dark:bg-[#122333]"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="password-title"
+          >
             <div className="flex items-center justify-between">
-              <h2 id="password-title" className="text-lg font-semibold">Ubah Password</h2>
-              <button type="button" onClick={() => setPasswordOpen(false)} aria-label="Tutup"><X className="h-5 w-5" /></button>
+              <h2 id="password-title" className="text-lg font-semibold">
+                Ubah Password
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPasswordOpen(false)}
+                aria-label="Tutup"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
             <form onSubmit={changePassword} className="mt-5 space-y-4">
-              {(["currentPassword", "newPassword", "confirmPassword"] as const).map((field) => (
+              {(
+                ["currentPassword", "newPassword", "confirmPassword"] as const
+              ).map((field) => (
                 <label key={field} className="block text-sm font-medium">
-                  {field === "currentPassword" ? "Password lama" : field === "newPassword" ? "Password baru" : "Konfirmasi password"}
+                  {field === "currentPassword"
+                    ? "Password lama"
+                    : field === "newPassword"
+                      ? "Password baru"
+                      : "Konfirmasi password"}
                   <div className="relative">
-                    <input required type={visiblePasswords[field] ? "text" : "password"} value={passwords[field]} onChange={(event) => setPasswords({ ...passwords, [field]: event.target.value })} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 pr-10 dark:border-[#294254] dark:bg-[#172b3d]" />
-                    <button type="button" onClick={() => setVisiblePasswords({ ...visiblePasswords, [field]: !visiblePasswords[field] })} className="absolute right-2 top-1/2 mt-0.5 -translate-y-1/2 text-slate-500" aria-label={visiblePasswords[field] ? "Sembunyikan password" : "Tampilkan password"}>
-                      {visiblePasswords[field] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <input
+                      required
+                      type={visiblePasswords[field] ? "text" : "password"}
+                      value={passwords[field]}
+                      onChange={(event) =>
+                        setPasswords({
+                          ...passwords,
+                          [field]: event.target.value,
+                        })
+                      }
+                      className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 pr-10 dark:border-[#294254] dark:bg-[#172b3d]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVisiblePasswords({
+                          ...visiblePasswords,
+                          [field]: !visiblePasswords[field],
+                        })
+                      }
+                      className="absolute right-2 top-1/2 mt-0.5 -translate-y-1/2 text-slate-500"
+                      aria-label={
+                        visiblePasswords[field]
+                          ? "Sembunyikan password"
+                          : "Tampilkan password"
+                      }
+                    >
+                      {visiblePasswords[field] ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </label>
               ))}
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setPasswordOpen(false)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold dark:border-[#294254]">Batal</button>
-                <button disabled={passwordSaving} type="submit" className="rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{passwordSaving ? "Menyimpan..." : "Simpan"}</button>
+                <button
+                  type="button"
+                  onClick={() => setPasswordOpen(false)}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold dark:border-[#294254]"
+                >
+                  Batal
+                </button>
+                <button
+                  disabled={passwordSaving}
+                  type="submit"
+                  className="rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                  {passwordSaving ? "Menyimpan..." : "Simpan"}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 }

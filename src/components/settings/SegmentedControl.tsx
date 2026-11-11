@@ -10,9 +10,17 @@ interface SegmentedControlProps<T extends string> {
   label?: string;
 }
 
-function SegmentedControl<T extends string>({ value, options, onChange, label }: SegmentedControlProps<T>) {
+function SegmentedControl<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+}: SegmentedControlProps<T>) {
   return (
-    <div aria-label={label} className="inline-flex rounded-lg border border-slate-200 p-1 dark:border-[#263449]">
+    <div
+      aria-label={label}
+      className="inline-flex rounded-lg border border-slate-200 p-1 dark:border-[#263449]"
+    >
       {options.map((option) => (
         <button
           key={option.value}

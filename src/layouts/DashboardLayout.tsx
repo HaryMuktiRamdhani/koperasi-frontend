@@ -279,7 +279,6 @@ function DashboardLayout() {
     try {
       await api.post("/auth/logout");
     } catch {
-      // The local credentials are cleared even if the network is unavailable.
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -526,7 +525,10 @@ function DashboardLayout() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
-                      <UserRound className="h-4 w-4 text-[#168b87]" strokeWidth={1.8} />
+                      <UserRound
+                        className="h-4 w-4 text-[#168b87]"
+                        strokeWidth={1.8}
+                      />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
                     <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">

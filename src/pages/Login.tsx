@@ -41,7 +41,6 @@ function Login() {
     } finally {
       setLoading(false);
     }
-
   }
 
   async function handleTwoFactor(event: FormEvent) {
@@ -49,14 +48,21 @@ function Login() {
     setLoading(true);
     setError("");
     try {
-      const payload = twoFactorCode.length === 6 ? { code: twoFactorCode } : { recoveryCode: twoFactorCode };
-      const response = await api.post("/auth/2fa/verify", payload, { headers: { Authorization: `Bearer ${pendingToken}` } });
+      const payload =
+        twoFactorCode.length === 6
+          ? { code: twoFactorCode }
+          : { recoveryCode: twoFactorCode };
+      const response = await api.post("/auth/2fa/verify", payload, {
+        headers: { Authorization: `Bearer ${pendingToken}` },
+      });
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       window.location.assign("/dashboard");
     } catch (verifyError: any) {
       setError(verifyError.response?.data?.message || "Verifikasi 2FA gagal");
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -105,75 +111,103 @@ function Login() {
             Gunakan akun yang telah diberikan oleh administrator.
           </p>
 
-          {pendingToken ? <form onSubmit={handleTwoFactor} className="space-y-5">
-            <p className="text-sm text-slate-600 dark:text-[#a7b4c7]">Masukkan kode dari aplikasi authenticator.</p>
-            <input required autoFocus value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.trim().toUpperCase())} placeholder="Kode 6 digit atau recovery code" className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-center text-lg tracking-[0.15em] dark:border-[#263449] dark:bg-[#1b2a3d] dark:text-slate-100" />
-            {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
-            <button type="submit" disabled={loading || twoFactorCode.length < 6} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#168b87] px-4 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"><ShieldCheck className="h-4 w-4" />{loading ? "Memverifikasi..." : "Verifikasi"}</button>
-          </form> : <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-300" />
-                <input
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="nama@sekolah.sch.id"
-                  className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-3 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
-                Password
-              </label>
-              <div className="relative">
-                <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-500 dark:text-violet-300" />
-                <input
-                  required
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Masukkan password"
-                  className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-10 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
-                />
-                <button
-                  type="button"
-                  aria-label={
-                    showPassword ? "Sembunyikan password" : "Tampilkan password"
-                  }
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#168b87]"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
-                {error}
+          {pendingToken ? (
+            <form onSubmit={handleTwoFactor} className="space-y-5">
+              <p className="text-sm text-slate-600 dark:text-[#a7b4c7]">
+                Masukkan kode dari aplikasi authenticator.
               </p>
-            )}
+              <input
+                required
+                autoFocus
+                value={twoFactorCode}
+                onChange={(event) =>
+                  setTwoFactorCode(event.target.value.trim().toUpperCase())
+                }
+                placeholder="Kode 6 digit atau recovery code"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-center text-lg tracking-[0.15em] dark:border-[#263449] dark:bg-[#1b2a3d] dark:text-slate-100"
+              />
+              {error && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
+                  {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={loading || twoFactorCode.length < 6}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#168b87] px-4 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {loading ? "Memverifikasi..." : "Verifikasi"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-300" />
+                  <input
+                    required
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="nama@sekolah.sch.id"
+                    className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-3 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+                  />
+                </div>
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#168b87] px-4 py-2.5 font-semibold text-white transition hover:bg-[#13716d] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              {loading ? "Memproses..." : "Masuk ke aplikasi"}
-            </button>
-          </form>}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-[#a7b4c7]">
+                  Password
+                </label>
+                <div className="relative">
+                  <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-500 dark:text-violet-300" />
+                  <input
+                    required
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Masukkan password"
+                    className="w-full rounded-lg border border-slate-200 dark:border-[#263449] py-2.5 pl-10 pr-10 text-slate-900 dark:text-slate-100 outline-none transition focus:border-[#20b2aa] focus:ring-2 focus:ring-[#20b2aa]/15"
+                  />
+                  <button
+                    type="button"
+                    aria-label={
+                      showPassword
+                        ? "Sembunyikan password"
+                        : "Tampilkan password"
+                    }
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#168b87]"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#168b87] px-4 py-2.5 font-semibold text-white transition hover:bg-[#13716d] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {loading ? "Memproses..." : "Masuk ke aplikasi"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

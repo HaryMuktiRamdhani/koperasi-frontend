@@ -67,7 +67,9 @@ function Sidebar() {
           className={`flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-[#263449] dark:bg-[#1b2a3d] ${compact ? "h-14 w-14" : "h-20 w-20"}`}
         >
           <img
-            src={profile.logoUrl || "/logo%20smk%201%20cisarua%20remove%20bg.png"}
+            src={
+              profile.logoUrl || "/logo%20smk%201%20cisarua%20remove%20bg.png"
+            }
             alt={`Logo ${profile.name}`}
             className="h-full w-full object-contain p-1.5"
           />

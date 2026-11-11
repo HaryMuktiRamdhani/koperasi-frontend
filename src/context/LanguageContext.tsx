@@ -26,7 +26,8 @@ const translations = {
     classes: "Kelas",
     majors: "Jurusan",
     search: "Cari menu...",
-    dashboardSubtitle: "Pantau data utama koperasi sekolah dan status pembayaran dalam satu tampilan.",
+    dashboardSubtitle:
+      "Pantau data utama koperasi sekolah dan status pembayaran dalam satu tampilan.",
     schoolSystem: "Sistem Informasi Sekolah",
     operationalData: "Data Operasional Sekolah",
     totalStudents: "Total Siswa",
@@ -82,7 +83,8 @@ const translations = {
     classes: "Classes",
     majors: "Majors",
     search: "Search menu...",
-    dashboardSubtitle: "Monitor key school cooperative data and payment status in one view.",
+    dashboardSubtitle:
+      "Monitor key school cooperative data and payment status in one view.",
     schoolSystem: "School Information System",
     operationalData: "School Operational Data",
     totalStudents: "Total Students",
@@ -99,7 +101,8 @@ const translations = {
     unpaid: "Unpaid",
     summary: "Summary",
     summaryDescription: "Key cooperative information at this time.",
-    settingsLanguageHint: "Changes are applied immediately throughout the application.",
+    settingsLanguageHint:
+      "Changes are applied immediately throughout the application.",
     appLanguage: "Application language",
     indonesia: "Bahasa Indonesia",
     english: "English",
@@ -120,7 +123,8 @@ const translations = {
     usDollar: "US dollar (USD)",
     hour24: "24-hour",
     hour12: "12-hour",
-    languageSaved: "Language and regional preferences are saved on this device.",
+    languageSaved:
+      "Language and regional preferences are saved on this device.",
   },
 } as const;
 
@@ -134,7 +138,9 @@ interface LanguageContextValue {
   formatDateTime: (value: Date | string | number) => string;
 }
 
-const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextValue | undefined>(
+  undefined,
+);
 
 function toDate(value: Date | string | number): Date {
   const date = value instanceof Date ? value : new Date(value);
@@ -153,11 +159,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const value = useMemo<LanguageContextValue>(() => {
     const locale = settings.language === "id" ? "id-ID" : "en-US";
     const numberLocale = settings.numberFormat === "id" ? "id-ID" : "en-US";
-    const dateOptions: Intl.DateTimeFormatOptions = settings.dateFormat === "short"
-      ? { day: "2-digit", month: "2-digit", year: "2-digit" }
-      : settings.dateFormat === "long"
-        ? { day: "2-digit", month: "long", year: "numeric" }
-        : { day: "numeric", month: "numeric", year: "numeric" };
+    const dateOptions: Intl.DateTimeFormatOptions =
+      settings.dateFormat === "short"
+        ? { day: "2-digit", month: "2-digit", year: "2-digit" }
+        : settings.dateFormat === "long"
+          ? { day: "2-digit", month: "long", year: "numeric" }
+          : { day: "numeric", month: "numeric", year: "numeric" };
     const timeOptions: Intl.DateTimeFormatOptions = {
       hour: "2-digit",
       minute: "2-digit",
@@ -167,20 +174,39 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       settings,
       updateLanguage,
       t: (key) => translations[settings.language][key] || translations.id[key],
-      formatNumber: (value) => new Intl.NumberFormat(numberLocale).format(value),
-      formatCurrency: (value) => new Intl.NumberFormat(locale, { style: "currency", currency: settings.currency, maximumFractionDigits: settings.currency === "IDR" ? 0 : 2 }).format(value),
-      formatDate: (value) => new Intl.DateTimeFormat(locale, { ...dateOptions, timeZone: settings.timeZone }).format(toDate(value)),
-      formatDateTime: (value) => new Intl.DateTimeFormat(locale, { ...dateOptions, ...timeOptions, timeZone: settings.timeZone }).format(toDate(value)),
+      formatNumber: (value) =>
+        new Intl.NumberFormat(numberLocale).format(value),
+      formatCurrency: (value) =>
+        new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency: settings.currency,
+          maximumFractionDigits: settings.currency === "IDR" ? 0 : 2,
+        }).format(value),
+      formatDate: (value) =>
+        new Intl.DateTimeFormat(locale, {
+          ...dateOptions,
+          timeZone: settings.timeZone,
+        }).format(toDate(value)),
+      formatDateTime: (value) =>
+        new Intl.DateTimeFormat(locale, {
+          ...dateOptions,
+          ...timeOptions,
+          timeZone: settings.timeZone,
+        }).format(toDate(value)),
     };
   }, [settings]);
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage harus digunakan di dalam LanguageProvider.");
+  if (!context)
+    throw new Error("useLanguage harus digunakan di dalam LanguageProvider.");
   return context;
 }
 
 export { DEFAULT_LANGUAGE_SETTINGS };
-

@@ -32,7 +32,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
 
-        <Route element={isAuthenticated ? <DashboardLayout /> : <Navigate to="/" replace />}>
+        <Route
+          element={
+            isAuthenticated ? <DashboardLayout /> : <Navigate to="/" replace />
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/jurusan" element={<Jurusan />} />
