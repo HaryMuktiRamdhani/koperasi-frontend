@@ -82,7 +82,7 @@ function StudentDetail() {
     <div className="space-y-6">
       <PageHeader
         title="Detail Siswa"
-        description="Informasi lengkap siswa dari data koperasi sekolah."
+        description="Informasi lengkap siswa dari data koperasi."
         icon={GraduationCap}
       />
       <div className="flex flex-wrap items-center justify-between gap-3">

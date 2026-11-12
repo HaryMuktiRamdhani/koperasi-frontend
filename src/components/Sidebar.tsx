@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { useCooperative } from "../context/CooperativeContext";
 
 export const menuItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -35,7 +34,6 @@ const sidebarGroups = [
 function Sidebar() {
   const { appearance } = useTheme();
   const { t } = useLanguage();
-  const { profile } = useCooperative();
   const compact = appearance.compactSidebar || appearance.autoHideSidebar;
   const labels: Record<string, string> = {
     "/dashboard": t("dashboard"),
@@ -67,10 +65,8 @@ function Sidebar() {
           className={`flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-[#263449] dark:bg-[#1b2a3d] ${compact ? "h-14 w-14" : "h-20 w-20"}`}
         >
           <img
-            src={
-              profile.logoUrl || "/logo%20smk%201%20cisarua%20remove%20bg.png"
-            }
-            alt={`Logo ${profile.name}`}
+            src="/stokpedia.png"
+            alt="Logo Stokpedia"
             className="h-full w-full object-contain p-1.5"
           />
         </div>
@@ -83,7 +79,7 @@ function Sidebar() {
             }
           >
             <h2 className="mt-3 max-w-47.5 truncate text-sm font-semibold tracking-wide">
-              {profile.name}
+              Stokpedia
             </h2>
           </div>
         )}

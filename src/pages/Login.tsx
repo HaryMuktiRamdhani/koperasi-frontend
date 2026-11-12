@@ -70,11 +70,13 @@ function Login() {
       <div className="hidden w-2/5 flex-col justify-between p-12 text-white lg:flex">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#20b2aa] text-sm font-bold text-[#102a43]">
-              KS
-            </div>
+            <img
+              src="/stokpedia.png"
+              alt="Logo Stokpedia"
+              className="h-11 w-11 rounded-xl object-contain"
+            />
             <span className="text-sm font-semibold tracking-wide">
-              Koperasi Sekolah
+              Stokpedia
             </span>
           </div>
           <div className="mt-32 max-w-sm">
@@ -82,7 +84,7 @@ function Login() {
               Ruang administrasi
             </p>
             <h1 className="mt-4 text-4xl font-semibold leading-tight">
-              Kelola koperasi sekolah dengan lebih terarah.
+              Kelola operasional koperasi dengan lebih terarah melalui Stokpedia.
             </h1>
             <p className="mt-5 text-sm leading-relaxed text-slate-300">
               Akses data siswa, barang, tagihan, dan pembayaran dalam satu
@@ -91,15 +93,17 @@ function Login() {
           </div>
         </div>
         <p className="text-xs text-slate-400">
-          Sistem Informasi Koperasi Sekolah
+          Stokpedia
         </p>
       </div>
       <div className="flex flex-1 items-center justify-center bg-[#f5f7fa] dark:bg-[#0b1220] px-5 py-10 sm:px-8">
         <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-7 shadow-[0_12px_36px_rgba(16,42,67,0.08)] sm:p-9">
           <div className="mb-8 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20b2aa] text-sm font-bold text-[#102a43]">
-              KS
-            </div>
+            <img
+              src="/stokpedia.png"
+              alt="Logo Stokpedia"
+              className="h-10 w-10 rounded-xl object-contain"
+            />
           </div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#168b87]">
             Selamat datang

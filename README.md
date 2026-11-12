@@ -1,12 +1,12 @@
-# Koperasi Sekolah Frontend
+# Stokpedia Frontend
 
-Frontend untuk Sistem Informasi Koperasi Sekolah. Aplikasi ini menyediakan antarmuka web untuk login, dashboard, pengelolaan data master, transaksi koperasi, manajemen pengguna, serta pengaturan akun dan aplikasi.
+Frontend untuk Stokpedia, sistem informasi koperasi sekolah. Aplikasi ini menyediakan antarmuka web untuk login, dashboard, pengelolaan data master, transaksi koperasi, manajemen pengguna, serta pengaturan akun dan aplikasi.
 
 Frontend dikembangkan sebagai aplikasi React terpisah dari backend dan berkomunikasi melalui REST API.
 
 ## Deskripsi Proyek
 
-Koperasi Sekolah adalah sistem informasi berbasis web yang membantu pengelolaan operasional koperasi sekolah secara terpusat. Aplikasi ini digunakan untuk mengelola data siswa, kelas, jurusan, barang, tagihan, dan pembayaran.
+Stokpedia adalah sistem informasi berbasis web yang membantu pengelolaan operasional koperasi sekolah secara terpusat. Aplikasi ini digunakan untuk mengelola data siswa, kelas, jurusan, barang, tagihan, dan pembayaran.
 
 Frontend ditujukan untuk pengguna internal koperasi sekolah, terutama:
 
@@ -349,4 +349,4 @@ Perintah `npm run build` menjalankan TypeScript check melalui `tsc`, kemudian me
 
 ## Penutup
 
-Project ini merupakan frontend application untuk Sistem Informasi Koperasi Sekolah. Frontend menyediakan antarmuka pengelolaan data, transaksi, akun, dan pengaturan yang terhubung ke backend melalui REST API, dengan dukungan autentikasi JWT, role admin/staff, tema light/dark, dan preferensi bahasa aplikasi.
+Project ini merupakan frontend application untuk Stokpedia. Frontend menyediakan antarmuka pengelolaan data, transaksi, akun, dan pengaturan yang terhubung ke backend melalui REST API, dengan dukungan autentikasi JWT, role admin/staff, tema light/dark, dan preferensi bahasa aplikasi.

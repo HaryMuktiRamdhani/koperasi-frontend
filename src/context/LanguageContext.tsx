@@ -27,7 +27,7 @@ const translations = {
     majors: "Jurusan",
     search: "Cari menu...",
     dashboardSubtitle:
-      "Pantau data utama koperasi sekolah dan status pembayaran dalam satu tampilan.",
+      "Pantau data utama koperasi dan status pembayaran melalui Stokpedia.",
     schoolSystem: "Sistem Informasi Sekolah",
     operationalData: "Data Operasional Sekolah",
     totalStudents: "Total Siswa",
