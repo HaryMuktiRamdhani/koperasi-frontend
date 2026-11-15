@@ -276,9 +276,8 @@ Frontend Stokpedia menggunakan sistem autentikasi berbasis JWT untuk mengatur ak
 1. Pengguna login menggunakan email dan password.
 2. Frontend mengirim data login ke backend melalui API.
 3. Jika login berhasil, token dan informasi pengguna disimpan di LocalStorage.
-4. Jika diperlukan, pengguna harus melewati verifikasi dua faktor (2FA).
-5. Halaman aplikasi dilindungi berdasarkan status login dan hak akses pengguna.
-6. Pengguna dapat keluar dari aplikasi melalui fitur logout.
+4. Halaman aplikasi dilindungi berdasarkan status login dan hak akses pengguna.
+5. Pengguna dapat keluar dari aplikasi melalui fitur logout.
 
 Stokpedia memiliki dua role pengguna, yaitu `admin` dan `staff`. Keduanya dapat menggunakan fitur aplikasi sesuai hak akses yang diberikan.
 
@@ -320,4 +319,4 @@ Perintah `npm run build` menjalankan TypeScript check melalui `tsc`, kemudian me
 
 ## Penutup
 
-Project ini merupakan frontend application untuk Stokpedia. Frontend menyediakan antarmuka pengelolaan data, transaksi, akun, dan pengaturan yang terhubung ke backend melalui REST API, dengan dukungan autentikasi JWT, role admin/staff, tema light/dark, dan preferensi bahasa aplikasi.
+Project Stokpedia merupakan aplikasi frontend yang dirancang untuk membantu pengelolaan data dan kegiatan koperasi sekolah.
