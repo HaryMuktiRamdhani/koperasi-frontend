@@ -26,6 +26,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 | React Router DOM 7 | Routing halaman dan proteksi navigasi |
 | Axios | HTTP client untuk komunikasi dengan REST API |
 | Lucide React | Ikon pada navigasi dan komponen antarmuka |
+| SheetJS (`xlsx`) | Membaca, memvalidasi, membuat template, dan menulis file Excel |
 | React DOM | Render aplikasi React ke halaman browser |
 
 ## Fitur Frontend
@@ -70,6 +71,13 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 - Menggunakan data kelas dan jurusan sebagai relasi pada form siswa.
 - Menyediakan pencarian, filter, dan tampilan status sesuai implementasi halaman.
 - Menyediakan halaman detail siswa melalui route `/students/:id`.
+- Mengekspor seluruh data siswa terbaru ke file `data_siswa.xlsx`, bukan hanya data pada halaman aktif.
+- Mengunduh template `template_data_siswa.xlsx` dengan header `NIS`, `Nama Siswa`, `Kelas`, `Jurusan`, `Angkatan`, dan `Status`.
+- Menyediakan worksheet petunjuk pengisian pada template Excel.
+- Mengimpor file `.xlsx` melalui preview sebelum penyimpanan.
+- Memvalidasi kolom wajib, format tahun angkatan, status, duplikasi NIS, kelas, jurusan, dan relasi kelas-jurusan.
+- Mencocokkan jurusan berdasarkan nama atau kode dari data master yang dimuat melalui API.
+- Menyimpan hanya baris valid melalui endpoint siswa yang sudah tersedia dan menampilkan ringkasan hasil import.
 
 #### Barang
 
@@ -273,6 +281,14 @@ Endpoint berikut ditemukan dari pemakaian API pada source code frontend:
 - Interceptor response mendeteksi response `401` yang menandakan sesi tidak valid atau kedaluwarsa.
 - Untuk error sesi tersebut, token dan informasi user dihapus dari browser, pesan singkat disimpan sementara, lalu pengguna diarahkan ke `/`.
 - Halaman menampilkan pesan error dari response API ketika tersedia, dengan fallback yang lebih umum untuk pengguna.
+
+### Import dan Export Excel
+
+- Fitur Excel menggunakan library SheetJS (`xlsx`) di browser.
+- Export menggunakan seluruh data dari `GET /students`, sehingga tidak terbatas pada filter atau pagination halaman aktif.
+- Import tidak menggunakan endpoint baru. Setelah preview dan validasi frontend, setiap baris valid dikirim melalui `POST /students`; validasi relasi dan keunikan data tetap diperiksa kembali oleh backend.
+- File template dan hasil export menggunakan urutan kolom yang sama: `NIS`, `Nama Siswa`, `Kelas`, `Jurusan`, `Angkatan`, dan `Status`.
+- NIS diproses sebagai teks untuk mempertahankan angka nol di depan. Jurusan dapat diisi menggunakan nama atau kode yang tersedia pada data master.
 
 ## Pengelolaan Data pada Browser
 
