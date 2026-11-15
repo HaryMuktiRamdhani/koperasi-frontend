@@ -223,7 +223,7 @@ Beberapa kelompok endpoint yang digunakan meliputi:
 
 | **Modul** | **Fungsi** |
 | --- | --- |
-| Authentication | Mengelola proses login, verifikasi dua faktor, dan sesi pengguna |
+| Authentication | Registrasi dan Login Pengguna |
 | Dashboard | Mengambil ringkasan informasi dan statistik koperasi |
 | Jurusan | Mengambil dan mengelola data jurusan |
 | Kelas | Mengambil dan mengelola data kelas serta relasi jurusan |
