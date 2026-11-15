@@ -86,7 +86,6 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Memuat daftar tagihan yang dapat dipilih untuk pembayaran.
 - Membuat pembayaran baru melalui endpoint backend.
 - Menampilkan informasi tagihan, siswa, barang, tanggal pembayaran, jumlah, dan status yang tersedia dari response API.
-- Memformat tanggal dan nominal pembayaran sesuai pengaturan aplikasi.
 
 ### 4. Pengguna
 
@@ -98,7 +97,6 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Mengubah data pengguna yang tersedia melalui fitur edit.
 - Mengaktifkan atau menonaktifkan status pengguna.
 - Mempertahankan perlindungan backend untuk akun admin aktif terakhir.
-- Membatasi route `/users` untuk role `admin`.
 - Tidak menampilkan password atau hash password dari response pengguna.
 
 ### 5. Settings
