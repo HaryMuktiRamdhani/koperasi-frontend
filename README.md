@@ -264,7 +264,6 @@ Frontend Stokpedia menggunakan LocalStorage dan SessionStorage untuk menyimpan b
 | LocalStorage | `user` | Menyimpan informasi pengguna |
 | LocalStorage | `koperasi.settings.appearance` | Menyimpan preferensi tampilan aplikasi |
 | LocalStorage | `koperasi.settings.language` | Menyimpan preferensi bahasa |
-| SessionStorage | `authMessage` | Menyimpan pesan sementara terkait sesi autentikasi |
 
 Selain itu, frontend menggunakan React Context untuk mengelola state aplikasi seperti tema, bahasa, identitas koperasi, dan tampilan sidebar.
 
