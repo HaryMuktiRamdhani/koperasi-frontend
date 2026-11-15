@@ -46,6 +46,7 @@ interface ClassData {
   level: string;
   academicYear: string;
   status: string;
+  jurusanId?: string;
   jurusanIds?: string[];
 }
 interface Major {
@@ -351,182 +352,269 @@ function Student() {
       setDeleteLoading(false);
     }
   }
-    function cellText(value: unknown) {
-      return String(value ?? "").trim();
+  function cellText(value: unknown) {
+    return String(value ?? "").trim();
+  }
+  function normaliseLookup(value: string) {
+    return value.trim().replace(/\s+/g, " ").toLocaleLowerCase("id-ID");
+  }
+  function formatWorkbookSheet(
+    sheet: XLSX.WorkSheet,
+    rowCount: number,
+    includeDataTypes = true,
+  ) {
+    sheet["!cols"] = [14, 28, 22, 30, 14, 16].map((wch) => ({ wch }));
+    sheet["!autofilter"] = { ref: `A1:F${Math.max(rowCount, 1)}` };
+    for (let column = 0; column < excelHeaders.length; column += 1) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: column });
+      const headerCell = sheet[address];
+      if (headerCell) {
+        headerCell.s = {
+          fill: { fgColor: { rgb: "168B87" } },
+          font: { bold: true, color: { rgb: "FFFFFF" } },
+          alignment: { horizontal: "center" },
+          border: {
+            bottom: { style: "thin", color: { rgb: "0F766E" } },
+          },
+        };
+      }
     }
-    function downloadWorkbook(rows: (string | number)[][], fileName: string) {
+    if (!includeDataTypes) return;
+    for (let row = 1; row < rowCount; row += 1) {
+      const nisCell = sheet[XLSX.utils.encode_cell({ r: row, c: 0 })];
+      if (nisCell) {
+        nisCell.t = "s";
+        nisCell.z = "@";
+      }
+      const generationCell = sheet[
+        XLSX.utils.encode_cell({ r: row, c: 4 })
+      ];
+      if (generationCell && /^\d{4}$/.test(String(generationCell.v))) {
+        generationCell.t = "n";
+        generationCell.v = Number(generationCell.v);
+        generationCell.z = "0";
+      }
+    }
+  }
+  function downloadWorkbook(
+    rows: (string | number)[][],
+    fileName: string,
+    instructions?: (string | number)[][],
+  ) {
       const sheet = XLSX.utils.aoa_to_sheet(rows);
-      sheet["!cols"] = excelHeaders.map((header) => ({
-        wch: Math.max(header.length + 2, 18),
-      }));
+      formatWorkbookSheet(sheet, rows.length);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, sheet, "Data Siswa");
+      if (instructions) {
+        const instructionSheet = XLSX.utils.aoa_to_sheet(instructions);
+        instructionSheet["!cols"] = [{ wch: 24 }, { wch: 90 }];
+        XLSX.utils.book_append_sheet(workbook, instructionSheet, "Petunjuk");
+      }
       XLSX.writeFile(workbook, fileName);
-    }
-    function downloadTemplate() {
-      downloadWorkbook(
+  }
+  function downloadTemplate() {
+    const templateClass =
+      classes.find((item) => item.status === "Aktif") || classes[0];
+    const templateMajor =
+      majors.find(
+        (item) =>
+          templateClass &&
+          relationKnownForClass(templateClass.id, item.id),
+      ) || majors[0];
+    downloadWorkbook(
+      [
+        [...excelHeaders],
         [
-          [...excelHeaders],
-          ["2024001", "Contoh Nama Siswa", "XII IPA 1", "IPA", "2024", "Aktif"],
+          "2024001",
+          "Contoh Nama Siswa",
+          templateClass?.name || "Isi sesuai data master",
+          templateMajor?.kode || templateMajor?.nama || "Isi sesuai data master",
+          2024,
+          "Aktif",
         ],
-        "template_data_siswa.xlsx",
+      ],
+      "template_data_siswa.xlsx",
+      [
+        ["Kolom", "Petunjuk pengisian"],
+        ["NIS", "Wajib diisi sebagai teks. Jangan menghapus angka nol di depan."],
+        ["Nama Siswa", "Wajib diisi."],
+        ["Kelas", "Gunakan nama kelas yang tersedia pada menu Data Kelas."],
+        ["Jurusan", "Gunakan nama atau kode jurusan dari data master."],
+        ["Angkatan", "Gunakan tahun empat digit, contoh 2024."],
+        ["Status", `Gunakan salah satu: ${statuses.join(", ")}.`],
+        ["Catatan", "Hapus baris contoh sebelum mengimpor data sebenarnya."],
+      ],
+    );
+  }
+  function exportStudents() {
+    downloadWorkbook(
+      [
+        [...excelHeaders],
+        ...students.map((student) => [
+          student.nis,
+          student.name,
+          student.Class?.name || "",
+          student.Jurusan?.nama || student.Jurusan?.kode || "",
+          student.generation,
+          student.status,
+        ]),
+      ],
+      "data_siswa.xlsx",
+    );
+  }
+  function closeImport() {
+    if (importing) return;
+    setImportOpen(false);
+    setImportRows([]);
+    setImportFileName("");
+    setImportError("");
+    setImportSummary(null);
+  }
+  async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setImportFileName(file.name);
+    setImportError("");
+    setImportSummary(null);
+    try {
+      if (!file.name.toLowerCase().endsWith(".xlsx")) {
+        throw new Error("File harus berformat .xlsx.");
+      }
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      if (!firstSheet) throw new Error("Sheet Data Siswa tidak ditemukan.");
+      const rows = XLSX.utils.sheet_to_json<unknown[]>(firstSheet, {
+        header: 1,
+        defval: "",
+        raw: false,
+      });
+      const header = (rows[0] || []).map(cellText);
+      if (
+        header.length !== excelHeaders.length ||
+        excelHeaders.some((value, index) => header[index] !== value)
+      ) {
+        throw new Error(`Header harus persis: ${excelHeaders.join(", ")}.`);
+      }
+      const existingNis = new Set(
+        students.map((student) => normaliseLookup(student.nis)),
       );
-    }
-    function exportStudents() {
-      downloadWorkbook(
-        [
-          [...excelHeaders],
-          ...students.map((student) => [
-            student.nis,
-            student.name,
-            student.Class?.name || "",
-            student.Jurusan?.nama || "",
-            student.generation,
-            student.status,
-          ]),
-        ],
-        "data_siswa.xlsx",
-      );
-    }
-    function closeImport() {
-      if (importing) return;
-      setImportOpen(false);
-      setImportRows([]);
-      setImportFileName("");
-      setImportError("");
-      setImportSummary(null);
-    }
-    async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
-      const file = event.target.files?.[0];
-      event.target.value = "";
-      if (!file) return;
-      setImportFileName(file.name);
-      setImportError("");
-      setImportSummary(null);
-      try {
-        if (!file.name.toLowerCase().endsWith(".xlsx")) {
-          throw new Error("File harus berformat .xlsx.");
+      const fileNis = new Set<string>();
+      const parsedRows: ImportStudentRow[] = [];
+      rows.slice(1).forEach((row, index) => {
+        const values = row as unknown[];
+        const [nis, name, className, majorName, generation, rawStatus] =
+          values.slice(0, excelHeaders.length).map(cellText);
+        if (![nis, name, className, majorName, generation, rawStatus].some(Boolean)) {
+          return;
         }
-        const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        if (!firstSheet) throw new Error("Sheet Excel tidak ditemukan.");
-        const rows = XLSX.utils.sheet_to_json<unknown[]>(firstSheet, {
-          header: 1,
-          defval: "",
-          raw: false,
-        });
-        const header = (rows[0] || []).map(cellText);
-        if (
-          header.length !== excelHeaders.length ||
-          excelHeaders.some((value, index) => header[index] !== value)
-        ) {
-          throw new Error(
-            `Header harus persis: ${excelHeaders.join(", ")}.`,
-          );
-        }
-        const existingNis = new Set(
-          students.map((student) => student.nis.trim().toLowerCase()),
+        const errors: string[] = [];
+        const nisKey = normaliseLookup(nis);
+        const selectedClass = classes.find(
+          (item) => normaliseLookup(item.name) === normaliseLookup(className),
         );
-        const fileNis = new Set<string>();
-        const parsedRows: ImportStudentRow[] = [];
-        rows.slice(1).forEach((row, index) => {
-          const values = row as unknown[];
-          const [nis, name, className, majorName, generation, status] =
-            values.slice(0, excelHeaders.length).map(cellText);
-          if (![nis, name, className, majorName, generation, status].some(Boolean)) {
-            return;
-          }
-          const errors: string[] = [];
-          const nisKey = nis.toLowerCase();
-          const selectedClass = classes.find(
-            (item) => item.name.trim().toLowerCase() === className.toLowerCase(),
+        const selectedMajor = majors.find((item) => {
+          const lookup = normaliseLookup(majorName);
+          return (
+            normaliseLookup(item.nama) === lookup ||
+            normaliseLookup(item.kode) === lookup
           );
-          const selectedMajor = majors.find(
-            (item) => item.nama.trim().toLowerCase() === majorName.toLowerCase(),
-          );
-          if (!nis) errors.push("NIS wajib diisi.");
-          else if (existingNis.has(nisKey)) errors.push("NIS sudah terdaftar.");
-          else if (fileNis.has(nisKey)) errors.push("NIS duplikat dalam file.");
-          else fileNis.add(nisKey);
-          if (!name) errors.push("Nama siswa wajib diisi.");
-          if (!className) errors.push("Kelas wajib diisi.");
-          else if (!selectedClass) errors.push("Nama kelas tidak ditemukan.");
-          else if (selectedClass.status !== "Aktif")
-            errors.push("Kelas tidak berstatus Aktif.");
-          if (!majorName) errors.push("Jurusan wajib diisi.");
-          else if (!selectedMajor) errors.push("Nama jurusan tidak ditemukan.");
-          if (
-            selectedClass &&
-            selectedMajor &&
-            !relationKnownForClass(selectedClass.id, selectedMajor.id)
-          ) {
-            errors.push("Jurusan tidak sesuai dengan relasi kelas.");
-          }
-          if (!generation) errors.push("Angkatan wajib diisi.");
-          if (!statuses.includes(status)) {
-            errors.push(`Status harus salah satu dari: ${statuses.join(", ")}.`);
-          }
-          const parsed: ImportStudentRow = {
-            rowNumber: index + 2,
+        });
+        const selectedStatus = statuses.find(
+          (status) => normaliseLookup(status) === normaliseLookup(rawStatus),
+        );
+        if (!nis) errors.push("NIS wajib diisi.");
+        else if (existingNis.has(nisKey)) errors.push("NIS sudah terdaftar.");
+        else if (fileNis.has(nisKey)) errors.push("NIS duplikat dalam file.");
+        else fileNis.add(nisKey);
+        if (!name) errors.push("Nama siswa wajib diisi.");
+        if (!className) errors.push("Kelas wajib diisi.");
+        else if (!selectedClass) errors.push("Nama kelas tidak ditemukan.");
+        else if (selectedClass.status !== "Aktif")
+          errors.push("Kelas tidak berstatus Aktif.");
+        if (!majorName) errors.push("Jurusan wajib diisi.");
+        else if (!selectedMajor)
+          errors.push("Nama atau kode jurusan tidak ditemukan.");
+        if (
+          selectedClass &&
+          selectedMajor &&
+          !relationKnownForClass(selectedClass.id, selectedMajor.id)
+        ) {
+          errors.push("Jurusan tidak sesuai dengan relasi kelas.");
+        }
+        if (!/^(19|20)\d{2}$/.test(generation)) {
+          errors.push("Angkatan harus berupa tahun empat digit yang valid.");
+        }
+        if (!selectedStatus) {
+          errors.push(`Status harus salah satu dari: ${statuses.join(", ")}.`);
+        }
+        const parsed: ImportStudentRow = {
+          rowNumber: index + 2,
+          nis,
+          name,
+          className,
+          majorName,
+          generation,
+          status: selectedStatus || rawStatus,
+          errors,
+        };
+        if (!errors.length && selectedClass && selectedMajor && selectedStatus) {
+          parsed.payload = {
             nis,
             name,
-            className,
-            majorName,
+            classId: selectedClass.id,
+            jurusanId: selectedMajor.id,
             generation,
-            status,
-            errors,
+            status: selectedStatus,
           };
-          if (!errors.length && selectedClass && selectedMajor) {
-            parsed.payload = {
-              nis,
-              name,
-              classId: selectedClass.id,
-              jurusanId: selectedMajor.id,
-              generation,
-              status,
-            };
-          }
-          parsedRows.push(parsed);
-        });
-        if (!parsedRows.length) throw new Error("Tidak ada data siswa untuk diimpor.");
-        setImportRows(parsedRows);
-        setImportOpen(true);
-      } catch (fileError) {
-        setImportRows([]);
-        setImportOpen(true);
-        setImportError(
-          fileError instanceof Error ? fileError.message : "File Excel tidak dapat dibaca.",
-        );
-      }
+        }
+        parsedRows.push(parsed);
+      });
+      if (!parsedRows.length) throw new Error("Tidak ada data siswa untuk diimpor.");
+      setImportRows(parsedRows);
+      setImportOpen(true);
+    } catch (fileError) {
+      setImportRows([]);
+      setImportOpen(true);
+      setImportError(
+        fileError instanceof Error
+          ? fileError.message
+          : "File Excel tidak dapat dibaca.",
+      );
     }
-    async function importValidRows() {
-      const validRows = importRows.filter((row) => row.payload);
-      if (!validRows.length || importing) return;
-      setImporting(true);
-      setImportError("");
-      let imported = 0;
-      let failed = 0;
-      const nextRows = importRows.map((row) => ({ ...row, errors: [...row.errors] }));
-      for (const row of validRows) {
-        try {
-          await api.post("/students", row.payload);
-          imported += 1;
-        } catch (requestError) {
-          failed += 1;
-          const message = (requestError as AxiosError<{ message?: string }>).response
-            ?.data?.message;
-          const target = nextRows.find((item) => item.rowNumber === row.rowNumber);
-          if (target) {
-            target.errors = [message || "Gagal menyimpan data siswa."];
-            delete target.payload;
-          }
+  }
+  async function importValidRows() {
+    const validRows = importRows.filter((row) => row.payload);
+    if (!validRows.length || importing) return;
+    setImporting(true);
+    setImportError("");
+    let imported = 0;
+    let failed = 0;
+    const nextRows = importRows.map((row) => ({
+      ...row,
+      errors: [...row.errors],
+    }));
+    for (const row of validRows) {
+      try {
+        await api.post("/students", row.payload);
+        imported += 1;
+      } catch (requestError) {
+        failed += 1;
+        const message = (
+          requestError as AxiosError<{ message?: string }>
+        ).response?.data?.message;
+        const target = nextRows.find((item) => item.rowNumber === row.rowNumber);
+        if (target) {
+          target.errors = [message || "Gagal menyimpan data siswa."];
+          delete target.payload;
         }
       }
-      setImportRows(nextRows);
-      setImportSummary({ imported, failed });
-      await loadData();
-      setImporting(false);
     }
+    setImportRows(nextRows);
+    setImportSummary({ imported, failed });
+    await loadData();
+    setImporting(false);
+  }
   function setClass(value: string) {
     const relationIds = relationIdsForClass(value);
     setForm((current) => ({
