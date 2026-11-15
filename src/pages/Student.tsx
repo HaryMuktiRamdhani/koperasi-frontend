@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
 import {
   ChevronLeft,
   ChevronRight,
+  Download,
   Eye,
+  FileSpreadsheet,
   Pencil,
   Search,
   SlidersHorizontal,
   Trash2,
+  Upload,
   Users,
   X,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { AxiosError } from "axios";
+import type { ChangeEvent, FormEvent } from "react";
+import * as XLSX from "xlsx";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
@@ -50,7 +54,34 @@ interface Major {
   kode: string;
 }
 
+interface ImportStudentRow {
+  rowNumber: number;
+  nis: string;
+  name: string;
+  className: string;
+  majorName: string;
+  generation: string;
+  status: string;
+  errors: string[];
+  payload?: {
+    nis: string;
+    name: string;
+    classId: string;
+    jurusanId: string;
+    generation: string;
+    status: string;
+  };
+}
+
 const statuses = ["Aktif", "Lulus", "Pindah", "Keluar"];
+const excelHeaders = [
+  "NIS",
+  "Nama Siswa",
+  "Kelas",
+  "Jurusan",
+  "Angkatan",
+  "Status",
+] as const;
 
 function Student() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,6 +107,15 @@ function Student() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [importOpen, setImportOpen] = useState(false);
+  const [importRows, setImportRows] = useState<ImportStudentRow[]>([]);
+  const [importFileName, setImportFileName] = useState("");
+  const [importError, setImportError] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importSummary, setImportSummary] = useState<{
+    imported: number;
+    failed: number;
+  } | null>(null);
 
   function updateFilters(patch: Partial<StudentFilterState>, replace = true) {
     const next = { ...filters, ...patch };
@@ -311,6 +351,182 @@ function Student() {
       setDeleteLoading(false);
     }
   }
+    function cellText(value: unknown) {
+      return String(value ?? "").trim();
+    }
+    function downloadWorkbook(rows: (string | number)[][], fileName: string) {
+      const sheet = XLSX.utils.aoa_to_sheet(rows);
+      sheet["!cols"] = excelHeaders.map((header) => ({
+        wch: Math.max(header.length + 2, 18),
+      }));
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, sheet, "Data Siswa");
+      XLSX.writeFile(workbook, fileName);
+    }
+    function downloadTemplate() {
+      downloadWorkbook(
+        [
+          [...excelHeaders],
+          ["2024001", "Contoh Nama Siswa", "XII IPA 1", "IPA", "2024", "Aktif"],
+        ],
+        "template_data_siswa.xlsx",
+      );
+    }
+    function exportStudents() {
+      downloadWorkbook(
+        [
+          [...excelHeaders],
+          ...students.map((student) => [
+            student.nis,
+            student.name,
+            student.Class?.name || "",
+            student.Jurusan?.nama || "",
+            student.generation,
+            student.status,
+          ]),
+        ],
+        "data_siswa.xlsx",
+      );
+    }
+    function closeImport() {
+      if (importing) return;
+      setImportOpen(false);
+      setImportRows([]);
+      setImportFileName("");
+      setImportError("");
+      setImportSummary(null);
+    }
+    async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (!file) return;
+      setImportFileName(file.name);
+      setImportError("");
+      setImportSummary(null);
+      try {
+        if (!file.name.toLowerCase().endsWith(".xlsx")) {
+          throw new Error("File harus berformat .xlsx.");
+        }
+        const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        if (!firstSheet) throw new Error("Sheet Excel tidak ditemukan.");
+        const rows = XLSX.utils.sheet_to_json<unknown[]>(firstSheet, {
+          header: 1,
+          defval: "",
+          raw: false,
+        });
+        const header = (rows[0] || []).map(cellText);
+        if (
+          header.length !== excelHeaders.length ||
+          excelHeaders.some((value, index) => header[index] !== value)
+        ) {
+          throw new Error(
+            `Header harus persis: ${excelHeaders.join(", ")}.`,
+          );
+        }
+        const existingNis = new Set(
+          students.map((student) => student.nis.trim().toLowerCase()),
+        );
+        const fileNis = new Set<string>();
+        const parsedRows: ImportStudentRow[] = [];
+        rows.slice(1).forEach((row, index) => {
+          const values = row as unknown[];
+          const [nis, name, className, majorName, generation, status] =
+            values.slice(0, excelHeaders.length).map(cellText);
+          if (![nis, name, className, majorName, generation, status].some(Boolean)) {
+            return;
+          }
+          const errors: string[] = [];
+          const nisKey = nis.toLowerCase();
+          const selectedClass = classes.find(
+            (item) => item.name.trim().toLowerCase() === className.toLowerCase(),
+          );
+          const selectedMajor = majors.find(
+            (item) => item.nama.trim().toLowerCase() === majorName.toLowerCase(),
+          );
+          if (!nis) errors.push("NIS wajib diisi.");
+          else if (existingNis.has(nisKey)) errors.push("NIS sudah terdaftar.");
+          else if (fileNis.has(nisKey)) errors.push("NIS duplikat dalam file.");
+          else fileNis.add(nisKey);
+          if (!name) errors.push("Nama siswa wajib diisi.");
+          if (!className) errors.push("Kelas wajib diisi.");
+          else if (!selectedClass) errors.push("Nama kelas tidak ditemukan.");
+          else if (selectedClass.status !== "Aktif")
+            errors.push("Kelas tidak berstatus Aktif.");
+          if (!majorName) errors.push("Jurusan wajib diisi.");
+          else if (!selectedMajor) errors.push("Nama jurusan tidak ditemukan.");
+          if (
+            selectedClass &&
+            selectedMajor &&
+            !relationKnownForClass(selectedClass.id, selectedMajor.id)
+          ) {
+            errors.push("Jurusan tidak sesuai dengan relasi kelas.");
+          }
+          if (!generation) errors.push("Angkatan wajib diisi.");
+          if (!statuses.includes(status)) {
+            errors.push(`Status harus salah satu dari: ${statuses.join(", ")}.`);
+          }
+          const parsed: ImportStudentRow = {
+            rowNumber: index + 2,
+            nis,
+            name,
+            className,
+            majorName,
+            generation,
+            status,
+            errors,
+          };
+          if (!errors.length && selectedClass && selectedMajor) {
+            parsed.payload = {
+              nis,
+              name,
+              classId: selectedClass.id,
+              jurusanId: selectedMajor.id,
+              generation,
+              status,
+            };
+          }
+          parsedRows.push(parsed);
+        });
+        if (!parsedRows.length) throw new Error("Tidak ada data siswa untuk diimpor.");
+        setImportRows(parsedRows);
+        setImportOpen(true);
+      } catch (fileError) {
+        setImportRows([]);
+        setImportOpen(true);
+        setImportError(
+          fileError instanceof Error ? fileError.message : "File Excel tidak dapat dibaca.",
+        );
+      }
+    }
+    async function importValidRows() {
+      const validRows = importRows.filter((row) => row.payload);
+      if (!validRows.length || importing) return;
+      setImporting(true);
+      setImportError("");
+      let imported = 0;
+      let failed = 0;
+      const nextRows = importRows.map((row) => ({ ...row, errors: [...row.errors] }));
+      for (const row of validRows) {
+        try {
+          await api.post("/students", row.payload);
+          imported += 1;
+        } catch (requestError) {
+          failed += 1;
+          const message = (requestError as AxiosError<{ message?: string }>).response
+            ?.data?.message;
+          const target = nextRows.find((item) => item.rowNumber === row.rowNumber);
+          if (target) {
+            target.errors = [message || "Gagal menyimpan data siswa."];
+            delete target.payload;
+          }
+        }
+      }
+      setImportRows(nextRows);
+      setImportSummary({ imported, failed });
+      await loadData();
+      setImporting(false);
+    }
   function setClass(value: string) {
     const relationIds = relationIdsForClass(value);
     setForm((current) => ({
@@ -330,15 +546,47 @@ function Student() {
     ["generation", filters.generation],
     ["status", filters.status],
   ] as const;
+  const validImportCount = importRows.filter((row) => row.payload).length;
+  const invalidImportCount = importRows.length - validImportCount;
 
   return (
     <div>
-      <PageHeader
-        className="mb-4"
-        title="Siswa"
-        description="Kelola data siswa sekolah"
-        icon={Users}
-      />
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <PageHeader
+          className="mb-0"
+          title="Siswa"
+          description="Kelola data siswa sekolah"
+          icon={Users}
+        />
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={downloadTemplate}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+          >
+            <Download className="h-4 w-4" />
+            Download Template
+          </button>
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-teal-600 px-3 py-2 text-sm font-medium text-teal-700 dark:text-teal-300">
+            <Upload className="h-4 w-4" />
+            Import Excel
+            <input
+              type="file"
+              accept=".xlsx"
+              onChange={(event) => void handleImportFile(event)}
+              className="sr-only"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={exportStudents}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            Export Excel
+          </button>
+        </div>
+      </div>
       {error && (
         <div
           role="alert"
@@ -738,6 +986,113 @@ function Student() {
         }}
         onConfirm={() => void handleDelete()}
       />
+      {importOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-xl dark:bg-[#111c2e]">
+            <div className="flex items-start justify-between border-b border-gray-200 p-5 dark:border-[#263449]">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  Import Data Siswa
+                </h2>
+                <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                  {importFileName || "Pilih file .xlsx dengan template yang tersedia."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeImport}
+                disabled={importing}
+                aria-label="Tutup import"
+                className="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed dark:hover:bg-[#1b2a3d]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[calc(90vh-180px)] overflow-auto p-5">
+              {importError && (
+                <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                  {importError}
+                </div>
+              )}
+              {importRows.length > 0 && (
+                <>
+                  <div className="mb-3 flex flex-wrap gap-2 text-sm">
+                    <span className="rounded-full bg-green-100 px-3 py-1 font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                      Valid: {validImportCount}
+                    </span>
+                    <span className="rounded-full bg-red-100 px-3 py-1 font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                      Tidak valid: {invalidImportCount}
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-[#263449]">
+                    <table className="w-full min-w-225 text-left text-sm">
+                      <thead className="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-[#1b2a3d] dark:text-[#a7b4c7]">
+                        <tr>
+                          <th className="px-3 py-2">Baris</th>
+                          {excelHeaders.map((header) => (
+                            <th key={header} className="px-3 py-2">
+                              {header}
+                            </th>
+                          ))}
+                          <th className="px-3 py-2">Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
+                        {importRows.map((row) => (
+                          <tr key={row.rowNumber}>
+                            <td className="px-3 py-2">{row.rowNumber}</td>
+                            <td className="px-3 py-2">{row.nis}</td>
+                            <td className="px-3 py-2">{row.name}</td>
+                            <td className="px-3 py-2">{row.className}</td>
+                            <td className="px-3 py-2">{row.majorName}</td>
+                            <td className="px-3 py-2">{row.generation}</td>
+                            <td className="px-3 py-2">{row.status}</td>
+                            <td
+                              className={`px-3 py-2 text-xs ${
+                                row.errors.length
+                                  ? "text-red-600 dark:text-red-300"
+                                  : "text-green-600 dark:text-green-300"
+                              }`}
+                            >
+                              {row.errors.length
+                                ? row.errors.join(" ")
+                                : "Siap diimpor"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+              {importSummary && (
+                <p className="mt-3 rounded-lg bg-teal-50 px-4 py-2.5 text-sm text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
+                  Import selesai: {importSummary.imported} data tersimpan dan{" "}
+                  {importSummary.failed} data gagal disimpan.
+                </p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 border-t border-gray-200 p-5 dark:border-[#263449]">
+              <button
+                type="button"
+                onClick={closeImport}
+                disabled={importing}
+                className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 disabled:cursor-not-allowed dark:bg-[#1b2a3d] dark:text-[#a7b4c7]"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                onClick={() => void importValidRows()}
+                disabled={!validImportCount || importing || Boolean(importSummary)}
+                className="cursor-pointer rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {importing ? "Menyimpan..." : `Simpan ${validImportCount} Data Valid`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
