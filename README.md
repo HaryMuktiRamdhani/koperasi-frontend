@@ -77,7 +77,7 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Menambah dan mengubah tagihan.
 - Mendukung pembuatan tagihan untuk beberapa siswa.
 - Menghapus tagihan melalui dialog konfirmasi.
-- Menyediakan pencarian, filter status, sorting, dan pagination.
+- Menyediakan pencarian, filter status dan sorting.
 - Menampilkan tanggal tagihan, jatuh tempo, jumlah, dan status pembayaran.
 
 #### Pembayaran
