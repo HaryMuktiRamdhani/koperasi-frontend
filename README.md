@@ -212,61 +212,47 @@ frontend/
 | `public/` | Asset statis seperti favicon, ikon, dan logo sekolah |
 | `dokumentasi/` | Folder dokumentasi teknis tambahan yang tersedia di project |
 
-Folder `src/types/` tidak tersedia pada struktur saat ini. Tipe dan interface digunakan secara lokal pada komponen, halaman, context, atau service yang membutuhkannya.
 
 ## Integrasi Backend
 
-### Komunikasi API
+Frontend Stokpedia berkomunikasi dengan backend melalui REST API menggunakan Axios.
 
-Frontend menggunakan instance Axios pada `src/services/api.ts`. Base URL ditentukan dengan urutan berikut:
+Konfigurasi komunikasi API menggunakan environment variable `VITE_API_URL` dengan `http://localhost:5001/api` sebagai URL default untuk development.
 
-1. Nilai environment `VITE_API_URL`, jika tersedia.
-2. `http://localhost:5001/api` sebagai fallback development.
+Beberapa kelompok endpoint yang digunakan meliputi:
 
-Contoh konfigurasi saat menjalankan frontend:
-
-```env
-VITE_API_URL=http://localhost:5001/api
-```
-
-File `.env.example` tidak tersedia di frontend saat ini. Nilai environment di atas merupakan konfigurasi yang dibaca langsung oleh source code, bukan file konfigurasi tambahan yang sudah disediakan project.
-
-### Kelompok Endpoint yang Digunakan
-
-Endpoint berikut ditemukan dari pemakaian API pada source code frontend:
-
-| Modul | Endpoint |
+| **Modul** | **Fungsi** |
 | --- | --- |
-| Authentication | `POST /auth/login`, `POST /auth/2fa/verify`, `POST /auth/logout`, `POST /auth/session/keep-alive` |
-| Dashboard | `GET /dashboard` |
-| Jurusan | `GET /jurusan`, `POST /jurusan`, `PUT /jurusan/:id`, `DELETE /jurusan/:id` |
-| Kelas | `GET /classes`, `POST /classes`, `PUT /classes/:id`, `DELETE /classes/:id` |
-| Siswa | `GET /students`, `POST /students`, `PUT /students/:id`, `DELETE /students/:id` |
-| Barang | `GET /items`, `POST /items`, `PUT /items/:id`, `DELETE /items/:id` |
-| Tagihan | `GET /bills`, `POST /bills/bulk`, `PUT /bills/:id`, `DELETE /bills/:id` |
-| Pembayaran | `GET /bills`, `GET /payments`, `POST /payments` |
-| Pengguna | `GET /users`, `POST /users`, `PUT /users/:id`, `PATCH /users/:id/status` |
-| Profil | `GET /profile`, `PATCH /profile`, `GET /profile/check-username`, `PATCH /profile/password`, `DELETE /profile` |
-| Sesi | `DELETE /profile/sessions/:id`, `DELETE /profile/sessions` |
-| Keamanan | `GET /security/settings`, `PUT /security/settings`, `GET /security/policy`, `PUT /security/policy`, `PATCH /profile/password` |
-| Profil koperasi | `GET /cooperative-profile`, `PATCH /cooperative-profile` |
-| Pengaturan backend | `GET /settings`, `PUT /settings/:key` tersedia melalui `settingsService.ts` |
+| Authentication | Mengelola proses login, verifikasi dua faktor, dan sesi pengguna |
+| Dashboard | Mengambil ringkasan informasi dan statistik koperasi |
+| Jurusan | Mengambil dan mengelola data jurusan |
+| Kelas | Mengambil dan mengelola data kelas serta relasi jurusan |
+| Siswa | Mengambil dan mengelola data siswa |
+| Barang | Mengambil dan mengelola data barang koperasi |
+| Tagihan | Mengambil dan mengelola data tagihan siswa |
+| Pembayaran | Mengelola transaksi dan riwayat pembayaran |
+| Pengguna | Mengambil dan mengelola akun serta status pengguna |
+| Profil | Mengakses dan mengelola informasi profil pengguna |
+| Keamanan | Mengelola pengaturan keamanan dan kebijakan password |
+| Sesi Aktif | Mengakses dan mengelola sesi perangkat pengguna |
+| Profil Koperasi | Mengambil dan memperbarui informasi profil koperasi |
+| Pengaturan | Mengambil dan mengelola konfigurasi aplikasi |
 
-### Token dan Penanganan Error
+Frontend menggunakan service API untuk mengirim request dan menerima respons dari backend. Token JWT disertakan pada request yang membutuhkan autentikasi melalui header `Authorization` dengan skema `Bearer`.
 
-- Axios membaca token dari `localStorage` pada setiap request yang bukan request login atau verifikasi autentikasi.
-- Token dikirim melalui header `Authorization: Bearer <token>`.
-- Interceptor response mendeteksi response `401` yang menandakan sesi tidak valid atau kedaluwarsa.
-- Untuk error sesi tersebut, token dan informasi user dihapus dari browser, pesan singkat disimpan sementara, lalu pengguna diarahkan ke `/`.
-- Halaman menampilkan pesan error dari response API ketika tersedia, dengan fallback yang lebih umum untuk pengguna.
+Selain itu, frontend menyediakan penanganan respons API, termasuk pengelolaan sesi ketika token tidak lagi valid.
 
 ### Import dan Export Excel
 
-- Fitur Excel menggunakan library SheetJS (`xlsx`) di browser.
-- Export menggunakan seluruh data dari `GET /students`, sehingga tidak terbatas pada filter atau pagination halaman aktif.
-- Import tidak menggunakan endpoint baru. Setelah preview dan validasi frontend, setiap baris valid dikirim melalui `POST /students`; validasi relasi dan keunikan data tetap diperiksa kembali oleh backend.
-- File template dan hasil export menggunakan urutan kolom yang sama: `NIS`, `Nama Siswa`, `Kelas`, `Jurusan`, `Angkatan`, dan `Status`.
-- NIS diproses sebagai teks untuk mempertahankan angka nol di depan. Jurusan dapat diisi menggunakan nama atau kode yang tersedia pada data master.
+Stokpedia menyediakan fitur import dan export data siswa menggunakan library SheetJS (`xlsx`) di browser.
+
+- Export data siswa dalam format `.xlsx` dengan mengambil seluruh data terbaru dari backend.
+- Menyediakan template Excel beserta petunjuk pengisian.
+- Import data melalui proses preview dan validasi sebelum dikirim ke backend.
+- Memvalidasi format NIS, nama siswa, kelas, jurusan, angkatan, status, serta duplikasi data.
+- Mengirim baris data yang valid melalui REST API untuk disimpan ke database.
+
+
 
 ## Pengelolaan Data pada Browser
 
