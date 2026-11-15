@@ -34,7 +34,6 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Menampilkan statistik utama seperti jumlah siswa, barang, tagihan, dan pemasukan.
 - Menampilkan informasi status pembayaran dan data ringkasan transaksi yang dikirim backend.
 - Menyediakan tautan menuju halaman data dan transaksi terkait.
-- Mengikuti tema dan format mata uang yang aktif pada aplikasi.
 
 ### 2. Master Data
 
@@ -63,7 +62,6 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Mengimpor file `.xlsx` melalui preview sebelum penyimpanan.
 - Memvalidasi kolom wajib, format tahun angkatan, status, duplikasi NIS, kelas, jurusan, dan relasi kelas-jurusan.
 - Mencocokkan jurusan berdasarkan nama atau kode dari data master yang dimuat melalui API.
-- Menyimpan hanya baris valid melalui endpoint siswa yang sudah tersedia dan menampilkan ringkasan hasil import.
 
 #### Barang
 
