@@ -256,23 +256,19 @@ Stokpedia menyediakan fitur import dan export data siswa menggunakan library She
 
 ## Pengelolaan Data pada Browser
 
-Frontend tidak menyimpan seluruh data koperasi di browser. Data master, transaksi, profil, sesi, dan pengaturan keamanan dimuat dari backend melalui API. Penyimpanan browser digunakan untuk autentikasi dan preferensi ringan.
+Frontend Stokpedia menggunakan LocalStorage dan SessionStorage untuk menyimpan beberapa informasi aplikasi.
 
-| Storage | Key | Fungsi |
+| **Storage** | **Key** | **Fungsi** |
 | --- | --- | --- |
-| LocalStorage | `token` | JWT untuk request terautentikasi dan pemeriksaan route |
-| LocalStorage | `user` | Informasi user hasil login yang diperlukan layout dan proteksi role |
-| LocalStorage | `theme` | Key tema lama yang dibaca untuk kompatibilitas saat inisialisasi |
-| LocalStorage | `koperasi.settings.appearance` | Preferensi tampilan yang dikelola `settingsStorage`, termasuk mode tema |
-| LocalStorage | `koperasi.settings.language` | Preferensi bahasa dan nilai formatter regional |
-| SessionStorage | `authMessage` | Pesan sementara setelah sesi berakhir atau token tidak valid |
+| LocalStorage | `token` | Menyimpan token autentikasi pengguna |
+| LocalStorage | `user` | Menyimpan informasi pengguna |
+| LocalStorage | `koperasi.settings.appearance` | Menyimpan preferensi tampilan aplikasi |
+| LocalStorage | `koperasi.settings.language` | Menyimpan preferensi bahasa |
+| SessionStorage | `authMessage` | Menyimpan pesan sementara terkait sesi autentikasi |
 
-React Context digunakan untuk state aplikasi yang perlu dibagikan:
+Selain itu, frontend menggunakan React Context untuk mengelola state aplikasi seperti tema, bahasa, identitas koperasi, dan tampilan sidebar.
 
-- `ThemeContext`: mode tema dan preferensi tampilan.
-- `LanguageContext`: bahasa, fungsi terjemahan, serta formatter angka, mata uang, tanggal, dan waktu.
-- `CooperativeContext`: identitas koperasi dan logo dari backend.
-- `SidebarContext`: state sidebar pada layout aplikasi.
+Data yang disimpan di browser digunakan untuk mendukung kebutuhan aplikasi. Data utama seperti siswa, kelas, jurusan, barang, tagihan, pembayaran, pengguna, serta pengaturan tetap dikelola melalui backend.
 
 ## Autentikasi dan Proteksi Halaman
 
