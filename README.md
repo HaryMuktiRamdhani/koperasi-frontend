@@ -107,9 +107,7 @@ Halaman Settings memiliki sidebar pengaturan dan route berikut:
 
 - Menampilkan foto profil, nama lengkap, username, dan bio.
 - Menyediakan modal untuk mengedit nama lengkap, username, dan bio.
-- Mengecek ketersediaan username.
-- Menyediakan penggantian foto dengan preview dan crop square.
-- Mempertahankan proses hapus akun dengan konfirmasi username dan password.
+- Menyediakan penggantian foto
 
 #### Keamanan
 
@@ -133,7 +131,6 @@ Halaman Settings memiliki sidebar pengaturan dan route berikut:
 
 - Menyediakan pemilihan bahasa aplikasi Bahasa Indonesia atau English.
 - Menyimpan pilihan bahasa pada browser.
-- Menyediakan fungsi terjemahan dan formatter yang digunakan oleh halaman lain.
 
 ## Struktur Folder
 
@@ -196,7 +193,7 @@ frontend/
 └── vite.config.ts
 ```
 
-### Keterangan Folder dan File Penting
+### Keterangan
 
 | Folder/File | Keterangan |
 | --- | --- |
