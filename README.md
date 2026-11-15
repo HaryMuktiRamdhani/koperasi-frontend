@@ -271,29 +271,25 @@ Data yang disimpan di browser digunakan untuk mendukung kebutuhan aplikasi. Data
 
 ## Autentikasi dan Proteksi Halaman
 
-1. Pengguna memasukkan email dan password pada halaman `/`.
-2. Frontend mengirim kredensial ke `POST /auth/login`.
-3. Jika berhasil tanpa langkah tambahan, JWT dan data user disimpan pada LocalStorage.
-4. Jika backend mengembalikan `requires2fa`, frontend menampilkan form verifikasi dan mengirim kode atau recovery code ke `POST /auth/2fa/verify`.
-5. Semua route utama dirender di dalam `DashboardLayout` dan membutuhkan token LocalStorage.
-6. Route `/users` memiliki pemeriksaan role tambahan dan hanya dapat dibuka oleh user dengan role `admin`.
-7. Backend tetap menjadi sumber validasi utama untuk token, sesi, role, permission, dan akses data.
-8. Logout memanggil endpoint backend, kemudian menghapus `token` dan `user` dari LocalStorage.
-9. `SessionTimeoutMonitor` memeriksa keberlanjutan sesi dan membantu menjaga sesi aktif ketika diperlukan.
+Frontend Stokpedia menggunakan sistem autentikasi berbasis JWT untuk mengatur akses pengguna ke dalam aplikasi.
 
-Role yang digunakan oleh frontend adalah `admin` dan `staff`, sesuai nilai yang dipakai pada form dan pemeriksaan route saat ini.
+1. Pengguna login menggunakan email dan password.
+2. Frontend mengirim data login ke backend melalui API.
+3. Jika login berhasil, token dan informasi pengguna disimpan di LocalStorage.
+4. Jika diperlukan, pengguna harus melewati verifikasi dua faktor (2FA).
+5. Halaman aplikasi dilindungi berdasarkan status login dan hak akses pengguna.
+6. Pengguna dapat keluar dari aplikasi melalui fitur logout.
+
+Stokpedia memiliki dua role pengguna, yaitu `admin` dan `staff`. Keduanya dapat menggunakan fitur aplikasi sesuai hak akses yang diberikan.
 
 ## Theme dan Tampilan Aplikasi
 
-- Styling utama menggunakan utility class Tailwind CSS.
-- Tema yang tersedia adalah Terang, Gelap, dan Sistem.
-- `ThemeProvider` menyimpan mode tema dan menerapkan class `dark` pada elemen HTML.
-- Mode Sistem mengikuti preferensi `prefers-color-scheme` browser.
-- Preferensi tema disimpan melalui `settingsStorage` sehingga tetap tersedia setelah refresh.
-- `index.css` menyediakan token warna permukaan, teks, border, primary teal, danger, dan styling select untuk light/dark mode.
-- Layout utama terdiri dari `DashboardLayout`, `Sidebar`, header aplikasi, dan area konten route.
-- Komponen seperti `PageHeader`, `SettingSection`, `SettingRow`, `Select`, `Toggle`, `ConfirmDialog`, dan `EmptyState` digunakan kembali pada halaman yang sesuai.
-- Ikon antarmuka menggunakan Lucide React.
+- Tampilan aplikasi dibuat menggunakan Tailwind CSS.
+- Tersedia tiga pilihan tema, yaitu Terang, Gelap, dan Sistem.
+- Pengaturan tema akan tersimpan sehingga tetap digunakan setelah halaman dimuat ulang.
+- Layout aplikasi terdiri dari sidebar, header, dan area konten utama.
+- Komponen antarmuka dibuat agar dapat digunakan kembali pada berbagai halaman.
+- Ikon aplikasi menggunakan Lucide React.
 
 ## Dokumentasi
 
