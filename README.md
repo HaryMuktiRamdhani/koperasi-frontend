@@ -68,7 +68,6 @@ Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan 
 - Menampilkan daftar barang koperasi.
 - Menambah, mengubah, dan menghapus data barang.
 - Menampilkan informasi harga dan status barang.
-- Memformat nilai harga berdasarkan pengaturan bahasa yang aktif.
 
 ### 3. Transaksi
 
