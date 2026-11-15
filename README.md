@@ -1,19 +1,16 @@
 # Stokpedia Frontend
 
-Frontend untuk Stokpedia, sistem informasi koperasi sekolah. Aplikasi ini menyediakan antarmuka web untuk login, dashboard, pengelolaan data master, transaksi koperasi, manajemen pengguna, serta pengaturan akun dan aplikasi.
+Frontend dari aplikasi **Stokpedia**, yaitu sistem informasi koperasi sekolah berbasis web yang menyediakan berbagai fitur untuk mendukung pengelolaan operasional koperasi. Frontend ini berfungsi sebagai antarmuka pengguna untuk mengakses seluruh fitur aplikasi, mulai dari login, dashboard, pengelolaan data, transaksi koperasi, manajemen pengguna, hingga pengaturan akun dan aplikasi.
 
-Frontend dikembangkan sebagai aplikasi React terpisah dari backend dan berkomunikasi melalui REST API.
+Frontend Stokpedia dikembangkan menggunakan React dengan Tailwind CSS sebagai framework styling. Aplikasi ini dikembangkan secara terpisah dari backend dan berkomunikasi melalui REST API untuk mengambil, mengirim, dan mengelola data aplikasi.
 
 ## Deskripsi Proyek
 
-Stokpedia adalah sistem informasi berbasis web yang membantu pengelolaan operasional koperasi sekolah secara terpusat. Aplikasi ini digunakan untuk mengelola data siswa, kelas, jurusan, barang, tagihan, dan pembayaran.
+Stokpedia merupakan sistem informasi koperasi sekolah berbasis web yang memiliki dua jenis pengguna utama, yaitu admin dan staff.
 
-Frontend ditujukan untuk pengguna internal koperasi sekolah, terutama:
+Frontend Stokpedia menyediakan antarmuka bagi admin dan staff untuk mengelola operasional koperasi, mulai dari data siswa, kelas, jurusan, barang, tagihan, pembayaran, hingga berbagai fitur administrasi lainnya. Kedua jenis pengguna memiliki akses ke fitur yang sama, dengan perbedaan bahwa akun admin utama (super admin) tidak dapat dihapus melalui aplikasi.
 
-- Admin, yang dapat mengakses manajemen pengguna dan fitur administrasi yang memerlukan hak akses admin.
-- Staff, yang dapat menggunakan fitur operasional sesuai hak akses yang diberikan backend.
-
-Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tampilan, navigasi, state antarmuka, validasi input dasar, serta pengiriman request HTTP. Backend menangani autentikasi, validasi utama, hak akses, pemrosesan bisnis, dan penyimpanan data.
+Frontend dan backend dikembangkan secara terpisah dengan komunikasi menggunakan REST API.
 
 ## Teknologi yang Digunakan
 
@@ -31,18 +28,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 
 ## Fitur Frontend
 
-### 1. Authentication
-
-- Login menggunakan email dan password melalui endpoint backend.
-- Menyimpan JWT dan informasi pengguna setelah login berhasil.
-- Mendukung alur verifikasi autentikasi dua faktor apabila backend memintanya.
-- Menyediakan input kode autentikasi atau recovery code pada tahap verifikasi dua faktor.
-- Menambahkan token JWT sebagai `Bearer` token pada request API yang membutuhkan autentikasi.
-- Mengarahkan pengguna yang belum memiliki token ke halaman login.
-- Menangani sesi yang kedaluwarsa atau tidak aktif dengan menghapus token dan informasi pengguna lokal, lalu mengarahkan kembali ke login.
-- Menyediakan logout yang memanggil backend sebelum membersihkan data autentikasi browser.
-
-### 2. Dashboard
+### 1. Dashboard
 
 - Menampilkan ringkasan informasi koperasi dari endpoint dashboard.
 - Menampilkan statistik utama seperti jumlah siswa, barang, tagihan, dan pemasukan.
@@ -50,7 +36,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 - Menyediakan tautan menuju halaman data dan transaksi terkait.
 - Mengikuti tema dan format mata uang yang aktif pada aplikasi.
 
-### 3. Master Data
+### 2. Master Data
 
 #### Jurusan
 
@@ -86,7 +72,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 - Menampilkan informasi harga dan status barang.
 - Memformat nilai harga berdasarkan pengaturan bahasa yang aktif.
 
-### 4. Transaksi
+### 3. Transaksi
 
 #### Tagihan
 
@@ -105,7 +91,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 - Menampilkan informasi tagihan, siswa, barang, tanggal pembayaran, jumlah, dan status yang tersedia dari response API.
 - Memformat tanggal dan nominal pembayaran sesuai pengaturan aplikasi.
 
-### 5. Pengguna
+### 4. Pengguna
 
 - Menampilkan daftar akun pengguna.
 - Menampilkan nama, email, role, dan status akun.
@@ -118,7 +104,7 @@ Frontend dan backend dikembangkan dalam project terpisah. Frontend menangani tam
 - Membatasi route `/users` untuk role `admin`.
 - Tidak menampilkan password atau hash password dari response pengguna.
 
-### 6. Settings
+### 5. Settings
 
 Halaman Settings memiliki sidebar pengaturan dan route berikut:
 
