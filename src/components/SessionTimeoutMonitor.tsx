@@ -54,7 +54,6 @@ function SessionTimeoutMonitor() {
       setLastActivity(Date.now());
       setOpen(false);
     } catch {
-      /* interceptor handles expired sessions */
     }
   }
 
