@@ -38,10 +38,6 @@ function applyAppearance(settings: AppearanceSettings) {
   const fontFamilies = { system: "ui-sans-serif, system-ui, sans-serif", monospace: "ui-monospace, SFMono-Regular, monospace", serif: "ui-serif, Georgia, serif" } as const;
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.documentElement.style.colorScheme = theme;
-  document.body.classList.toggle("bg-[#f5f7fa]", theme === "light");
-  document.body.classList.toggle("text-[#102a43]", theme === "light");
-  document.body.classList.toggle("dark:bg-[#0b1220]", theme === "dark");
-  document.body.classList.toggle("dark:text-slate-100", theme === "dark");
   document.documentElement.dataset.accent = settings.accent;
   document.documentElement.classList.toggle("high-contrast", settings.highContrast);
   document.documentElement.classList.toggle("focus-visible-outline", settings.focusOutline);

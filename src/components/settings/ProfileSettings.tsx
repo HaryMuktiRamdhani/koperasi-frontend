@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
-import { Camera, Pencil, Trash2, UserRound, X } from "lucide-react";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import {
+  AtSign,
+  Camera,
+  Mail,
+  Pencil,
+  Phone,
+  ShieldCheck,
+  Trash2,
+  X,
+} from "lucide-react";
 import api from "../../services/api";
 import ConfirmDialog from "./ConfirmDialog";
 import EmptyState from "./EmptyState";
@@ -28,6 +37,17 @@ const emptyProfile: ProfileData = {
   role: "",
 };
 
+const cardClass =
+  "rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)]";
+const inputClass =
+  "mt-1.5 w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-surface-muted)] px-3 py-2.5 text-sm text-[var(--app-text)] placeholder:text-[var(--app-muted)]";
+const secondaryButtonClass =
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--app-border)] px-4 py-2.5 text-sm font-semibold text-[var(--app-text)] transition hover:bg-[var(--app-surface-muted)]";
+const primaryButtonClass =
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--app-primary)] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60";
+
+const URL_PATTERN = /(https?:\/\/[^\s]+)/g;
+
 function getError(error: unknown, fallback: string) {
   if (typeof error === "object" && error && "response" in error) {
     return (
@@ -36,6 +56,36 @@ function getError(error: unknown, fallback: string) {
     );
   }
   return fallback;
+}
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function formatRole(role: string) {
+  if (!role) return "-";
+  return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+}
+
+function renderBio(text: string): ReactNode[] {
+  return text.split(URL_PATTERN).map((part, index) =>
+    /^https?:\/\//.test(part) ? (
+      <a
+        key={index}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="break-all font-medium text-(--app-primary) underline underline-offset-2"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
 }
 
 async function cropSquare(file: File): Promise<string> {
@@ -60,6 +110,32 @@ async function cropSquare(file: File): Promise<string> {
   return canvas.toDataURL(
     file.type === "image/webp" ? "image/webp" : "image/jpeg",
     0.88,
+  );
+}
+
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 py-3.5">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary)">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs font-medium uppercase tracking-wide text-(--app-muted)">
+          {label}
+        </p>
+        <p className="truncate text-sm font-medium text-(--app-text)">
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -225,9 +301,19 @@ function ProfileSettings() {
     }
   }
 
+  function openEdit() {
+    setDraft({
+      name: profile.name,
+      username: profile.username || "",
+      bio: profile.bio || "",
+    });
+    setEditOpen(true);
+    setError("");
+  }
+
   if (loading)
     return (
-      <p className="py-12 text-center text-sm text-slate-500 dark:text-[#a7b4c7]">
+      <p className="py-12 text-center text-sm text-(--app-muted)">
         Memuat profil...
       </p>
     );
@@ -238,67 +324,131 @@ function ProfileSettings() {
     <div className="space-y-6">
       {(message || error) && (
         <p
+          role="status"
           className={`rounded-lg px-3 py-2 text-sm ${message ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300" : "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300"}`}
         >
           {message || error}
         </p>
       )}
-      <section className="rounded-xl border border-slate-200 bg-white p-8 dark:border-[#294254] dark:bg-[#122333]">
-        <div className="flex flex-col items-center text-center">
-          <div className="relative">
-            <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-[#e7f6f4] text-[#168b87] dark:bg-[#153f45] dark:text-[#72ddd4]">
-              {profile.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt="Foto profil"
-                  className="h-full w-full object-cover"
+
+      {/* Hero: banner + avatar + identitas */}
+      <section className={`${cardClass} overflow-hidden`}>
+        <div
+          className="h-32 sm:h-36"
+          style={{
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--app-primary) 38%, var(--app-surface)) 0%, var(--app-surface-muted) 100%)",
+          }}
+        />
+        <div className="px-6 pb-6 sm:px-8">
+          <div className="-mt-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="relative w-fit">
+                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-(--app-surface) bg-(--app-primary-soft) text-3xl font-semibold text-(--app-primary)">
+                  {profile.avatarUrl ? (
+                    <img
+                      src={profile.avatarUrl}
+                      alt="Foto profil"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    getInitials(profile.name)
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  aria-label="Ganti foto profil"
+                  className="absolute bottom-0 right-0 inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-(--app-surface) bg-(--app-primary) text-white transition hover:opacity-90"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => void handleAvatar(event)}
+                  className="hidden"
                 />
-              ) : (
-                <UserRound className="h-14 w-14" strokeWidth={1.4} />
-              )}
+              </div>
+              <div className="min-w-0 pb-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="truncate text-2xl font-semibold text-(--app-text)">
+                    {profile.name}
+                  </h2>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-(--app-primary-soft) px-2.5 py-0.5 text-xs font-semibold text-(--app-primary)">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {formatRole(profile.role)}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-(--app-muted)">
+                  @{profile.username || "username belum diatur"}
+                </p>
+              </div>
             </div>
             <button
               type="button"
-              onClick={() => fileRef.current?.click()}
-              aria-label="Ganti foto profil"
-              className="absolute bottom-0 right-0 inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#168b87] text-white dark:border-[#122333]"
+              onClick={openEdit}
+              className={`${secondaryButtonClass} sm:mb-1`}
             >
-              <Camera className="h-4 w-4" />
+              <Pencil className="h-4 w-4" /> Edit Profil
             </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(event) => void handleAvatar(event)}
-              className="hidden"
-            />
           </div>
-          <h2 className="mt-5 text-2xl font-semibold text-[#102a43] dark:text-slate-100">
-            {profile.name}
-          </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-[#a7b4c7]">
-            @{profile.username || "username belum diatur"}
-          </p>
-          <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-            {profile.bio || "Belum ada bio"}
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setDraft({
-                name: profile.name,
-                username: profile.username || "",
-                bio: profile.bio || "",
-              });
-              setEditOpen(true);
-              setError("");
-            }}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:border-[#294254] dark:text-slate-200"
-          >
-            <Pencil className="h-4 w-4" /> Edit Profil
-          </button>
         </div>
       </section>
+
+      {/* Detail: tentang + informasi akun */}
+      <div className="grid gap-6 lg:grid-cols-5">
+        <section className={`${cardClass} p-6 lg:col-span-3`}>
+          <h3 className="text-base font-semibold text-(--app-text)">Tentang</h3>
+          {profile.bio ? (
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-(--app-text)">
+              {renderBio(profile.bio)}
+            </p>
+          ) : (
+            <div className="mt-3 rounded-xl border border-dashed border-(--app-border) px-4 py-8 text-center">
+              <p className="text-sm text-(--app-muted)">
+                Belum ada bio. Ceritakan sedikit tentang dirimu.
+              </p>
+              <button
+                type="button"
+                onClick={openEdit}
+                className="mt-3 text-sm font-semibold text-(--app-primary) hover:underline"
+              >
+                Tambah bio
+              </button>
+            </div>
+          )}
+        </section>
+
+        <section className={`${cardClass} px-6 py-4 lg:col-span-2`}>
+          <h3 className="pt-2 text-base font-semibold text-(--app-text)">
+            Informasi Akun
+          </h3>
+          <div className="mt-1 divide-y divide-(--app-border)">
+            <InfoRow
+              icon={<AtSign className="h-4 w-4" />}
+              label="Username"
+              value={profile.username ? `@${profile.username}` : "-"}
+            />
+            <InfoRow
+              icon={<Mail className="h-4 w-4" />}
+              label="Email"
+              value={profile.email || "-"}
+            />
+            <InfoRow
+              icon={<Phone className="h-4 w-4" />}
+              label="Telepon"
+              value={profile.phone || "-"}
+            />
+            <InfoRow
+              icon={<ShieldCheck className="h-4 w-4" />}
+              label="Role"
+              value={formatRole(profile.role)}
+            />
+          </div>
+        </section>
+      </div>
 
       <SettingSection
         title="Zona Berbahaya"
@@ -307,31 +457,34 @@ function ProfileSettings() {
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 dark:border-red-900 dark:text-red-300"
+          className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
         >
           <Trash2 className="h-4 w-4" /> Hapus Akun
         </button>
       </SettingSection>
 
       {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div
-            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 dark:border-[#294254] dark:bg-[#122333]"
+            className={`${cardClass} w-full max-w-md p-6 shadow-2xl`}
             role="dialog"
             aria-modal="true"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Edit Profil</h2>
+              <h2 className="text-lg font-semibold text-var(--app-text)">
+                Edit Profil
+              </h2>
               <button
                 type="button"
                 onClick={() => setEditOpen(false)}
                 aria-label="Tutup"
+                className="text-(--app-muted) hover:text-(--app-text)"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form onSubmit={saveProfile} className="mt-5 space-y-4">
-              <label className="block text-sm font-medium">
+              <label className="block text-sm font-medium text-(--app-text)">
                 Nama lengkap
                 <input
                   required
@@ -339,10 +492,10 @@ function ProfileSettings() {
                   onChange={(event) =>
                     setDraft({ ...draft, name: event.target.value })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 dark:border-[#294254] dark:bg-[#172b3d]"
+                  className={inputClass}
                 />
               </label>
-              <label className="block text-sm font-medium">
+              <label className="block text-sm font-medium text-(--app-text)">
                 Username
                 <input
                   required
@@ -353,11 +506,11 @@ function ProfileSettings() {
                       username: event.target.value.toLowerCase(),
                     })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 dark:border-[#294254] dark:bg-[#172b3d]"
+                  className={inputClass}
                 />
                 {usernameState !== "idle" && (
                   <span
-                    className={`mt-1 block text-xs ${usernameState === "available" ? "text-emerald-600" : usernameState === "taken" ? "text-red-600" : "text-slate-500"}`}
+                    className={`mt-1 block text-xs ${usernameState === "available" ? "text-emerald-600 dark:text-emerald-400" : usernameState === "taken" ? "text-red-600 dark:text-red-400" : "text-(--app-muted)"}`}
                   >
                     {usernameState === "checking"
                       ? "Memeriksa..."
@@ -367,7 +520,7 @@ function ProfileSettings() {
                   </span>
                 )}
               </label>
-              <label className="block text-sm font-medium">
+              <label className="block text-sm font-medium text-(--app-text)">
                 Bio
                 <textarea
                   value={draft.bio}
@@ -375,21 +528,21 @@ function ProfileSettings() {
                     setDraft({ ...draft, bio: event.target.value })
                   }
                   rows={4}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 dark:border-[#294254] dark:bg-[#172b3d]"
+                  className={inputClass}
                 />
               </label>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditOpen(false)}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold dark:border-[#294254]"
+                  className={secondaryButtonClass}
                 >
                   Batal
                 </button>
                 <button
                   disabled={saving}
                   type="submit"
-                  className="rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                  className={primaryButtonClass}
                 >
                   {saving ? "Menyimpan..." : "Simpan"}
                 </button>
@@ -400,14 +553,16 @@ function ProfileSettings() {
       )}
 
       {photoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div
-            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 dark:border-[#294254] dark:bg-[#122333]"
+            className={`${cardClass} w-full max-w-sm p-6 shadow-2xl`}
             role="dialog"
             aria-modal="true"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Ganti Foto</h2>
+              <h2 className="text-lg font-semibold text-(--app-text)">
+                Ganti Foto
+              </h2>
               <button
                 type="button"
                 onClick={() => {
@@ -415,18 +570,19 @@ function ProfileSettings() {
                   setPhotoPreview("");
                 }}
                 aria-label="Tutup"
+                className="text-(--app-muted) hover:text-(--app-text)"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <p className="mt-2 text-sm text-slate-500 dark:text-[#a7b4c7]">
+            <p className="mt-2 text-sm text-(--app-muted)">
               JPG, PNG, atau WebP. Maksimal 5MB.
             </p>
             {photoPreview && (
               <img
                 src={photoPreview}
                 alt="Preview foto profil"
-                className="mx-auto mt-5 h-44 w-44 rounded-full object-cover"
+                className="mx-auto mt-5 h-44 w-44 rounded-full border-4 border-(--app-border) object-cover"
               />
             )}
             <div className="mt-5 flex justify-end gap-2">
@@ -436,7 +592,7 @@ function ProfileSettings() {
                   setPhotoOpen(false);
                   setPhotoPreview("");
                 }}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold dark:border-[#294254]"
+                className={secondaryButtonClass}
               >
                 Batal
               </button>
@@ -444,7 +600,7 @@ function ProfileSettings() {
                 type="button"
                 disabled={photoSaving || !photoPreview}
                 onClick={() => void savePhoto()}
-                className="rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                className={primaryButtonClass}
               >
                 {photoSaving ? "Menyimpan..." : "Simpan"}
               </button>
@@ -466,14 +622,14 @@ function ProfileSettings() {
             placeholder="Username"
             value={deleteUsername}
             onChange={(event) => setDeleteUsername(event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-[#294254] dark:bg-[#172b3d]"
+            className={inputClass}
           />
           <input
             type="password"
             placeholder="Password"
             value={deletePassword}
             onChange={(event) => setDeletePassword(event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-[#294254] dark:bg-[#172b3d]"
+            className={inputClass}
           />
         </div>
       </ConfirmDialog>

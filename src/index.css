@@ -3,39 +3,39 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --app-bg: #f4f7f8;
-  --app-surface: #ffffff;
-  --app-surface-muted: #f8fafb;
-  --app-border: #dbe5e7;
-  --app-text: #173042;
-  --app-muted: #607786;
-  --app-primary: #168b87;
-  --app-primary-soft: #e7f6f4;
-  --app-danger: #c2414b;
-  --select-background: #ffffff;
-  --select-foreground: #102a43;
-  --select-border: #e2e8f0;
-  --select-option-hover: #d9f3f0;
-  --select-option-selected: #168b87;
+  --app-bg: #e9ecef;
+  --app-surface: #f6f7f8;
+  --app-surface-muted: #eceff1;
+  --app-border: #d2d8dd;
+  --app-text: #1f2933;
+  --app-muted: #5b6770;
+  --app-primary: #12807c;
+  --app-primary-soft: #dcefed;
+  --app-danger: #b3363f;
+  --select-background: #f6f7f8;
+  --select-foreground: #1f2933;
+  --select-border: #cfd5da;
+  --select-option-hover: #dcefed;
+  --select-option-selected: #12807c;
   --select-option-selected-foreground: #ffffff;
 }
 
 .dark {
-  --app-bg: #0b1520;
-  --app-surface: #122333;
-  --app-surface-muted: #172b3d;
-  --app-border: #294254;
-  --app-text: #e7f1f3;
-  --app-muted: #a7bbc4;
-  --app-primary: #38b8ae;
-  --app-primary-soft: #153f45;
-  --app-danger: #f28b91;
-  --select-background: #1b2a3d;
-  --select-foreground: #f1f5f9;
-  --select-border: #263449;
-  --select-option-hover: #164e63;
-  --select-option-selected: #168b87;
-  --select-option-selected-foreground: #f8fafc;
+  --app-bg: #0a0a0a;
+  --app-surface: #141414;
+  --app-surface-muted: #1a1a1a;
+  --app-border: #2a2a2a;
+  --app-text: #ededed;
+  --app-muted: #9a9a9a;
+  --app-primary: #14877f;
+  --app-primary-soft: #0f2624;
+  --app-danger: #f87171;
+  --select-background: #141414;
+  --select-foreground: #ededed;
+  --select-border: #2a2a2a;
+  --select-option-hover: #1f2b2a;
+  --select-option-selected: #14877f;
+  --select-option-selected-foreground: #ffffff;
 }
 
 html,
@@ -57,14 +57,19 @@ body {
   color: var(--app-text);
 }
 
+/* Semua permukaan putih (kartu, header, sidebar, input) mengikuti tema */
+.app-root .bg-white:not(.rounded-full) {
+  background-color: var(--app-surface);
+}
+
 .app-root .rounded-xl.bg-white {
   border: 1px solid var(--app-border);
   background: var(--app-surface);
-  box-shadow: 0 8px 24px rgb(23 48 66 / 0.04);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.05);
 }
 
 .dark .app-root .rounded-xl.bg-white {
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.5);
 }
 
 .app-root input:not([type="checkbox"]):not([type="radio"]),
@@ -78,7 +83,7 @@ body {
 .app-root textarea:focus,
 .app-root select:focus {
   border-color: var(--app-primary);
-  outline: 2px solid color-mix(in srgb, var(--app-primary) 18%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--app-primary) 25%, transparent);
   outline-offset: 0;
 }
 
@@ -109,7 +114,7 @@ body {
 .app-root .hover\:bg-\[\#13716d\]:hover,
 .app-root .hover\:bg-blue-700:hover,
 .app-root .hover\:bg-gray-800:hover {
-  background: color-mix(in srgb, var(--app-primary) 86%, #102a43);
+  background: color-mix(in srgb, var(--app-primary) 86%, #000000);
 }
 
 select,
@@ -150,7 +155,7 @@ select option:disabled,
 
 .dark select option:disabled,
 .dark .theme-select option:disabled {
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 select:disabled,
