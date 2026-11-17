@@ -23,6 +23,7 @@ import {
   type ClassFilterState,
   type ClassSortKey,
 } from "../utils/classFilters";
+import { getStoredRole } from "../utils/permissions";
 
 interface Major {
   id: string;
@@ -66,6 +67,7 @@ function splitLegacyName(name: string) {
 }
 
 function Kelas() {
+  const canManage = getStoredRole() === "admin";
   const [searchParams, setSearchParams] = useSearchParams();
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
@@ -406,17 +408,17 @@ function Kelas() {
       )}
 
       <div className="mb-4 flex justify-end">
-        <button
+        {canManage && <button
           type="button"
           onClick={formOpen ? resetForm : openCreate}
           className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
         >
           {formOpen ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {formOpen ? "Tutup Form" : "Tambah Kelas"}
-        </button>
+        </button>}
       </div>
 
-      {formOpen && (
+      {canManage && formOpen && (
         <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
           <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-slate-100">
             {editId ? "Edit Kelas" : "Tambah Kelas"}
@@ -688,7 +690,7 @@ function Kelas() {
                   ))}
                   <th className="px-4 py-3">Jurusan</th>
                   <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Aksi</th>
+                  {canManage && <th className="px-4 py-3">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
@@ -731,7 +733,7 @@ function Kelas() {
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    {canManage && <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button
                           title="Edit kelas"
@@ -751,7 +753,7 @@ function Kelas() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                    </td>
+                    </td>}
                   </tr>
                 ))}
                 {!pageItems.length && (

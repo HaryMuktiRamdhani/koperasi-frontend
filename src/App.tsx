@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Users from "./pages/Users";
+import AccessDenied from "./components/AccessDenied";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -56,7 +57,10 @@ function App() {
             path="/settings"
             element={<Navigate to="/settings/profile" replace />}
           />
-          <Route path="/settings/:section" element={<Settings />} />
+          <Route
+            path="/settings/:section"
+            element={role === "admin" ? <Settings /> : <AccessDenied />}
+          />
           <Route path="/help" element={<Help />} />
           <Route
             path="/users"

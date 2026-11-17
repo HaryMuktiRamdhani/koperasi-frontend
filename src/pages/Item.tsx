@@ -15,6 +15,7 @@ import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
 import { useLanguage } from "../context/LanguageContext";
+import { getStoredRole } from "../utils/permissions";
 
 type ItemStatus = "Aktif" | "Nonaktif" | "Akan Datang";
 type StatusFilter = "Semua" | ItemStatus;
@@ -102,6 +103,7 @@ function ItemThumb({ src, alt, sizeClass }: ItemThumbProps) {
 
 function Item() {
   const { formatCurrency } = useLanguage();
+  const canManage = getStoredRole() === "admin";
 
   const [barang, setBarang] = useState<BarangData[]>([]);
   const [listLoading, setListLoading] = useState(true);
@@ -431,14 +433,14 @@ function Item() {
             Reset
           </button>
 
-          <button
+          {canManage && <button
             type="button"
             onClick={openCreate}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
             Tambah Barang
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -506,7 +508,7 @@ function Item() {
 
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button
+                        {canManage && <button
                           type="button"
                           onClick={() => openEdit(item)}
                           aria-label={`Edit ${item.name}`}
@@ -514,9 +516,9 @@ function Item() {
                           className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                         >
                           <Pencil className="h-4 w-4" />
-                        </button>
+                        </button>}
 
-                        <button
+                        {canManage && <button
                           type="button"
                           onClick={() => {
                             setDeleteId(item.id);
@@ -527,7 +529,7 @@ function Item() {
                           className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
+                        </button>}
                       </div>
                     </td>
                   </tr>
@@ -578,7 +580,7 @@ function Item() {
         </div>
       </div>
 
-      {modalOpen && (
+      {canManage && modalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onMouseDown={(event) => {
@@ -770,7 +772,7 @@ function Item() {
         </div>
       )}
 
-      <ConfirmModal
+      {canManage && <ConfirmModal
         open={Boolean(deleteId)}
         title="Hapus Barang?"
         description="Data barang yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
@@ -780,7 +782,7 @@ function Item() {
           if (!deleteLoading) setDeleteId(null);
         }}
         onConfirm={() => void handleDelete()}
-      />
+      />}
     </div>
   );
 }

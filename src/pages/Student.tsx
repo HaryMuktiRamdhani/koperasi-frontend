@@ -28,6 +28,7 @@ import {
   type StudentFilterState,
   type StudentSortKey,
 } from "../utils/studentFilters";
+import { getStoredRole } from "../utils/permissions";
 
 interface Student {
   id: string;
@@ -85,6 +86,7 @@ const excelHeaders = [
 ] as const;
 
 function Student() {
+  const canDelete = getStoredRole() === "admin";
   const [searchParams, setSearchParams] = useSearchParams();
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
@@ -990,7 +992,7 @@ function Student() {
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button
+                        {canDelete && <button
                           onClick={() => {
                             setDeleteId(item.id);
                             setDeleteError("");
@@ -1001,7 +1003,7 @@ function Student() {
                           className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
+                        </button>}
                       </div>
                     </td>
                   </tr>

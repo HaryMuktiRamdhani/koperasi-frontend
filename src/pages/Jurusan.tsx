@@ -3,6 +3,7 @@ import { GraduationCap, Pencil, Plus, Trash2, X } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
+import { getStoredRole } from "../utils/permissions";
 
 interface JurusanData {
   id: string;
@@ -13,6 +14,7 @@ interface JurusanData {
 }
 
 function Jurusan() {
+  const canManage = getStoredRole() === "admin";
   const [jurusan, setJurusan] = useState<JurusanData[]>([]);
   const [nama, setNama] = useState("");
   const [kode, setKode] = useState("");
@@ -188,7 +190,7 @@ function Jurusan() {
       )}
 
       {/* Form */}
-      <section className="rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
+      {canManage && <section className="rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-[#263449] px-5 py-4 sm:px-6">
           <div>
             <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
@@ -292,7 +294,7 @@ function Jurusan() {
             </button>
           </div>
         </form>
-      </section>
+      </section>}
 
       {/* Data table */}
       <section className="overflow-hidden rounded-lg border border-gray-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]">
@@ -313,7 +315,7 @@ function Jurusan() {
                 <th className="px-5 py-3.5 sm:px-6">Nama Jurusan</th>
                 <th className="px-5 py-3.5 sm:px-6">Kode</th>
                 <th className="px-5 py-3.5 sm:px-6">Status</th>
-                <th className="px-5 py-3.5 text-right sm:px-6">Aksi</th>
+                {canManage && <th className="px-5 py-3.5 text-right sm:px-6">Aksi</th>}
               </tr>
             </thead>
 
@@ -379,7 +381,7 @@ function Jurusan() {
                       })()}
                     </td>
 
-                    <td className="px-5 py-4 sm:px-6">
+                    {canManage && <td className="px-5 py-4 sm:px-6">
                       <div className="flex justify-end gap-1">
                         <button
                           type="button"
@@ -402,7 +404,7 @@ function Jurusan() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                    </td>
+                    </td>}
                   </tr>
                 ))
               )}

@@ -17,6 +17,7 @@ import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import ConfirmModal from "../components/ConfirmModal";
 import { useLanguage } from "../context/LanguageContext";
+import { getStoredRole } from "../utils/permissions";
 
 interface Major {
   id: string;
@@ -140,6 +141,7 @@ function writeParams(filters: FilterState) {
 
 function Bill() {
   const { formatCurrency, formatDate } = useLanguage();
+  const canDelete = getStoredRole() === "admin";
   const formatRupiah = formatCurrency;
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() => readParams(searchParams));
@@ -1060,7 +1062,7 @@ function Bill() {
                         >
                           <Edit3 className="h-4 w-4" />
                         </button>
-                        <button
+                        {canDelete && <button
                           type="button"
                           onClick={() => {
                             setDeleteTarget(bill);
@@ -1071,7 +1073,7 @@ function Bill() {
                           className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
+                        </button>}
                       </div>
                     </td>
                   </tr>
@@ -1121,7 +1123,7 @@ function Bill() {
           </button>
         </div>
       </section>
-      <ConfirmModal
+      {canDelete && <ConfirmModal
         open={Boolean(deleteTarget)}
         title="Hapus Tagihan?"
         description="Data tagihan yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
@@ -1131,7 +1133,7 @@ function Bill() {
           if (!deleteLoading) setDeleteTarget(null);
         }}
         onConfirm={() => void handleDelete()}
-      />
+      />}
     </div>
   );
 }

@@ -166,7 +166,7 @@ function Sidebar() {
             PENGATURAN
           </p>
         )}
-        <NavLink
+        {role === "admin" && <NavLink
           to="/settings/profile"
           className={({ isActive }) =>
             [
@@ -192,7 +192,7 @@ function Sidebar() {
               {t("settings")}
             </span>
           )}
-        </NavLink>
+        </NavLink>}
       </div>
     </aside>
   );

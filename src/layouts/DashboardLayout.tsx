@@ -394,7 +394,7 @@ function DashboardLayout() {
               )}
 
               <div ref={notificationRef} className="relative">
-                <button
+                {user.role === "admin" && <button
                   type="button"
                   aria-label="Notifikasi"
                   aria-expanded={notificationsOpen}
@@ -410,7 +410,7 @@ function DashboardLayout() {
                   ].join(" ")}
                 >
                   <Bell className="h-5 w-5" strokeWidth={1.8} />
-                </button>
+                </button>}
                 {notificationsOpen && (
                   <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
                     <div className="flex items-start justify-between gap-3">
@@ -542,7 +542,7 @@ function DashboardLayout() {
                       >
                         Profile
                       </button>
-                      <button
+                      {user.role === "admin" && <button
                         type="button"
                         onClick={() => {
                           navigate("/settings");
@@ -551,7 +551,7 @@ function DashboardLayout() {
                         className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
                       >
                         Settings
-                      </button>
+                      </button>}
                     </div>
                     <button
                       type="button"
