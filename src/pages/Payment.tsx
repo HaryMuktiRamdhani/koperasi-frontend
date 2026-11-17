@@ -33,6 +33,22 @@ interface PembayaranData {
     itemId: string;
     amount: number;
     status: string;
+    Student?: {
+      id: string;
+      nis: string;
+      name: string;
+      Class?: {
+        id: string;
+        name: string;
+        level: string;
+        academicYear: string;
+      };
+      Jurusan?: {
+        id: string;
+        nama: string;
+        kode: string;
+      };
+    };
   };
   User?: {
     id: string;
@@ -226,6 +242,9 @@ function Payment() {
               <tr>
                 <th className="px-6 py-4">No</th>
                 <th className="px-6 py-4">Tanggal</th>
+                <th className="px-6 py-4">Nama Siswa</th>
+                <th className="px-6 py-4">Kelas</th>
+                <th className="px-6 py-4">Jurusan</th>
                 <th className="px-6 py-4">Nominal</th>
                 <th className="px-6 py-4">Metode</th>
                 <th className="px-6 py-4">Catatan</th>
@@ -246,6 +265,25 @@ function Payment() {
                     {formatDate(item.paymentDate)}
                   </td>
 
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900 dark:text-slate-100">
+                      {item.Bill?.Student?.name || "-"}
+                    </div>
+                    {item.Bill?.Student?.nis && (
+                      <div className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                        NIS: {item.Bill.Student.nis}
+                      </div>
+                    )}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
+                    {item.Bill?.Student?.Class?.name || "-"}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
+                    {item.Bill?.Student?.Jurusan?.nama || "-"}
+                  </td>
+
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
                     {formatCurrency(item.amount)}
                   </td>
@@ -263,7 +301,7 @@ function Payment() {
               {pembayaran.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={8}
                     className="px-6 py-10 text-center text-gray-500 dark:text-[#a7b4c7]"
                   >
                     Belum ada riwayat pembayaran.
