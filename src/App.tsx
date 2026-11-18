@@ -8,6 +8,7 @@ import Classes from "./pages/Kelas";
 import Student from "./pages/Student";
 import StudentDetail from "./pages/StudentDetail";
 import Item from "./pages/Item";
+import BarangMasuk from "./pages/BarangMasuk";
 import Opname from "./pages/Opname";
 import Bill from "./pages/Bill";
 import Payment from "./pages/Payment";
@@ -47,6 +48,8 @@ function App() {
 
           <Route path="/students" element={<Student />} />
           <Route path="/students/:id" element={<StudentDetail />} />
+
+          <Route path="/barang-masuk" element={<BarangMasuk />} />
 
           <Route path="/opname" element={<Opname />} />
 
