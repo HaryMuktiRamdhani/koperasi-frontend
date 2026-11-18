@@ -30,6 +30,7 @@ interface BarangData {
   id: string;
   name: string;
   price: number;
+  stock?: number;
   status?: ItemStatus;
   imageUrl?: string | null;
   createdAt?: string;
@@ -38,6 +39,7 @@ interface BarangData {
 interface BarangPayload {
   name: string;
   price: number;
+  stock: number;
   status: ItemStatus;
   // undefined = gambar tidak diubah, null = hapus gambar, string = gambar baru
   imageData?: string | null;
@@ -117,6 +119,7 @@ function Item() {
   const [editId, setEditId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
   const [status, setStatus] = useState<ItemStatus>("Aktif");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
@@ -194,6 +197,7 @@ function Item() {
     setEditId(null);
     setName("");
     setPrice("");
+    setStock("");
     setStatus("Aktif");
     setImagePreview(null);
     setImageChanged(false);
@@ -210,6 +214,7 @@ function Item() {
     setEditId(item.id);
     setName(item.name);
     setPrice(String(item.price));
+    setStock(String(item.stock ?? 0));
     setStatus(statusOf(item));
     setImagePreview(resolveImageUrl(item.imageUrl));
     setModalOpen(true);
@@ -274,6 +279,7 @@ function Item() {
 
     const trimmedName = name.trim();
     const priceNumber = Number(price);
+    const stockNumber = stock === "" ? 0 : Number(stock);
 
     if (!trimmedName) {
       setFormError("Nama barang wajib diisi.");
@@ -285,9 +291,15 @@ function Item() {
       return;
     }
 
+    if (!Number.isInteger(stockNumber) || stockNumber < 0) {
+      setFormError("Stok harus berupa angka bulat 0 atau lebih.");
+      return;
+    }
+
     const payload: BarangPayload = {
       name: trimmedName,
       price: priceNumber,
+      stock: stockNumber,
       status,
     };
 
@@ -461,6 +473,7 @@ function Item() {
                 <th className="px-6 py-4">No</th>
                 <th className="px-6 py-4">Gambar</th>
                 <th className="px-6 py-4">Nama Barang</th>
+                <th className="px-6 py-4">Stok</th>
                 <th className="px-6 py-4">Harga</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Aksi</th>
@@ -492,6 +505,10 @@ function Item() {
 
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">
                       {item.name}
+                    </td>
+
+                    <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
+                      {item.stock ?? 0}
                     </td>
 
                     <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
@@ -539,7 +556,7 @@ function Item() {
               {filteredBarang.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-6 py-12 text-center text-gray-500 dark:text-[#a7b4c7]"
                   >
                     {listLoading ? (
@@ -734,6 +751,26 @@ function Item() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="item-stock"
+                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  >
+                    Stok
+                  </label>
+                  <input
+                    id="item-stock"
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    step="1"
+                    value={stock}
+                    onChange={(event) => setStock(event.target.value)}
+                    placeholder="Contoh: 20"
+                    className={inputClass}
+                  />
                 </div>
               </div>
 

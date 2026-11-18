@@ -5,6 +5,7 @@ import {
   School,
   Users,
   Package,
+  ClipboardCheck,
   ReceiptText,
   Wallet,
   Settings,
@@ -18,6 +19,7 @@ export const menuItems = [
   { to: "/jurusan", label: "Jurusan", icon: GraduationCap },
   { to: "/classes", label: "Kelas", icon: School },
   { to: "/students", label: "Siswa", icon: Users },
+  { to: "/opname", label: "Opname", icon: ClipboardCheck },
   { to: "/items", label: "Barang", icon: Package },
   { to: "/bills", label: "Tagihan", icon: ReceiptText },
   { to: "/payments", label: "Pembayaran", icon: Wallet },
@@ -26,7 +28,10 @@ export const menuItems = [
 
 const sidebarGroups = [
   { label: "OVERVIEW", paths: ["/dashboard"] },
-  { label: "DATA", paths: ["/jurusan", "/classes", "/students", "/items"] },
+  {
+    label: "DATA",
+    paths: ["/jurusan", "/classes", "/students", "/opname", "/items"],
+  },
   { label: "TRANSAKSI", paths: ["/bills", "/payments"] },
   { label: "AKUN", paths: ["/users"] },
 ] as const;
