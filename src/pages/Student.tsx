@@ -5,6 +5,7 @@ import {
   Download,
   Eye,
   FileSpreadsheet,
+  GraduationCap,
   Pencil,
   Search,
   SlidersHorizontal,
@@ -97,6 +98,7 @@ function Student() {
   const [searchDraft, setSearchDraft] = useState(filters.search);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -639,6 +641,15 @@ function Student() {
   const validImportCount = importRows.filter((row) => row.payload).length;
   const invalidImportCount = importRows.length - validImportCount;
 
+  // Tombol akses fitur alumni (fungsionalitas menyusul)
+  function showComingSoon(featureName: string) {
+    const message = `Fitur ${featureName} akan segera tersedia.`;
+    setNotice(message);
+    window.setTimeout(() => {
+      setNotice((current) => (current === message ? "" : current));
+    }, 4000);
+  }
+
   return (
     <div>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -649,6 +660,14 @@ function Student() {
           icon={Users}
         />
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => showComingSoon("Data Alumni")}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+          >
+            <GraduationCap className="h-4 w-4" />
+            Data Alumni
+          </button>
           <button
             type="button"
             onClick={downloadTemplate}
@@ -677,6 +696,14 @@ function Student() {
           </button>
         </div>
       </div>
+      {notice && (
+        <div
+          role="status"
+          className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300"
+        >
+          {notice}
+        </div>
+      )}
       {error && (
         <div
           role="alert"

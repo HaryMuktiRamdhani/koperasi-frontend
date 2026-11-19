@@ -4,10 +4,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Edit3,
+  History,
   Plus,
   Search,
   SlidersHorizontal,
   Trash2,
+  TrendingUp,
   X,
   School,
 } from "lucide-react";
@@ -94,6 +96,15 @@ function Kelas() {
     endYear: String(currentYear + 3),
     status: "Aktif",
   });
+
+  // Tombol akses fitur tahun ajaran (fungsionalitas menyusul)
+  function showComingSoon(featureName: string) {
+    const message = `Fitur ${featureName} akan segera tersedia.`;
+    setNotice(message);
+    window.setTimeout(() => {
+      setNotice((current) => (current === message ? "" : current));
+    }, 4000);
+  }
 
   function updateFilters(patch: Partial<ClassFilterState>) {
     const next = { ...filters, ...patch };
@@ -407,7 +418,23 @@ function Kelas() {
         </div>
       )}
 
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap justify-end gap-2">
+        {canManage && <button
+          type="button"
+          onClick={() => showComingSoon("Kenaikan Kelas")}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-teal-600 px-4 py-2 text-sm font-medium text-teal-700 dark:text-teal-300"
+        >
+          <TrendingUp className="h-4 w-4" />
+          Kenaikan Kelas
+        </button>}
+        {canManage && <button
+          type="button"
+          onClick={() => showComingSoon("Riwayat Kenaikan")}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+        >
+          <History className="h-4 w-4" />
+          Riwayat Kenaikan
+        </button>}
         {canManage && <button
           type="button"
           onClick={formOpen ? resetForm : openCreate}
