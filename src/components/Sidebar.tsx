@@ -31,13 +31,18 @@ export const menuItems = [
 ] as const;
 
 const sidebarGroups = [
-  { label: "OVERVIEW", paths: ["/dashboard"] },
+  { label: "OVERVIEW",
+     paths: ["/dashboard"] },
   {
     label: "DATA",
     paths: [
       "/jurusan",
       "/classes",
-      "/students",
+      "/students",] },
+
+      {
+        label: "PERSEDIAAN",
+        paths: [
       "/barang-masuk",
       "/barang-keluar",
       "/opname",
@@ -183,33 +188,35 @@ function Sidebar() {
             PENGATURAN
           </p>
         )}
-        {role === "admin" && <NavLink
-          to="/settings/profile"
-          className={({ isActive }) =>
-            [
-              `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm ${compact ? "justify-center px-2" : ""}`,
-              isActive
-                ? "border-transparent bg-[#e7f6f4] font-semibold text-[#13716d] before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-[#168b87] dark:bg-[#153f45] dark:text-[#72ddd4]"
-                : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-[#102a43] dark:text-slate-300 dark:hover:bg-[#172b3d] dark:hover:text-white",
-            ].join(" ")
-          }
-          aria-label="Pengaturan"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-            <Settings className="h-4 w-4" strokeWidth={1.8} />
-          </span>
-          {(!compact || appearance.autoHideSidebar) && (
-            <span
-              className={
-                appearance.autoHideSidebar
-                  ? "hidden group-hover/sidebar:inline"
-                  : ""
-              }
-            >
-              {t("settings")}
+        {role === "admin" && (
+          <NavLink
+            to="/settings/profile"
+            className={({ isActive }) =>
+              [
+                `flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm ${compact ? "justify-center px-2" : ""}`,
+                isActive
+                  ? "border-transparent bg-[#e7f6f4] font-semibold text-[#13716d] before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-[#168b87] dark:bg-[#153f45] dark:text-[#72ddd4]"
+                  : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-[#102a43] dark:text-slate-300 dark:hover:bg-[#172b3d] dark:hover:text-white",
+              ].join(" ")
+            }
+            aria-label="Pengaturan"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              <Settings className="h-4 w-4" strokeWidth={1.8} />
             </span>
-          )}
-        </NavLink>}
+            {(!compact || appearance.autoHideSidebar) && (
+              <span
+                className={
+                  appearance.autoHideSidebar
+                    ? "hidden group-hover/sidebar:inline"
+                    : ""
+                }
+              >
+                {t("settings")}
+              </span>
+            )}
+          </NavLink>
+        )}
       </div>
     </aside>
   );
