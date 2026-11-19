@@ -9,6 +9,7 @@ import Student from "./pages/Student";
 import StudentDetail from "./pages/StudentDetail";
 import Item from "./pages/Item";
 import BarangMasuk from "./pages/BarangMasuk";
+import BarangKeluar from "./pages/BarangKeluar";
 import Opname from "./pages/Opname";
 import Bill from "./pages/Bill";
 import Payment from "./pages/Payment";
@@ -50,6 +51,8 @@ function App() {
           <Route path="/students/:id" element={<StudentDetail />} />
 
           <Route path="/barang-masuk" element={<BarangMasuk />} />
+
+          <Route path="/barang-keluar" element={<BarangKeluar />} />
 
           <Route path="/opname" element={<Opname />} />
 
