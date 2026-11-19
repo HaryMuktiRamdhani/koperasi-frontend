@@ -139,7 +139,12 @@ function DashboardLayout() {
         category: "Menu",
         path: item.to,
       })),
-      ...searchResults,
+      ...searchResults.map((item) => ({
+        ...item,
+        // Hasil siswa langsung membuka halaman detail siswa berdasarkan ID,
+        // memakai route yang sama dengan tombol Detail di halaman Siswa.
+        path: item.category === "Siswa" ? `/students/${item.id}` : item.path,
+      })),
     ],
     [matchingPages, searchResults],
   );
