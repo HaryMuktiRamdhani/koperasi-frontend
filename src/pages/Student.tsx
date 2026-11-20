@@ -38,6 +38,7 @@ interface Student {
   classId: string;
   jurusanId: string;
   generation: string;
+  gender?: string | null;
   status: string;
   Class?: { id: string; name: string; level: string; academicYear: string };
   Jurusan?: { id: string; nama: string; kode: string };
@@ -77,6 +78,7 @@ interface ImportStudentRow {
 }
 
 const statuses = ["Aktif", "Lulus", "Pindah", "Keluar"];
+const genders = ["Laki-laki", "Perempuan"];
 const excelHeaders = [
   "NIS",
   "Nama Siswa",
@@ -107,6 +109,7 @@ function Student() {
     classId: "",
     jurusanId: "",
     generation: "",
+    gender: "",
     status: "Aktif",
   });
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -266,6 +269,10 @@ function Student() {
     return !relationKnownForClass(student.classId, student.jurusanId);
   });
 
+  const editingStudent = editId
+    ? students.find((student) => student.id === editId)
+    : undefined;
+
   function resetFilters() {
     setSearchDraft("");
     setFilters(DEFAULT_STUDENT_FILTERS);
@@ -292,6 +299,7 @@ function Student() {
       classId: student.classId,
       jurusanId: student.jurusanId,
       generation: student.generation,
+      gender: student.gender || "",
       status: student.status || "Aktif",
     });
   }
@@ -303,6 +311,7 @@ function Student() {
       classId: "",
       jurusanId: "",
       generation: "",
+      gender: "",
       status: "Aktif",
     });
   }
@@ -314,6 +323,7 @@ function Student() {
       classId: form.classId,
       jurusanId: form.jurusanId,
       generation: form.generation.trim(),
+      gender: form.gender,
       status: form.status,
     };
     if (
@@ -324,6 +334,11 @@ function Student() {
       !payload.generation
     ) {
       setError("NIS, nama, kelas, jurusan, dan angkatan wajib diisi.");
+      return;
+    }
+    // Wajib untuk siswa baru; siswa lama boleh dilengkapi nanti.
+    if (!editId && !payload.gender) {
+      setError("Jenis kelamin wajib dipilih untuk siswa baru.");
       return;
     }
     setSaving(true);
@@ -748,6 +763,24 @@ function Student() {
               className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
             />
             <select
+              required={!editId}
+              aria-label="Jenis kelamin"
+              value={form.gender}
+              onChange={(event) =>
+                setForm({ ...form, gender: event.target.value })
+              }
+              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+            >
+              <option value="" disabled={Boolean(editingStudent?.gender)}>
+                Pilih jenis kelamin
+              </option>
+              {genders.map((gender) => (
+                <option key={gender} value={gender}>
+                  {gender}
+                </option>
+              ))}
+            </select>
+            <select
               required
               value={form.classId}
               onChange={(event) => setClass(event.target.value)}
@@ -796,6 +829,12 @@ function Student() {
               ))}
             </select>
           </div>
+          {editId && !editingStudent?.gender && (
+            <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
+              Jenis kelamin siswa ini belum diisi. Pilih jenis kelamin untuk
+              melengkapi data.
+            </p>
+          )}
           {form.classId && relationIdsForClass(form.classId).length === 0 && (
             <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
               Kelas ini belum memiliki jurusan yang tersimpan pada data siswa.
@@ -932,7 +971,7 @@ function Student() {
               Memuat data siswa...
             </div>
           ) : (
-            <table className="w-full min-w-212.5 text-left text-sm">
+            <table className="w-full min-w-240 text-left text-sm">
               <thead className="bg-gray-50 dark:bg-[#1b2a3d] text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
                 <tr>
                   <th className="px-5 py-3">No</th>
@@ -960,6 +999,7 @@ function Student() {
                       </button>
                     </th>
                   ))}
+                  <th className="px-5 py-3">Jenis Kelamin</th>
                   <th className="px-5 py-3">Jurusan</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3">Aksi</th>
@@ -983,6 +1023,13 @@ function Student() {
                     </td>
                     <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.generation}
+                    </td>
+                    <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
+                      {item.gender || (
+                        <span className="text-xs italic text-slate-400 dark:text-slate-500">
+                          Belum diisi
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.Jurusan?.kode || "-"}
@@ -1019,18 +1066,20 @@ function Student() {
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
-                        {canDelete && <button
-                          onClick={() => {
-                            setDeleteId(item.id);
-                            setDeleteError("");
-                          }}
-                          type="button"
-                          aria-label={`Hapus ${item.name}`}
-                          title="Hapus siswa"
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>}
+                        {canDelete && (
+                          <button
+                            onClick={() => {
+                              setDeleteId(item.id);
+                              setDeleteError("");
+                            }}
+                            type="button"
+                            aria-label={`Hapus ${item.name}`}
+                            title="Hapus siswa"
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -1038,7 +1087,7 @@ function Student() {
                 {!pageItems.length && (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]"
                     >
                       <p>

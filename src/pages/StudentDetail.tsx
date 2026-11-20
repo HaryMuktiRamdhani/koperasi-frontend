@@ -11,6 +11,7 @@ interface StudentData {
   classId: string;
   jurusanId: string;
   generation: string;
+  gender?: string | null;
   status: string;
   Class?: { name: string; level: string; academicYear: string };
   Jurusan?: { nama: string; kode: string };
@@ -142,7 +143,10 @@ function StudentDetail() {
             <InfoItem label="NIS" value={student.nis} />
             <InfoItem label="NISN" />
             <InfoItem label="Email" />
-            <InfoItem label="Jenis kelamin" />
+            <InfoItem
+              label="Jenis kelamin"
+              value={student.gender || "Belum diisi"}
+            />
             <InfoItem label="Nomor telepon" />
             <InfoItem label="Tempat lahir" />
             <InfoItem label="Tanggal lahir" />
