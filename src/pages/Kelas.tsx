@@ -17,6 +17,7 @@ import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
+import PromotionModal from "../components/PromotionModal";
 import {
   classFiltersToParams,
   DEFAULT_CLASS_FILTERS,
@@ -81,6 +82,7 @@ function Kelas() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [promotionOpen, setPromotionOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ClassData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -421,7 +423,7 @@ function Kelas() {
       <div className="mb-4 flex flex-wrap justify-end gap-2">
         {canManage && <button
           type="button"
-          onClick={() => showComingSoon("Kenaikan Kelas")}
+          onClick={() => setPromotionOpen(true)}
           className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-teal-600 px-4 py-2 text-sm font-medium text-teal-700 dark:text-teal-300"
         >
           <TrendingUp className="h-4 w-4" />
@@ -840,6 +842,15 @@ function Kelas() {
           </div>
         </div>
       </div>
+      <PromotionModal
+        open={canManage && promotionOpen}
+        onClose={() => setPromotionOpen(false)}
+        onCompleted={(message) => {
+          setPromotionOpen(false);
+          setNotice(message);
+          void loadData();
+        }}
+      />
       <ConfirmModal
         open={Boolean(deleteTarget)}
         title="Hapus Kelas?"
