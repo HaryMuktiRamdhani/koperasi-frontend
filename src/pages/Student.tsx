@@ -62,6 +62,7 @@ interface ImportStudentRow {
   rowNumber: number;
   nis: string;
   name: string;
+  gender: string;
   className: string;
   majorName: string;
   generation: string;
@@ -70,6 +71,7 @@ interface ImportStudentRow {
   payload?: {
     nis: string;
     name: string;
+    gender: string;
     classId: string;
     jurusanId: string;
     generation: string;
@@ -82,11 +84,20 @@ const genders = ["Laki-laki", "Perempuan"];
 const excelHeaders = [
   "NIS",
   "Nama Siswa",
+  "Jenis Kelamin",
   "Kelas",
   "Jurusan",
   "Angkatan",
   "Status",
 ] as const;
+
+// Menerima "Laki-laki", "Perempuan", atau singkatan "L" / "P".
+function parseGender(value: string) {
+  const key = value.trim().replace(/\s+/g, " ").toLocaleLowerCase("id-ID");
+  if (["laki-laki", "laki laki", "pria", "l"].includes(key)) return "Laki-laki";
+  if (["perempuan", "wanita", "p"].includes(key)) return "Perempuan";
+  return "";
+}
 
 function Student() {
   const canDelete = getStoredRole() === "admin";
@@ -382,8 +393,8 @@ function Student() {
     rowCount: number,
     includeDataTypes = true,
   ) {
-    sheet["!cols"] = [14, 28, 22, 30, 14, 16].map((wch) => ({ wch }));
-    sheet["!autofilter"] = { ref: `A1:F${Math.max(rowCount, 1)}` };
+    sheet["!cols"] = [14, 28, 16, 22, 30, 14, 16].map((wch) => ({ wch }));
+    sheet["!autofilter"] = { ref: `A1:G${Math.max(rowCount, 1)}` };
     for (let column = 0; column < excelHeaders.length; column += 1) {
       const address = XLSX.utils.encode_cell({ r: 0, c: column });
       const headerCell = sheet[address];
@@ -406,7 +417,7 @@ function Student() {
         nisCell.z = "@";
       }
       const generationCell = sheet[
-        XLSX.utils.encode_cell({ r: row, c: 4 })
+        XLSX.utils.encode_cell({ r: row, c: 5 })
       ];
       if (generationCell && /^\d{4}$/.test(String(generationCell.v))) {
         generationCell.t = "n";
@@ -446,6 +457,7 @@ function Student() {
         [
           "2024001",
           "Contoh Nama Siswa",
+          "Laki-laki",
           templateClass?.name || "Isi sesuai data master",
           templateMajor?.kode || templateMajor?.nama || "Isi sesuai data master",
           2024,
@@ -457,6 +469,7 @@ function Student() {
         ["Kolom", "Petunjuk pengisian"],
         ["NIS", "Wajib diisi sebagai teks. Jangan menghapus angka nol di depan."],
         ["Nama Siswa", "Wajib diisi."],
+        ["Jenis Kelamin", "Wajib diisi: Laki-laki atau Perempuan (boleh disingkat L / P)."],
         ["Kelas", "Gunakan nama kelas yang tersedia pada menu Data Kelas."],
         ["Jurusan", "Gunakan nama atau kode jurusan dari data master."],
         ["Angkatan", "Gunakan tahun empat digit, contoh 2024."],
@@ -472,6 +485,7 @@ function Student() {
         ...students.map((student) => [
           student.nis,
           student.name,
+          student.gender || "",
           student.Class?.name || "",
           student.Jurusan?.nama || student.Jurusan?.kode || "",
           student.generation,
@@ -522,11 +536,23 @@ function Student() {
       const parsedRows: ImportStudentRow[] = [];
       rows.slice(1).forEach((row, index) => {
         const values = row as unknown[];
-        const [nis, name, className, majorName, generation, rawStatus] =
-          values.slice(0, excelHeaders.length).map(cellText);
-        if (![nis, name, className, majorName, generation, rawStatus].some(Boolean)) {
+        const [
+          nis,
+          name,
+          rawGender,
+          className,
+          majorName,
+          generation,
+          rawStatus,
+        ] = values.slice(0, excelHeaders.length).map(cellText);
+        if (
+          ![nis, name, rawGender, className, majorName, generation, rawStatus].some(
+            Boolean,
+          )
+        ) {
           return;
         }
+        const selectedGender = parseGender(rawGender);
         const errors: string[] = [];
         const nisKey = normaliseLookup(nis);
         const selectedClass = classes.find(
@@ -547,6 +573,9 @@ function Student() {
         else if (fileNis.has(nisKey)) errors.push("NIS duplikat dalam file.");
         else fileNis.add(nisKey);
         if (!name) errors.push("Nama siswa wajib diisi.");
+        if (!rawGender) errors.push("Jenis kelamin wajib diisi.");
+        else if (!selectedGender)
+          errors.push("Jenis kelamin harus Laki-laki atau Perempuan.");
         if (!className) errors.push("Kelas wajib diisi.");
         else if (!selectedClass) errors.push("Nama kelas tidak ditemukan.");
         else if (selectedClass.status !== "Aktif")
@@ -571,6 +600,7 @@ function Student() {
           rowNumber: index + 2,
           nis,
           name,
+          gender: selectedGender || rawGender,
           className,
           majorName,
           generation,
@@ -581,6 +611,7 @@ function Student() {
           parsed.payload = {
             nis,
             name,
+            gender: selectedGender,
             classId: selectedClass.id,
             jurusanId: selectedMajor.id,
             generation,
@@ -1209,6 +1240,7 @@ function Student() {
                             <td className="px-3 py-2">{row.rowNumber}</td>
                             <td className="px-3 py-2">{row.nis}</td>
                             <td className="px-3 py-2">{row.name}</td>
+                            <td className="px-3 py-2">{row.gender}</td>
                             <td className="px-3 py-2">{row.className}</td>
                             <td className="px-3 py-2">{row.majorName}</td>
                             <td className="px-3 py-2">{row.generation}</td>
