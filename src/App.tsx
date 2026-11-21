@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Jurusan from "./pages/Jurusan";
 import Classes from "./pages/Kelas";
+import RiwayatKenaikan from "./pages/RiwayatKenaikan";
 import Student from "./pages/Student";
 import StudentDetail from "./pages/StudentDetail";
 import Item from "./pages/Item";
@@ -46,6 +47,16 @@ function App() {
           <Route path="/jurusan" element={<Jurusan />} />
 
           <Route path="/classes" element={<Classes />} />
+          <Route
+            path="/classes/promotion-history"
+            element={
+              role === "admin" ? (
+                <RiwayatKenaikan />
+              ) : (
+                <Navigate to="/classes" replace />
+              )
+            }
+          />
 
           <Route path="/students" element={<Student />} />
           <Route path="/students/:id" element={<StudentDetail />} />
