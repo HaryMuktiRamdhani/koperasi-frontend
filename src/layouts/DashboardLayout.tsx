@@ -3,12 +3,24 @@ import type { FormEvent, KeyboardEvent } from "react";
 import {
   Bell,
   ChevronDown,
+  ChevronRight,
+  CornerDownLeft,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  ReceiptText,
+  School,
   Search,
+  Settings,
   UserRound,
+  Users,
+  Wallet,
   X,
   LoaderCircle,
   CircleAlert,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar, { menuItems } from "../components/Sidebar";
 import api from "../services/api";
@@ -38,6 +50,29 @@ interface NotificationItem {
   path: string;
   createdAt: string;
 }
+
+// Warna aksen mengikuti pengaturan tampilan (Settings > Appearance).
+const ACCENT = "var(--accent-color, #20b2aa)";
+
+// Ikon kecil untuk setiap kategori hasil pencarian.
+const categoryIcons: Record<string, LucideIcon> = {
+  Menu: LayoutDashboard,
+  Siswa: Users,
+  Kelas: School,
+  Jurusan: GraduationCap,
+  Barang: Package,
+  Tagihan: ReceiptText,
+  Pembayaran: Wallet,
+};
+
+const iconButtonClass =
+  "flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-(--app-border) bg-(--app-surface) text-(--app-muted) hover:border-(--app-primary) hover:text-(--app-primary)";
+
+const panelClass =
+  "absolute right-0 top-13 z-30 rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-2xl shadow-slate-900/10 dark:shadow-black/40";
+
+const profileItemClass =
+  "flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-(--app-muted) hover:bg-(--app-primary-soft) hover:text-(--app-primary)";
 
 function getStoredUser(): AuthUser {
   const storedUser = localStorage.getItem("user");
@@ -297,23 +332,42 @@ function DashboardLayout() {
       <Sidebar />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]/95 px-5 py-3.5 text-[#102a43] dark:text-slate-100 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-(--app-border) bg-(--app-surface)/85 px-5 py-3 text-(--app-text) backdrop-blur-md lg:px-8">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-0.5"
+            style={{
+              backgroundImage: `linear-gradient(90deg, ${ACCENT}, #3b82f6 60%, transparent)`,
+            }}
+          />
           <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold tracking-[0.18em] text-[#168b87]">
-                Stokpedia
-              </p>
-              {appearance.showBreadcrumb && (
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="text-sm text-slate-500 dark:text-[#a7b4c7]">
-                    Administrasi
-                  </span>
-                  <span className="text-slate-200 dark:text-[#263449]">/</span>
-                  <h1 className="truncate text-base font-semibold text-[#102a43] dark:text-slate-100">
-                    {currentPage}
-                  </h1>
-                </div>
-              )}
+            <div className="flex min-w-0 items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="hidden h-10 w-1 shrink-0 rounded-full sm:block"
+                style={{
+                  backgroundImage: `linear-gradient(180deg, ${ACCENT}, #3b82f6)`,
+                }}
+              />
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--app-primary)">
+                  Stokpedia
+                </p>
+                {appearance.showBreadcrumb && (
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    <span className="text-xs text-(--app-muted)">
+                      Administrasi
+                    </span>
+                    <ChevronRight
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5 text-(--app-muted)"
+                    />
+                    <h1 className="truncate text-lg font-semibold tracking-tight text-(--app-text)">
+                      {currentPage}
+                    </h1>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
@@ -322,7 +376,7 @@ function DashboardLayout() {
                   className="relative hidden md:block"
                   onSubmit={handleSearchSubmit}
                 >
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-300" />
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-(--app-primary)" />
                   <input
                     ref={searchRef}
                     aria-label="Cari halaman"
@@ -332,64 +386,91 @@ function DashboardLayout() {
                     onChange={(event) => setSearch(event.target.value)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder={t("search")}
-                    className="w-48 rounded-lg border border-slate-200 dark:border-[#263449] bg-slate-50 dark:bg-[#1b2a3d] py-2 pl-9 pr-3 text-sm text-[#102a43] dark:text-slate-100 outline-none focus:border-[#20b2aa] focus:bg-white dark:focus:bg-[#111c2e] focus:ring-2 focus:ring-[#20b2aa]/15 lg:w-60"
+                    className="w-56 rounded-xl border border-(--app-border) bg-(--app-surface-muted) py-2.5 pl-10 pr-3 text-sm text-(--app-text) outline-none placeholder:text-(--app-muted) focus:bg-(--app-surface) lg:w-72"
                   />
                   {search && (
                     <div
                       id="global-search-results"
                       role="listbox"
-                      className="absolute left-0 right-0 top-11 overflow-hidden rounded-lg border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] py-1 shadow-lg"
+                      className="absolute right-0 top-13 z-30 w-[min(26rem,90vw)] overflow-hidden rounded-2xl border border-(--app-border) bg-(--app-surface) py-1.5 shadow-2xl shadow-slate-900/10 dark:shadow-black/40"
                     >
                       {searchLoading ? (
-                        <div className="flex items-center gap-2 px-3 py-4 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                          <LoaderCircle className="h-4 w-4 text-[#168b87]" />{" "}
+                        <div className="flex items-center gap-2 px-4 py-5 text-sm text-(--app-muted)">
+                          <LoaderCircle className="h-4 w-4 text-(--app-primary)" />{" "}
                           Mencari data...
                         </div>
                       ) : searchError ? (
-                        <div className="px-3 py-4 text-center text-sm text-red-600">
+                        <div className="px-4 py-5 text-center text-sm text-red-600">
                           {searchError}
                         </div>
                       ) : combinedResults.length > 0 ? (
-                        combinedResults.map((item, index) => (
-                          <button
-                            key={`${item.category}-${item.id}`}
-                            type="button"
-                            role="option"
-                            aria-selected={index === highlightedResult}
-                            onMouseEnter={() => setHighlightedResult(index)}
-                            onClick={() => goToPage(item.path)}
-                            className={[
-                              "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm",
-                              index === highlightedResult
-                                ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#102a43] dark:text-slate-100"
-                                : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
-                            ].join(" ")}
-                          >
-                            <Search
-                              className="h-4 w-4 text-[#168b87]"
-                              strokeWidth={1.8}
-                            />
-                            <span className="min-w-0">
-                              <span className="block font-medium">
-                                {item.label}
-                              </span>
-                              <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">
-                                {item.category} · {item.detail}
-                              </span>
-                            </span>
-                          </button>
-                        ))
+                        <div className="max-h-96 overflow-y-auto px-1.5">
+                          {combinedResults.map((item, index) => {
+                            const ResultIcon =
+                              categoryIcons[item.category] || Search;
+                            const active = index === highlightedResult;
+
+                            return (
+                              <button
+                                key={`${item.category}-${item.id}`}
+                                type="button"
+                                role="option"
+                                aria-selected={active}
+                                onMouseEnter={() => setHighlightedResult(index)}
+                                onClick={() => goToPage(item.path)}
+                                className={[
+                                  "flex w-full cursor-pointer items-center gap-3 rounded-xl px-2.5 py-2 text-left text-sm",
+                                  active
+                                    ? "bg-(--app-primary-soft) text-(--app-text)"
+                                    : "text-(--app-muted) hover:bg-(--app-surface-muted)",
+                                ].join(" ")}
+                              >
+                                <span
+                                  className={[
+                                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                                    active
+                                      ? "bg-(--app-primary) text-white"
+                                      : "bg-(--app-surface-muted) text-(--app-primary)",
+                                  ].join(" ")}
+                                >
+                                  <ResultIcon
+                                    className="h-4 w-4"
+                                    strokeWidth={1.9}
+                                  />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                  <span className="block truncate font-medium text-(--app-text)">
+                                    {item.label}
+                                  </span>
+                                  <span className="block truncate text-xs text-(--app-muted)">
+                                    <span className="font-semibold text-(--app-primary)">
+                                      {item.category}
+                                    </span>
+                                    {" · "}
+                                    {item.detail}
+                                  </span>
+                                </span>
+                                {active && (
+                                  <CornerDownLeft
+                                    aria-hidden="true"
+                                    className="h-4 w-4 shrink-0 text-(--app-primary)"
+                                  />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
                       ) : (
-                        <div className="px-3 py-4 text-center">
-                          <p className="text-sm font-medium text-[#102a43] dark:text-slate-100">
+                        <div className="px-4 py-6 text-center">
+                          <p className="text-sm font-medium text-(--app-text)">
                             Tidak ada halaman ditemukan
                           </p>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                          <p className="mt-1 text-xs text-(--app-muted)">
                             Coba kata kunci lain.
                           </p>
                         </div>
                       )}
-                      <p className="border-t border-slate-200 dark:border-[#263449] px-3 py-2 text-[11px] text-slate-500 dark:text-[#a7b4c7]">
+                      <p className="mt-1 border-t border-(--app-border) bg-(--app-surface-muted) px-4 py-2 text-[11px] text-(--app-muted)">
                         Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc
                         untuk menutup
                       </p>
@@ -399,63 +480,70 @@ function DashboardLayout() {
               )}
 
               <div ref={notificationRef} className="relative">
-                {user.role === "admin" && <button
-                  type="button"
-                  aria-label="Notifikasi"
-                  aria-expanded={notificationsOpen}
-                  onClick={() => {
-                    setNotificationsOpen((open) => !open);
-                    setProfileOpen(false);
-                  }}
-                  className={[
-                    "cursor-pointer rounded-lg p-2",
-                    notificationsOpen
-                      ? "bg-[#e8f7f5] dark:bg-[#1b2a3d] text-[#13716d]"
-                      : "text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100",
-                  ].join(" ")}
-                >
-                  <Bell className="h-5 w-5" strokeWidth={1.8} />
-                </button>}
+                {user.role === "admin" && (
+                  <button
+                    type="button"
+                    aria-label="Notifikasi"
+                    aria-expanded={notificationsOpen}
+                    onClick={() => {
+                      setNotificationsOpen((open) => !open);
+                      setProfileOpen(false);
+                    }}
+                    className={[
+                      iconButtonClass,
+                      notificationsOpen
+                        ? "border-(--app-primary) bg-(--app-primary-soft) text-(--app-primary)"
+                        : "",
+                    ].join(" ")}
+                  >
+                    <Bell className="h-5 w-5" strokeWidth={1.8} />
+                  </button>
+                )}
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-12 w-80 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4 shadow-lg">
+                  <div className={`${panelClass} w-[min(22rem,90vw)] p-4`}>
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h2 className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
-                          Notifikasi
-                        </h2>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
-                          Informasi dan aktivitas akun
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary)">
+                          <Bell className="h-4 w-4" strokeWidth={1.9} />
+                        </span>
+                        <div>
+                          <h2 className="text-sm font-semibold text-(--app-text)">
+                            Notifikasi
+                          </h2>
+                          <p className="text-xs text-(--app-muted)">
+                            Informasi dan aktivitas akun
+                          </p>
+                        </div>
                       </div>
                       <button
                         type="button"
                         aria-label="Tutup notifikasi"
                         onClick={() => setNotificationsOpen(false)}
-                        className="cursor-pointer rounded-md p-1 text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
+                        className="cursor-pointer rounded-lg p-1.5 text-(--app-muted) hover:bg-(--app-surface-muted) hover:text-(--app-text)"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                     {notificationsLoading ? (
-                      <div className="flex items-center justify-center gap-2 py-7 text-sm text-slate-500 dark:text-[#a7b4c7]">
-                        <LoaderCircle className="h-4 w-4 text-[#168b87]" />{" "}
+                      <div className="flex items-center justify-center gap-2 py-8 text-sm text-(--app-muted)">
+                        <LoaderCircle className="h-4 w-4 text-(--app-primary)" />{" "}
                         Memuat notifikasi...
                       </div>
                     ) : notificationsError ? (
-                      <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700">
+                      <div className="mt-4 flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
                         <CircleAlert className="h-4 w-4 shrink-0" />{" "}
                         {notificationsError}
                       </div>
                     ) : notifications.length === 0 ? (
-                      <div className="mt-4 rounded-lg border border-dashed border-slate-200 dark:border-[#263449] px-3 py-5 text-center">
+                      <div className="mt-4 rounded-xl border border-dashed border-(--app-border) px-3 py-6 text-center">
                         <Bell
-                          className="mx-auto h-5 w-5 text-slate-500 dark:text-[#a7b4c7]"
+                          className="mx-auto h-5 w-5 text-(--app-muted)"
                           strokeWidth={1.7}
                         />
-                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-[#a7b4c7]">
+                        <p className="mt-2 text-sm font-medium text-(--app-text)">
                           Belum ada notifikasi
                         </p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-[#a7b4c7]">
+                        <p className="mt-1 text-xs leading-relaxed text-(--app-muted)">
                           Belum ada aktivitas operasional untuk ditampilkan.
                         </p>
                       </div>
@@ -469,15 +557,15 @@ function DashboardLayout() {
                               goToPage(notification.path);
                               setNotificationsOpen(false);
                             }}
-                            className="w-full cursor-pointer rounded-lg border border-slate-200 dark:border-[#263449] p-3 text-left hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
+                            className="w-full cursor-pointer rounded-xl border border-(--app-border) border-l-4 border-l-(--app-primary) bg-(--app-surface-muted) p-3 text-left hover:bg-(--app-primary-soft)"
                           >
-                            <p className="text-xs font-semibold text-[#102a43] dark:text-slate-100">
+                            <p className="text-xs font-semibold text-(--app-text)">
                               {notification.title}
                             </p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                            <p className="mt-1 text-xs text-(--app-muted)">
                               {notification.message}
                             </p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                            <p className="mt-1 text-xs font-medium text-(--app-primary)">
                               {notification.detail}
                             </p>
                           </button>
@@ -498,73 +586,95 @@ function DashboardLayout() {
                     }
                   }}
                   aria-expanded={profileOpen}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg p-1.5 pr-2 hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
+                  className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-(--app-border) bg-(--app-surface) py-1.5 pl-1.5 pr-2.5 hover:border-(--app-primary)"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-xs font-bold text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300">
+                  <span
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, ${ACCENT}, #0e7490)`,
+                    }}
+                  >
                     {getInitials(user.name, user.email)}
                   </span>
-                  <span className="hidden max-w-32 text-left sm:block">
-                    <span className="block truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">
+                  <span className="hidden max-w-44 text-left sm:block">
+                    <span className="block truncate text-sm font-semibold leading-tight text-(--app-text)">
                       {user.name || user.email || "Pengguna"}
                     </span>
-                    <span className="block text-xs text-slate-500 dark:text-[#a7b4c7]">
+                    <span className="block text-xs text-(--app-muted)">
                       {formatRole(user.role)}
                     </span>
                   </span>
-                  <ChevronDown className="hidden h-4 w-4 text-slate-500 dark:text-[#a7b4c7] sm:block" />
+                  <ChevronDown className="hidden h-4 w-4 text-(--app-muted) sm:block" />
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 top-12 w-64 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-3 shadow-lg">
-                    <div className="flex items-center gap-3 border-b border-slate-200 dark:border-[#263449] px-2 pb-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#d9f3f0] text-sm font-bold text-[#13716d] dark:bg-[#164e63] dark:text-[#5eead4]">
+                  <div className={`${panelClass} w-72 overflow-hidden`}>
+                    <div
+                      className="flex items-center gap-3 px-4 py-4"
+                      style={{
+                        backgroundImage: `linear-gradient(135deg, color-mix(in srgb, ${ACCENT} 16%, transparent), transparent 70%)`,
+                      }}
+                    >
+                      <span
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
+                        style={{
+                          backgroundImage: `linear-gradient(135deg, ${ACCENT}, #0e7490)`,
+                        }}
+                      >
                         {getInitials(user.name, user.email)}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#102a43] dark:text-slate-100">
+                        <p className="truncate text-sm font-semibold text-(--app-text)">
                           {user.name || "Pengguna"}
                         </p>
-                        <p className="truncate text-xs text-slate-500 dark:text-[#a7b4c7]">
+                        <p className="truncate text-xs text-(--app-muted)">
                           {user.email || "Email tidak tersedia"}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 px-2 py-3 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                    <div className="flex items-center gap-2 border-y border-(--app-border) px-4 py-2.5 text-xs text-(--app-muted)">
                       <UserRound
-                        className="h-4 w-4 text-[#168b87]"
+                        className="h-4 w-4 text-(--app-primary)"
                         strokeWidth={1.8}
                       />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
-                    <div className="mb-2 space-y-1 border-t border-slate-200 dark:border-[#263449] pt-2">
+                    <div className="space-y-0.5 p-2">
                       <button
                         type="button"
                         onClick={() => {
                           navigate("/settings/profile");
                           setProfileOpen(false);
                         }}
-                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
+                        className={profileItemClass}
                       >
+                        <UserRound className="h-4 w-4" strokeWidth={1.8} />
                         Profile
                       </button>
-                      {user.role === "admin" && <button
-                        type="button"
-                        onClick={() => {
-                          navigate("/settings");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-500 dark:text-[#a7b4c7] hover:bg-slate-50 dark:hover:bg-[#1b2a3d] hover:text-[#102a43] dark:hover:text-slate-100"
-                      >
-                        Settings
-                      </button>}
+                      {user.role === "admin" && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigate("/settings");
+                            setProfileOpen(false);
+                          }}
+                          className={profileItemClass}
+                        >
+                          <Settings className="h-4 w-4" strokeWidth={1.8} />
+                          Settings
+                        </button>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="w-full rounded-lg bg-slate-50 dark:bg-[#1b2a3d] px-3 py-2 text-left text-sm font-medium text-[#102a43] dark:text-slate-100 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
-                    >
-                      Logout
-                    </button>
+                    <div className="border-t border-(--app-border) p-2">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-(--app-muted) hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                      >
+                        <LogOut className="h-4 w-4" strokeWidth={1.8} />
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
