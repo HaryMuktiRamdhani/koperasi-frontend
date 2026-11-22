@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import {
@@ -149,6 +150,7 @@ function DashboardLayout() {
           "/profile": t("profile"),
           "/help": "Help & Support",
         }[location.pathname] || t("dashboard"));
+
   const visibleMenuItems = useMemo(
     () =>
       menuItems.filter(
@@ -156,6 +158,7 @@ function DashboardLayout() {
       ),
     [user.role],
   );
+
   const matchingPages = useMemo(
     () =>
       visibleMenuItems.filter((item) =>
@@ -165,6 +168,7 @@ function DashboardLayout() {
       ),
     [search, visibleMenuItems],
   );
+
   const combinedResults = useMemo(
     () => [
       ...matchingPages.map((item) => ({
@@ -176,8 +180,7 @@ function DashboardLayout() {
       })),
       ...searchResults.map((item) => ({
         ...item,
-        // Hasil siswa langsung membuka halaman detail siswa berdasarkan ID,
-        // memakai route yang sama dengan tombol Detail di halaman Siswa.
+        
         path: item.category === "Siswa" ? `/students/${item.id}` : item.path,
       })),
     ],
@@ -223,9 +226,11 @@ function DashboardLayout() {
     if (!notificationsOpen) return;
 
     let cancelled = false;
+
     async function loadNotifications() {
       setNotificationsLoading(true);
       setNotificationsError("");
+
       try {
         const response = await api.get<{ items: NotificationItem[] }>(
           "/notifications",
@@ -239,6 +244,7 @@ function DashboardLayout() {
     }
 
     loadNotifications();
+
     return () => {
       cancelled = true;
     };
@@ -337,22 +343,25 @@ function DashboardLayout() {
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-0.5"
             style={{
-              backgroundImage: `linear-gradient(90deg, ${ACCENT}, #3b82f6 60%, transparent)`,
+              backgroundImage: `linear-gradient(90deg, ${ACCENT}, color-mix(in srgb, ${ACCENT} 35%, transparent))`,
             }}
           />
+
           <div className="flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <span
                 aria-hidden="true"
                 className="hidden h-10 w-1 shrink-0 rounded-full sm:block"
                 style={{
-                  backgroundImage: `linear-gradient(180deg, ${ACCENT}, #3b82f6)`,
+                  backgroundColor: ACCENT,
                 }}
               />
+
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--app-primary)">
                   Stokpedia
                 </p>
+
                 {appearance.showBreadcrumb && (
                   <div className="mt-0.5 flex items-center gap-1.5">
                     <span className="text-xs text-(--app-muted)">
@@ -377,6 +386,7 @@ function DashboardLayout() {
                   onSubmit={handleSearchSubmit}
                 >
                   <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-(--app-primary)" />
+
                   <input
                     ref={searchRef}
                     aria-label="Cari halaman"
@@ -388,6 +398,7 @@ function DashboardLayout() {
                     placeholder={t("search")}
                     className="w-56 rounded-xl border border-(--app-border) bg-(--app-surface-muted) py-2.5 pl-10 pr-3 text-sm text-(--app-text) outline-none placeholder:text-(--app-muted) focus:bg-(--app-surface) lg:w-72"
                   />
+
                   {search && (
                     <div
                       id="global-search-results"
@@ -438,10 +449,12 @@ function DashboardLayout() {
                                     strokeWidth={1.9}
                                   />
                                 </span>
+
                                 <span className="min-w-0 flex-1">
                                   <span className="block truncate font-medium text-(--app-text)">
                                     {item.label}
                                   </span>
+
                                   <span className="block truncate text-xs text-(--app-muted)">
                                     <span className="font-semibold text-(--app-primary)">
                                       {item.category}
@@ -450,6 +463,7 @@ function DashboardLayout() {
                                     {item.detail}
                                   </span>
                                 </span>
+
                                 {active && (
                                   <CornerDownLeft
                                     aria-hidden="true"
@@ -470,6 +484,7 @@ function DashboardLayout() {
                           </p>
                         </div>
                       )}
+
                       <p className="mt-1 border-t border-(--app-border) bg-(--app-surface-muted) px-4 py-2 text-[11px] text-(--app-muted)">
                         Gunakan ↑ ↓ untuk memilih, Enter untuk membuka, Esc
                         untuk menutup
@@ -499,6 +514,7 @@ function DashboardLayout() {
                     <Bell className="h-5 w-5" strokeWidth={1.8} />
                   </button>
                 )}
+
                 {notificationsOpen && (
                   <div className={`${panelClass} w-[min(22rem,90vw)] p-4`}>
                     <div className="flex items-start justify-between gap-3">
@@ -506,6 +522,7 @@ function DashboardLayout() {
                         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary)">
                           <Bell className="h-4 w-4" strokeWidth={1.9} />
                         </span>
+
                         <div>
                           <h2 className="text-sm font-semibold text-(--app-text)">
                             Notifikasi
@@ -515,6 +532,7 @@ function DashboardLayout() {
                           </p>
                         </div>
                       </div>
+
                       <button
                         type="button"
                         aria-label="Tutup notifikasi"
@@ -524,6 +542,7 @@ function DashboardLayout() {
                         <X className="h-4 w-4" />
                       </button>
                     </div>
+
                     {notificationsLoading ? (
                       <div className="flex items-center justify-center gap-2 py-8 text-sm text-(--app-muted)">
                         <LoaderCircle className="h-4 w-4 text-(--app-primary)" />{" "}
@@ -591,11 +610,12 @@ function DashboardLayout() {
                   <span
                     className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white"
                     style={{
-                      backgroundImage: `linear-gradient(135deg, ${ACCENT}, #0e7490)`,
+                      backgroundColor: ACCENT,
                     }}
                   >
                     {getInitials(user.name, user.email)}
                   </span>
+
                   <span className="hidden max-w-44 text-left sm:block">
                     <span className="block truncate text-sm font-semibold leading-tight text-(--app-text)">
                       {user.name || user.email || "Pengguna"}
@@ -604,6 +624,7 @@ function DashboardLayout() {
                       {formatRole(user.role)}
                     </span>
                   </span>
+
                   <ChevronDown className="hidden h-4 w-4 text-(--app-muted) sm:block" />
                 </button>
 
@@ -612,17 +633,18 @@ function DashboardLayout() {
                     <div
                       className="flex items-center gap-3 px-4 py-4"
                       style={{
-                        backgroundImage: `linear-gradient(135deg, color-mix(in srgb, ${ACCENT} 16%, transparent), transparent 70%)`,
+                        backgroundColor: `color-mix(in srgb, ${ACCENT} 12%, transparent)`,
                       }}
                     >
                       <span
                         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
                         style={{
-                          backgroundImage: `linear-gradient(135deg, ${ACCENT}, #0e7490)`,
+                          backgroundColor: ACCENT,
                         }}
                       >
                         {getInitials(user.name, user.email)}
                       </span>
+
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-(--app-text)">
                           {user.name || "Pengguna"}
@@ -632,6 +654,7 @@ function DashboardLayout() {
                         </p>
                       </div>
                     </div>
+
                     <div className="flex items-center gap-2 border-y border-(--app-border) px-4 py-2.5 text-xs text-(--app-muted)">
                       <UserRound
                         className="h-4 w-4 text-(--app-primary)"
@@ -639,6 +662,7 @@ function DashboardLayout() {
                       />
                       <span>Role: {formatRole(user.role)}</span>
                     </div>
+
                     <div className="space-y-0.5 p-2">
                       <button
                         type="button"
@@ -651,6 +675,7 @@ function DashboardLayout() {
                         <UserRound className="h-4 w-4" strokeWidth={1.8} />
                         Profile
                       </button>
+
                       {user.role === "admin" && (
                         <button
                           type="button"
@@ -665,6 +690,7 @@ function DashboardLayout() {
                         </button>
                       )}
                     </div>
+
                     <div className="border-t border-(--app-border) p-2">
                       <button
                         type="button"

@@ -7,13 +7,11 @@ import {
   Pencil,
   Phone,
   ShieldCheck,
-  Trash2,
   X,
 } from "lucide-react";
 import api from "../../services/api";
 import ConfirmDialog from "./ConfirmDialog";
 import EmptyState from "./EmptyState";
-import SettingSection from "./SettingSection";
 
 interface ProfileData {
   id: string;
@@ -449,19 +447,6 @@ function ProfileSettings() {
           </div>
         </section>
       </div>
-
-      <SettingSection
-        title="Zona Berbahaya"
-        description="Penghapusan akun bersifat permanen dan tidak dapat dibatalkan."
-      >
-        <button
-          type="button"
-          onClick={() => setDeleteOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
-        >
-          <Trash2 className="h-4 w-4" /> Hapus Akun
-        </button>
-      </SettingSection>
 
       {editOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">

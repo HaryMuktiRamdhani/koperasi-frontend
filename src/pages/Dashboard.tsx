@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -25,27 +26,17 @@ interface DashboardData {
   totalIncome: number;
 }
 
-// Warna aksen mengikuti pengaturan tampilan (Settings > Appearance).
 const ACCENT = "var(--accent-color, #20b2aa)";
 
-// Kartu memakai variabel tema dari index.css agar sama di light dan dark mode.
 const cardClass =
-  "rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-sm";
+  "rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--app-primary)] hover:shadow-lg hover:shadow-teal-900/5 motion-reduce:transition-none";
 
-type Tone = "teal" | "blue" | "sky";
+type Tone = "teal";
 
 const tones: Record<Tone, { tile: string; bar: string }> = {
   teal: {
-    tile: "bg-teal-500/10 text-teal-600 dark:text-teal-300",
-    bar: "bg-teal-500",
-  },
-  blue: {
-    tile: "bg-blue-500/10 text-blue-600 dark:text-blue-300",
-    bar: "bg-blue-500",
-  },
-  sky: {
-    tile: "bg-sky-500/10 text-sky-600 dark:text-sky-300",
-    bar: "bg-sky-500",
+    tile: "bg-teal-600/10 text-teal-700 dark:text-teal-300 transition-colors duration-300 group-hover:bg-teal-600/20",
+    bar: "bg-teal-600",
   },
 };
 
@@ -58,33 +49,50 @@ interface StatCardProps {
   tone: Tone;
 }
 
-function StatCard({ label, value, icon: Icon, to, linkLabel, tone }: StatCardProps) {
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  to,
+  linkLabel,
+  tone,
+}: StatCardProps) {
   const style = tones[tone];
 
   return (
-    <div className={`${cardClass} relative overflow-hidden p-5`}>
+    <div className={`${cardClass} group relative overflow-hidden p-5`}>
       <span
         aria-hidden="true"
-        className={`absolute inset-x-0 top-0 h-1 ${style.bar}`}
+        className={`absolute inset-x-0 top-0 h-1 ${style.bar} origin-left transition-transform duration-500 group-hover:scale-x-105`}
       />
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-(--app-muted)">{label}</p>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-(--app-text) tabular-nums">
+          <p className="text-sm font-medium text-(--app-muted)">
+            {label}
+          </p>
+
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-(--app-text) tabular-nums transition-colors duration-300">
             {value}
           </p>
         </div>
+
         <span
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${style.tile}`}
         >
-          <Icon className="h-5 w-5" strokeWidth={1.9} />
+          <Icon
+            className="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+            strokeWidth={1.9}
+          />
         </span>
       </div>
+
       <Link
         to={to}
-        className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-(--app-primary) hover:underline"
+        className="mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-(--app-primary) transition-colors duration-200 hover:underline"
       >
-        {linkLabel} <ArrowRight className="h-3.5 w-3.5" />
+        {linkLabel}
+        <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
       </Link>
     </div>
   );
@@ -93,11 +101,30 @@ function StatCard({ label, value, icon: Icon, to, linkLabel, tone }: StatCardPro
 function PaymentRing({ percentage }: { percentage: number }) {
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
-  const filled = (Math.min(Math.max(percentage, 0), 100) / 100) * circumference;
+
+  const safePercentage = Math.min(Math.max(percentage, 0), 100);
+
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setAnimated(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  const offset = animated
+    ? circumference - (safePercentage / 100) * circumference
+    : circumference;
 
   return (
-    <div className="relative h-40 w-40 shrink-0">
-      <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" aria-hidden="true">
+    <div className="relative h-40 w-40 shrink-0 transition-transform duration-300 hover:scale-105 motion-reduce:transition-none">
+      <svg
+        viewBox="0 0 120 120"
+        className="h-full w-full -rotate-90"
+        aria-hidden="true"
+      >
         <circle
           cx="60"
           cy="60"
@@ -106,6 +133,7 @@ function PaymentRing({ percentage }: { percentage: number }) {
           strokeWidth="11"
           className="stroke-slate-200 dark:stroke-[#294254]"
         />
+
         <circle
           cx="60"
           cy="60"
@@ -114,11 +142,17 @@ function PaymentRing({ percentage }: { percentage: number }) {
           strokeWidth="11"
           strokeLinecap="round"
           stroke={ACCENT}
-          strokeDasharray={`${filled} ${circumference}`}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          style={{
+            transition:
+              "stroke-dashoffset 1200ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
         />
       </svg>
+
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-3xl font-semibold tracking-tight text-(--app-text)">
+        <span className="text-3xl font-semibold tracking-tight text-(--app-text) tabular-nums">
           {percentage}%
         </span>
       </div>
@@ -129,8 +163,10 @@ function PaymentRing({ percentage }: { percentage: number }) {
 function Dashboard() {
   const { appearance } = useTheme();
   const { t, formatCurrency, formatNumber } = useLanguage();
+
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pageVisible, setPageVisible] = useState(false);
 
   async function getDashboard() {
     try {
@@ -147,15 +183,34 @@ function Dashboard() {
     getDashboard();
   }, []);
 
+  // Animasi masuk setelah data dashboard selesai dimuat.
+  useEffect(() => {
+    if (loading || !data) return;
+
+    const frame = requestAnimationFrame(() => {
+      setPageVisible(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [loading, data]);
+
+  const revealStyle = (delay = 0) => ({
+    opacity: pageVisible ? 1 : 0,
+    transform: pageVisible ? "translateY(0)" : "translateY(12px)",
+    transitionDelay: `${delay}ms`,
+  });
+
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className={`${cardClass} flex items-center gap-3 px-6 py-4`}>
           <span
             aria-hidden="true"
-            className="h-2.5 w-2.5 rounded-full bg-(--app-primary)"
+            className="h-2.5 w-2.5 animate-pulse rounded-full bg-(--app-primary)"
           />
-          <p className="text-sm text-(--app-muted)">{t("dashboard")}...</p>
+          <p className="text-sm text-(--app-muted)">
+            {t("dashboard")}...
+          </p>
         </div>
       </div>
     );
@@ -167,6 +222,7 @@ function Dashboard() {
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-300">
           <CircleAlert className="h-6 w-6" strokeWidth={1.8} />
         </span>
+
         <h2 className="mt-4 text-lg font-semibold text-(--app-text)">
           {t("dashboard")} unavailable
         </h2>
@@ -183,12 +239,36 @@ function Dashboard() {
       ? Math.round((data.paidBills / data.totalBills) * 100)
       : 0;
 
-  const summaryRows: { label: string; value: string; icon: LucideIcon }[] = [
-    { label: "Siswa terdaftar", value: formatNumber(data.totalStudents), icon: Users },
-    { label: "Barang tersedia", value: formatNumber(data.totalItems), icon: Package },
-    { label: "Total tagihan", value: formatNumber(data.totalBills), icon: ReceiptText },
-    { label: "Tagihan belum dibayar", value: formatNumber(data.unpaidBills), icon: Clock3 },
-    { label: "Total pemasukan", value: formatCurrency(data.totalIncome), icon: Wallet },
+  const summaryRows: {
+    label: string;
+    value: string;
+    icon: LucideIcon;
+  }[] = [
+    {
+      label: "Siswa terdaftar",
+      value: formatNumber(data.totalStudents),
+      icon: Users,
+    },
+    {
+      label: "Barang tersedia",
+      value: formatNumber(data.totalItems),
+      icon: Package,
+    },
+    {
+      label: "Total tagihan",
+      value: formatNumber(data.totalBills),
+      icon: ReceiptText,
+    },
+    {
+      label: "Tagihan belum dibayar",
+      value: formatNumber(data.unpaidBills),
+      icon: Clock3,
+    },
+    {
+      label: "Total pemasukan",
+      value: formatCurrency(data.totalIncome),
+      icon: Wallet,
+    },
   ];
 
   const quickActions: {
@@ -198,48 +278,84 @@ function Dashboard() {
     icon: LucideIcon;
     tone: Tone;
   }[] = [
-    { to: "/students", title: "Data Siswa", subtitle: "Kelola siswa", icon: Users, tone: "teal" },
-    { to: "/items", title: "Data Barang", subtitle: "Kelola barang", icon: Package, tone: "blue" },
-    { to: "/bills", title: "Tagihan", subtitle: "Kelola tagihan", icon: ReceiptText, tone: "sky" },
-    { to: "/payments", title: "Pembayaran", subtitle: "Catat pembayaran", icon: Wallet, tone: "teal" },
+    {
+      to: "/students",
+      title: "Data Siswa",
+      subtitle: "Kelola siswa",
+      icon: Users,
+      tone: "teal",
+    },
+    {
+      to: "/items",
+      title: "Data Barang",
+      subtitle: "Kelola barang",
+      icon: Package,
+      tone: "teal",
+    },
+    {
+      to: "/bills",
+      title: "Tagihan",
+      subtitle: "Kelola tagihan",
+      icon: ReceiptText,
+      tone: "teal",
+    },
+    {
+      to: "/payments",
+      title: "Pembayaran",
+      subtitle: "Catat pembayaran",
+      icon: Wallet,
+      tone: "teal",
+    },
   ];
 
   return (
     <div className="space-y-7">
+      {/* Hero Section */}
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-6 text-white shadow-lg shadow-slate-900/10 sm:p-8"
         style={{
-          backgroundImage: `radial-gradient(70% 140% at 100% 0%, color-mix(in srgb, ${ACCENT} 45%, transparent), transparent 65%), linear-gradient(135deg, #0f2a43 0%, #123a52 55%, #0f4c5c 100%)`,
+          ...revealStyle(0),
+          backgroundImage:
+            "linear-gradient(135deg, #115e59 0%, #0f766e 55%, #0d9488 100%)",
         }}
+        className="relative overflow-hidden rounded-3xl border border-teal-700/20 p-6 text-white shadow-sm shadow-teal-900/10 transition-[opacity,transform,box-shadow] duration-500 ease-out hover:shadow-lg hover:shadow-teal-900/15 motion-reduce:transition-none sm:p-8"
       >
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10"
+          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10 transition-transform duration-700 hover:scale-110"
         />
+
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -right-4 -top-4 h-32 w-32 rounded-full border border-white/10"
         />
+
         <div className="relative flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100">
               {t("schoolSystem")}
             </p>
+
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               Dashboard
             </h1>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300">
+
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-teal-50/85">
               {t("dashboardSubtitle")}
             </p>
           </div>
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur">
-            <Activity className="h-3.5 w-3.5 text-teal-200" />
+
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur transition-all duration-300 hover:border-white/40 hover:bg-white/20">
+            <Activity className="h-3.5 w-3.5 text-teal-100" />
             {t("operationalData")}
           </span>
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* Statistics Cards */}
+      <div
+        style={revealStyle(100)}
+        className="grid grid-cols-1 gap-4 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none md:grid-cols-2 xl:grid-cols-4"
+      >
         <StatCard
           label={t("totalStudents")}
           value={formatNumber(data.totalStudents)}
@@ -248,65 +364,76 @@ function Dashboard() {
           linkLabel={t("viewStudents")}
           tone="teal"
         />
+
         <StatCard
           label={t("totalItems")}
           value={formatNumber(data.totalItems)}
           icon={Package}
           to="/items"
           linkLabel={t("viewItems")}
-          tone="blue"
+          tone="teal"
         />
+
         <StatCard
           label={t("totalBills")}
           value={formatNumber(data.totalBills)}
           icon={ReceiptText}
           to="/bills"
           linkLabel={t("viewBills")}
-          tone="sky"
+          tone="teal"
         />
 
         {appearance.dashboardWidgets.cashSummary && (
           <div
-            className="relative overflow-hidden rounded-2xl border border-white/10 p-5 text-white shadow-lg shadow-slate-900/10"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #102a43 0%, #12425a 60%, #0f5b66 100%)",
-            }}
+            className={`${cardClass} group relative overflow-hidden p-5`}
           >
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute -bottom-10 -right-10 h-32 w-32 rounded-full border border-white/10"
+              className="pointer-events-none absolute -bottom-10 -right-10 h-32 w-32 rounded-full border border-teal-600/10 transition-transform duration-500 group-hover:scale-125"
             />
+
             <div className="relative">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-slate-300">
+                <p className="text-sm font-medium text-(--app-muted)">
                   {t("totalIncome")}
                 </p>
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-teal-200">
-                  <Wallet className="h-5 w-5" strokeWidth={1.9} />
+
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 transition-colors duration-300 group-hover:bg-teal-600/20 dark:text-teal-300">
+                  <Wallet
+                    className="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+                    strokeWidth={1.9}
+                  />
                 </span>
               </div>
-              <p className="-mt-1 text-2xl font-semibold tracking-tight text-white tabular-nums">
+
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-(--app-text) tabular-nums">
                 {formatCurrency(data.totalIncome)}
               </p>
             </div>
+
             <Link
               to="/payments"
-              className="relative mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-teal-200 hover:text-white"
+              className="relative mt-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-(--app-primary) hover:underline"
             >
-              {t("viewPayments")} <ArrowRight className="h-3.5 w-3.5" />
+              {t("viewPayments")}
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* Payment Status and Summary */}
+      <div
+        style={revealStyle(200)}
+        className="grid grid-cols-1 gap-6 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2"
+      >
         {appearance.dashboardWidgets.chart && (
           <div className={`${cardClass} flex flex-col p-6`}>
             <div>
               <h2 className="text-base font-semibold text-(--app-text)">
                 {t("paymentStatus")}
               </h2>
+
               <p className="mt-1 text-sm text-(--app-muted)">
                 {t("paymentStatusDescription")}
               </p>
@@ -316,20 +443,23 @@ function Dashboard() {
               <PaymentRing percentage={paymentPercentage} />
 
               <div className="grid w-full flex-1 grid-cols-2 gap-3 sm:grid-cols-1">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 dark:border-emerald-900/70 dark:bg-emerald-950/40">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-emerald-900/70 dark:bg-emerald-950/40 motion-reduce:transition-none">
                   <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
                     <CheckCircle2 className="h-4 w-4" />
                     <p className="text-sm font-medium">{t("paid")}</p>
                   </div>
+
                   <p className="mt-2 text-xl font-semibold text-(--app-text) tabular-nums">
                     {formatNumber(data.paidBills)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900/70 dark:bg-amber-950/40">
+
+                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-900/70 dark:bg-amber-950/40 motion-reduce:transition-none">
                   <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
                     <Clock3 className="h-4 w-4" />
                     <p className="text-sm font-medium">{t("unpaid")}</p>
                   </div>
+
                   <p className="mt-2 text-xl font-semibold text-(--app-text) tabular-nums">
                     {formatNumber(data.unpaidBills)}
                   </p>
@@ -339,10 +469,12 @@ function Dashboard() {
           </div>
         )}
 
+        {/* Summary */}
         <div className={`${cardClass} p-6`}>
           <h2 className="text-base font-semibold text-(--app-text)">
             {t("summary")}
           </h2>
+
           <p className="mt-1 text-sm text-(--app-muted)">
             {t("summaryDescription")}
           </p>
@@ -351,12 +483,16 @@ function Dashboard() {
             {summaryRows.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-3 py-3"
+                className="group/row flex items-center justify-between gap-3 rounded-lg py-3 transition-colors duration-200 hover:bg-(--app-primary-soft)"
               >
                 <span className="flex items-center gap-3 text-sm text-(--app-muted)">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary)">
-                    <row.icon className="h-4 w-4" strokeWidth={1.9} />
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary) transition-transform duration-300 group-hover/row:scale-110">
+                    <row.icon
+                      className="h-4 w-4"
+                      strokeWidth={1.9}
+                    />
                   </span>
+
                   {row.label}
                 </span>
 
@@ -370,7 +506,10 @@ function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className={`${cardClass} p-6`}>
+      <div
+        style={revealStyle(300)}
+        className={`${cardClass} p-6 transition-[opacity,transform,box-shadow] duration-500 ease-out motion-reduce:transition-none`}
+      >
         <div>
           <h2 className="text-base font-semibold text-(--app-text)">
             Akses Cepat
@@ -386,12 +525,15 @@ function Dashboard() {
             <Link
               key={action.to}
               to={action.to}
-              className="group flex items-center gap-3 rounded-xl border border-(--app-border) bg-(--app-surface-muted) p-4 hover:border-(--app-primary) hover:bg-(--app-primary-soft)"
+              className="group flex items-center gap-3 rounded-xl border border-(--app-border) bg-(--app-surface-muted) p-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-(--app-primary) hover:bg-(--app-primary-soft) hover:shadow-md motion-reduce:transition-none"
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tones[action.tone].tile}`}
               >
-                <action.icon className="h-5 w-5" strokeWidth={1.9} />
+                <action.icon
+                  className="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+                  strokeWidth={1.9}
+                />
               </span>
 
               <div className="min-w-0 flex-1">
@@ -404,7 +546,7 @@ function Dashboard() {
                 </p>
               </div>
 
-              <ArrowRight className="h-4 w-4 shrink-0 text-(--app-muted) group-hover:text-(--app-primary)" />
+              <ArrowRight className="h-4 w-4 shrink-0 text-(--app-muted) transition-all duration-300 group-hover:translate-x-1 group-hover:text-(--app-primary)" />
             </Link>
           ))}
         </div>

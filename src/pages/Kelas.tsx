@@ -51,6 +51,12 @@ const statuses = ["Aktif", "Akan datang", "Nonaktif", "Lulus/Arsip"];
 const START_YEAR = 2013;
 const currentYear = new Date().getFullYear();
 
+const controlClass =
+  "transition-colors duration-150 ease-out focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20";
+
+const buttonClass =
+  "transition-all duration-150 ease-out hover:-translate-y-0.5 active:scale-[0.98]";
+
 function yearsFrom(start: number, end: number) {
   return Array.from({ length: end - start + 1 }, (_, index) =>
     String(end - index),
@@ -73,23 +79,30 @@ function Kelas() {
   const canManage = getStoredRole() === "admin";
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
+
   const [filters, setFilters] = useState<ClassFilterState>(() =>
     normaliseClassFilters(searchParams),
   );
+
   const [searchDraft, setSearchDraft] = useState(filters.search);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
   const [promotionOpen, setPromotionOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ClassData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
   const [formOpen, setFormOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [autoName, setAutoName] = useState(true);
+
   const [form, setForm] = useState({
     name: "",
     level: "X",
@@ -115,22 +128,26 @@ function Kelas() {
   useEffect(() => {
     const urlFilters = normaliseClassFilters(searchParams);
     if (searchDraft === urlFilters.search) return;
+
     const timer = window.setTimeout(() => {
       const next = { ...urlFilters, search: searchDraft, page: 1 };
       setFilters(next);
       setSearchParams(classFiltersToParams(next), { replace: true });
     }, 300);
+
     return () => window.clearTimeout(timer);
   }, [searchDraft, searchParams]);
 
   async function loadData() {
     setLoading(true);
     setError("");
+
     try {
       const [classResponse, majorResponse] = await Promise.all([
         api.get<ClassData[]>("/classes"),
         api.get<Major[]>("/jurusan"),
       ]);
+
       setClasses(classResponse.data);
       setMajors(majorResponse.data);
     } catch {
@@ -146,9 +163,11 @@ function Kelas() {
 
   const filtered = useMemo(() => {
     const query = filters.search.trim().toLowerCase();
+
     return classes
       .filter((item) => {
         const startYear = parseAcademicYear(item.academicYear)?.start;
+
         return (
           (!filters.level || item.level === filters.level) &&
           (!query || item.name.toLowerCase().includes(query)) &&
@@ -172,6 +191,7 @@ function Kelas() {
               : filters.sort === "academicYear"
                 ? a.academicYear
                 : a.name;
+
         const right =
           filters.sort === "studentCount"
             ? b.studentCount
@@ -180,18 +200,21 @@ function Kelas() {
               : filters.sort === "academicYear"
                 ? b.academicYear
                 : b.name;
+
         const comparison =
           typeof left === "number" && typeof right === "number"
             ? left - right
             : String(left).localeCompare(String(right), "id", {
                 numeric: true,
               });
+
         return comparison * (filters.direction === "asc" ? 1 : -1);
       });
   }, [classes, filters]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / filters.pageSize));
   const currentPage = Math.min(filters.page, pageCount);
+
   const pageItems = filtered.slice(
     (currentPage - 1) * filters.pageSize,
     currentPage * filters.pageSize,
@@ -199,6 +222,7 @@ function Kelas() {
 
   useEffect(() => {
     if (filters.page === currentPage) return;
+
     const next = { ...filters, page: currentPage };
     setFilters(next);
     setSearchParams(classFiltersToParams(next), { replace: true });
@@ -208,17 +232,22 @@ function Kelas() {
     const values = classes
       .map((item) => parseAcademicYear(item.academicYear)?.start)
       .filter(Boolean) as string[];
+
     return [...new Set(values)].sort((a, b) => Number(b) - Number(a));
   }, [classes]);
+
   const invalidYearClasses = classes.filter((item) => {
     const years = parseAcademicYear(item.academicYear);
     return !years || Number(years.end) <= Number(years.start);
   });
+
   const selectedMajor = majors.find((item) => item.id === form.jurusanId);
+
   const generatedName =
     form.level && selectedMajor && form.classNumber
       ? `${form.level} ${selectedMajor.kode} ${form.classNumber}`
       : "";
+
   const unassignedClasses = classes.filter((item) => !item.jurusanId);
 
   function setFormValue<K extends keyof typeof form>(
@@ -231,6 +260,7 @@ function Kelas() {
   function resetForm() {
     setEditId(null);
     setAutoName(true);
+
     setForm({
       name: "",
       level: "X",
@@ -240,6 +270,7 @@ function Kelas() {
       endYear: String(currentYear + 3),
       status: "Aktif",
     });
+
     setFormOpen(false);
   }
 
@@ -251,8 +282,10 @@ function Kelas() {
   function startEdit(item: ClassData) {
     const nameParts = splitLegacyName(item.name);
     const years = parseAcademicYear(item.academicYear);
+
     setEditId(item.id);
     setAutoName(false);
+
     setForm({
       name: item.name,
       level: nameParts.level || item.level,
@@ -262,6 +295,7 @@ function Kelas() {
       endYear: years?.end || String(currentYear + 3),
       status: statuses.includes(item.status) ? item.status : "Aktif",
     });
+
     setFormOpen(true);
   }
 
@@ -275,21 +309,27 @@ function Kelas() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+
     const name = autoName ? generatedName : form.name.trim();
+
     if (!form.level || !form.jurusanId || !form.classNumber || !name) {
       setError("Tingkat, jurusan, nomor kelas, dan nama kelas wajib diisi.");
       return;
     }
+
     if (!/^[1-9]\d*$/.test(form.classNumber)) {
       setError("Nomor kelas harus berupa angka positif.");
       return;
     }
+
     if (Number(form.endYear) <= Number(form.startYear)) {
       setError("Tahun selesai harus lebih besar daripada tahun masuk.");
       return;
     }
+
     setSaving(true);
     setError("");
+
     try {
       const payload = {
         name,
@@ -298,11 +338,14 @@ function Kelas() {
         academicYear: `${form.startYear}/${form.endYear}`,
         status: form.status,
       };
+
       if (editId) await api.put(`/classes/${editId}`, payload);
       else await api.post("/classes", payload);
+
       setNotice(
         editId ? "Kelas berhasil diperbarui." : "Kelas berhasil ditambahkan.",
       );
+
       resetForm();
       await loadData();
     } catch (requestError: any) {
@@ -316,10 +359,13 @@ function Kelas() {
 
   async function handleDelete() {
     if (!deleteTarget || deleteLoading) return;
+
     setDeleteLoading(true);
     setDeleteError("");
+
     try {
       await api.delete(`/classes/${deleteTarget.id}`);
+
       setNotice("Kelas berhasil dihapus.");
       setDeleteTarget(null);
       await loadData();
@@ -335,6 +381,7 @@ function Kelas() {
   function resetFilters() {
     setSearchDraft("");
     setFilters(DEFAULT_CLASS_FILTERS);
+
     setSearchParams(classFiltersToParams(DEFAULT_CLASS_FILTERS), {
       replace: true,
     });
@@ -369,42 +416,111 @@ function Kelas() {
   ] as const;
 
   return (
-    <div>
+    <div className="kelas-page mx-auto w-full max-w-7xl space-y-6">
+      <style>{`
+        @keyframes kelasFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes kelasFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .kelas-page {
+          animation: kelasFadeUp 0.45s ease-out both;
+        }
+
+        .kelas-section {
+          animation: kelasFadeUp 0.5s ease-out both;
+        }
+
+        .kelas-section:nth-of-type(2) {
+          animation-delay: 70ms;
+        }
+
+        .kelas-section:nth-of-type(3) {
+          animation-delay: 120ms;
+        }
+
+        .kelas-row {
+          animation: kelasFadeIn 0.35s ease-out both;
+          transition:
+            background-color 180ms ease,
+            box-shadow 180ms ease;
+        }
+
+        .kelas-row:hover {
+          background-color: rgb(20 184 166 / 0.055);
+        }
+
+        .dark .kelas-row:hover {
+          background-color: rgb(20 184 166 / 0.09);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .kelas-page,
+          .kelas-section,
+          .kelas-row {
+            animation: none !important;
+          }
+
+          .kelas-row {
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <PageHeader
         className="mb-4"
         title="Kelas"
         description="Kelola rombongan belajar sekolah"
         icon={School}
       />
+
       {error && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"
+          className="kelas-section mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"
         >
           {error}
         </div>
       )}
+
       {notice && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300"
+          className="kelas-section mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300"
         >
           {notice}
         </div>
       )}
+
       {invalidYearClasses.length > 0 && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300"
+          className="kelas-section mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300"
         >
           {invalidYearClasses.length} kelas memiliki format tahun ajaran lama
           yang tidak konsisten. Data tidak diubah otomatis.
         </div>
       )}
+
       {unassignedClasses.length > 0 && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300"
+          className="kelas-section mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300"
         >
           {unassignedClasses.length} kelas lama belum memiliki Jurusan langsung.
           Relasi dari siswa lama tetap dipertahankan; pilih Jurusan saat
@@ -412,58 +528,68 @@ function Kelas() {
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap justify-end gap-2">
-        {canManage && <button
-          type="button"
-          onClick={() => setPromotionOpen(true)}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-teal-600 px-4 py-2 text-sm font-medium text-teal-700 dark:text-teal-300"
-        >
-          <TrendingUp className="h-4 w-4" />
-          Kenaikan Kelas
-        </button>}
-        {canManage && <button
-          type="button"
-          onClick={() => navigate("/classes/promotion-history")}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-        >
-          <History className="h-4 w-4" />
-          Riwayat Kenaikan
-        </button>}
-        {canManage && <button
-          type="button"
-          onClick={formOpen ? resetForm : openCreate}
-          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
-        >
-          {formOpen ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {formOpen ? "Tutup Form" : "Tambah Kelas"}
-        </button>}
+      <div className="kelas-section mb-4 flex flex-wrap justify-end gap-2">
+        {canManage && (
+          <button
+            type="button"
+            onClick={() => setPromotionOpen(true)}
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-teal-600 px-4 py-2 text-sm font-medium text-teal-700 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-950/30 ${buttonClass}`}
+          >
+            <TrendingUp className="h-4 w-4" />
+            Kenaikan Kelas
+          </button>
+        )}
+
+        {canManage && (
+          <button
+            type="button"
+            onClick={() => navigate("/classes/promotion-history")}
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-50 dark:hover:bg-[#1b2a3d] ${buttonClass}`}
+          >
+            <History className="h-4 w-4" />
+            Riwayat Kenaikan
+          </button>
+        )}
+
+        {canManage && (
+          <button
+            type="button"
+            onClick={formOpen ? resetForm : openCreate}
+            className={`inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 ${buttonClass}`}
+          >
+            {formOpen ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {formOpen ? "Tutup Form" : "Tambah Kelas"}
+          </button>
+        )}
       </div>
 
       {canManage && formOpen && (
-        <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+        <div className="kelas-section mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
           <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-slate-100">
             {editId ? "Edit Kelas" : "Tambah Kelas"}
           </h2>
+
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
               <select
                 required
                 value={form.level}
                 onChange={(event) => setFormValue("level", event.target.value)}
-                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 <option value="">Pilih tingkat</option>
                 {levels.map((level) => (
                   <option key={level}>{level}</option>
                 ))}
               </select>
+
               <select
                 required
                 value={form.jurusanId}
                 onChange={(event) =>
                   setFormValue("jurusanId", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 <option value="">Pilih jurusan</option>
                 {majors.map((major) => (
@@ -472,6 +598,7 @@ function Kelas() {
                   </option>
                 ))}
               </select>
+
               <input
                 required
                 type="number"
@@ -482,43 +609,47 @@ function Kelas() {
                 onChange={(event) =>
                   setFormValue("classNumber", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm ${controlClass}`}
               />
+
               <select
                 required
                 value={form.startYear}
                 onChange={(event) => handleStartYear(event.target.value)}
-                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 <option value="">Tahun masuk</option>
                 {yearsFrom(START_YEAR, currentYear + 1).map((year) => (
                   <option key={year}>{year}</option>
                 ))}
               </select>
+
               <select
                 required
                 value={form.endYear}
                 onChange={(event) =>
                   setFormValue("endYear", event.target.value)
                 }
-                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 <option value="">Tahun selesai</option>
                 {yearsFrom(START_YEAR + 1, currentYear + 8).map((year) => (
                   <option key={year}>{year}</option>
                 ))}
               </select>
+
               <select
                 required
                 value={form.status}
                 onChange={(event) => setFormValue("status", event.target.value)}
-                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+                className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 {statuses.map((status) => (
                   <option key={status}>{status}</option>
                 ))}
               </select>
             </div>
+
             <div className="mt-3 flex flex-wrap items-center gap-3">
               {editId && (
                 <label className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-[#a7b4c7]">
@@ -530,16 +661,18 @@ function Kelas() {
                   Perbarui nama otomatis
                 </label>
               )}
+
               <span className="text-sm text-gray-600 dark:text-[#a7b4c7]">
                 Preview:{" "}
                 <strong className="text-gray-900 dark:text-slate-100">
                   {generatedName || form.name || "Lengkapi identitas kelas"}
                 </strong>
               </span>
+
               <div className="ml-auto flex gap-2">
                 <button
                   disabled={saving}
-                  className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                  className={`rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60 ${buttonClass}`}
                 >
                   {saving
                     ? "Menyimpan..."
@@ -547,11 +680,12 @@ function Kelas() {
                       ? "Simpan Perubahan"
                       : "Tambah"}
                 </button>
+
                 {editId && (
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-4 py-2 text-sm font-semibold text-gray-700 dark:text-[#a7b4c7]"
+                    className={`rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-4 py-2 text-sm font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 dark:hover:bg-[#263449] ${buttonClass}`}
                   >
                     Batal
                   </button>
@@ -562,7 +696,7 @@ function Kelas() {
         </div>
       )}
 
-      <div className="min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div className="kelas-section min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm transition-shadow duration-200 hover:shadow-md">
         <div className="border-b border-gray-200 dark:border-[#263449] p-4">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -573,6 +707,7 @@ function Kelas() {
                 Kelola kelas, status, dan kapasitas siswa.
               </p>
             </div>
+
             <div className="relative w-full lg:max-w-sm">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-blue-500 dark:text-blue-300" />
               <input
@@ -580,28 +715,34 @@ function Kelas() {
                 placeholder="Cari nama kelas..."
                 value={searchDraft}
                 onChange={(event) => setSearchDraft(event.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm"
+                className={`w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm ${controlClass}`}
               />
             </div>
           </div>
+
           <div className="mt-3 flex flex-wrap gap-2 border-b border-gray-100 dark:border-[#263449] pb-3">
             {["", ...levels].map((level) => (
               <button
                 key={level || "all"}
                 onClick={() => updateFilters({ level, page: 1 })}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${filters.level === level ? "bg-teal-600 text-white" : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7]"}`}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 ease-out hover:-translate-y-0.5 active:scale-[0.98] ${
+                  filters.level === level
+                    ? "bg-teal-600 text-white shadow-sm shadow-teal-600/20"
+                    : "bg-gray-100 dark:bg-[#1b2a3d] text-gray-600 dark:text-[#a7b4c7] hover:bg-gray-200 dark:hover:bg-[#263449]"
+                }`}
               >
                 {level || "Semua"}
               </button>
             ))}
           </div>
+
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
             <select
               value={filters.jurusanId}
               onChange={(event) =>
                 updateFilters({ jurusanId: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
             >
               <option value="">Semua jurusan</option>
               {majors.map((major) => (
@@ -610,49 +751,55 @@ function Kelas() {
                 </option>
               ))}
             </select>
+
             <select
               value={filters.startYear}
               onChange={(event) =>
                 updateFilters({ startYear: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
             >
               <option value="">Semua tahun masuk</option>
               {startYears.map((year) => (
                 <option key={year}>{year}</option>
               ))}
             </select>
+
             <select
               value={filters.status}
               onChange={(event) =>
                 updateFilters({ status: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
             >
               <option value="">Semua status</option>
               {statuses.map((status) => (
                 <option key={status}>{status}</option>
               ))}
             </select>
+
             <select
               value={filters.occupancy}
               onChange={(event) =>
                 updateFilters({ occupancy: event.target.value, page: 1 })
               }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
             >
               <option value="">Semua jumlah siswa</option>
               <option value="empty">Kosong</option>
               <option value="hasStudents">Ada siswa</option>
             </select>
+
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+              className={`inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-50 dark:hover:bg-[#1b2a3d] ${buttonClass}`}
             >
-              <SlidersHorizontal className="h-4 w-4" /> Reset Filter
+              <SlidersHorizontal className="h-4 w-4" />
+              Reset Filter
             </button>
           </div>
+
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
             <span className="text-gray-500 dark:text-[#a7b4c7]">
               Menampilkan{" "}
@@ -660,13 +807,14 @@ function Kelas() {
               {Math.min(currentPage * filters.pageSize, filtered.length)} dari{" "}
               {filtered.length} kelas
             </span>
+
             {chips.map(
               ([key, label]) =>
                 label && (
                   <button
                     key={key}
                     onClick={() => removeFilter(key)}
-                    className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700"
+                    className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700 transition-colors duration-150 hover:bg-teal-100 dark:bg-teal-950/40 dark:text-teal-300 dark:hover:bg-teal-900/50"
                   >
                     {label}
                     <X className="h-3 w-3" />
@@ -675,6 +823,7 @@ function Kelas() {
             )}
           </div>
         </div>
+
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-10 text-center text-sm text-gray-500 dark:text-[#a7b4c7]">
@@ -696,7 +845,7 @@ function Kelas() {
                     <th key={key} className="px-4 py-3">
                       <button
                         onClick={() => sortBy(key)}
-                        className="inline-flex items-center gap-1"
+                        className="inline-flex items-center gap-1 transition-colors duration-150 hover:text-teal-600"
                       >
                         {label}
                         <span className="text-teal-600">
@@ -714,33 +863,43 @@ function Kelas() {
                   {canManage && <th className="px-4 py-3">Aksi</th>}
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
                 {pageItems.map((item, index) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                    className="kelas-row transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                    style={{
+                      animationDelay: `${Math.min(index * 35, 350)}ms`,
+                    }}
                   >
                     <td className="px-4 py-3 text-gray-500 dark:text-[#a7b4c7]">
                       {(currentPage - 1) * filters.pageSize + index + 1}
                     </td>
+
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">
                       {item.name}
                     </td>
+
                     <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.level}
                     </td>
+
                     <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.academicYear}
                     </td>
+
                     <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.studentCount}
                     </td>
+
                     <td className="px-4 py-3 text-gray-600 dark:text-[#a7b4c7]">
                       {item.Jurusan?.kode ||
                         (item.jurusanIds?.length
                           ? `${item.jurusanIds.length} relasi lama`
                           : "Belum ditentukan")}
                     </td>
+
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -754,29 +913,34 @@ function Kelas() {
                         {item.status}
                       </span>
                     </td>
-                    {canManage && <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button
-                          title="Edit kelas"
-                          onClick={() => startEdit(item)}
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
-                        >
-                          <Edit3 className="h-4 w-4" />
-                        </button>
-                        <button
-                          title="Hapus kelas"
-                          onClick={() => {
-                            setDeleteTarget(item);
-                            setDeleteError("");
-                          }}
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>}
+
+                    {canManage && (
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            title="Edit kelas"
+                            onClick={() => startEdit(item)}
+                            className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60 ${buttonClass}`}
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+
+                          <button
+                            title="Hapus kelas"
+                            onClick={() => {
+                              setDeleteTarget(item);
+                              setDeleteError("");
+                            }}
+                            className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60 ${buttonClass}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
+
                 {!pageItems.length && (
                   <tr>
                     <td
@@ -788,9 +952,10 @@ function Kelas() {
                           ? "Halaman ini tidak memiliki data."
                           : "Tidak ada kelas yang cocok dengan filter."}
                       </p>
+
                       <button
                         onClick={resetFilters}
-                        className="mt-3 font-medium text-teal-600"
+                        className="mt-3 font-medium text-teal-600 transition-colors duration-150 hover:text-teal-700"
                       >
                         Reset Filter
                       </button>
@@ -801,39 +966,44 @@ function Kelas() {
             </table>
           )}
         </div>
+
         <div className="flex items-center justify-between border-t border-gray-200 dark:border-[#263449] px-4 py-3">
           <select
             value={filters.pageSize}
             onChange={(event) =>
               updateFilters({ pageSize: Number(event.target.value), page: 1 })
             }
-            className="rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm"
+            className={`rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm bg-white dark:bg-[#111c2e] ${controlClass}`}
           >
             <option value={10}>10 / halaman</option>
             <option value={25}>25 / halaman</option>
             <option value={50}>50 / halaman</option>
           </select>
+
           <div className="flex items-center gap-2 text-sm">
             <button
               disabled={currentPage <= 1}
               onClick={() => updateFilters({ page: currentPage - 1 })}
-              className="rounded border p-1 disabled:opacity-40"
+              className="rounded border border-gray-300 dark:border-[#263449] p-1 transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-[#1b2a3d] disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
+
             <span>
               Halaman {currentPage} dari {pageCount}
             </span>
+
             <button
               disabled={currentPage >= pageCount}
               onClick={() => updateFilters({ page: currentPage + 1 })}
-              className="rounded border p-1 disabled:opacity-40"
+              className="rounded border border-gray-300 dark:border-[#263449] p-1 transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-[#1b2a3d] disabled:opacity-40 disabled:hover:bg-transparent"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
+
       <PromotionModal
         open={canManage && promotionOpen}
         onClose={() => setPromotionOpen(false)}
@@ -843,6 +1013,7 @@ function Kelas() {
           void loadData();
         }}
       />
+
       <ConfirmModal
         open={Boolean(deleteTarget)}
         title="Hapus Kelas?"

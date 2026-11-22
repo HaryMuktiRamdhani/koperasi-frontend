@@ -141,20 +141,14 @@ function StudentDetail() {
           <dl className="grid gap-x-6 gap-y-6 pt-6 sm:grid-cols-2">
             <InfoItem label="Nama lengkap" value={student.name} />
             <InfoItem label="NIS" value={student.nis} />
-            <InfoItem label="NISN" />
-            <InfoItem label="Email" />
             <InfoItem
               label="Jenis kelamin"
               value={student.gender || "Belum diisi"}
             />
-            <InfoItem label="Nomor telepon" />
-            <InfoItem label="Tempat lahir" />
-            <InfoItem label="Tanggal lahir" />
             <InfoItem label="Kelas" value={student.Class?.name} />
             <InfoItem label="Jurusan" value={student.Jurusan?.nama} />
             <InfoItem label="Angkatan" value={student.generation} />
             <InfoItem label="Status" value={student.status} />
-            <InfoItem label="Alamat" full />
           </dl>
         </section>
       </div>
