@@ -89,17 +89,31 @@ function StudentDetail() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => navigate("/students")}
+          onClick={() =>
+            navigate(student.status === "Lulus" ? "/students/alumni" : "/students")
+          }
           className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#168b87] hover:text-[#102a43] dark:hover:text-[#5eead4]"
         >
-          <ArrowLeft className="h-4 w-4" /> Kembali ke daftar siswa
+          <ArrowLeft className="h-4 w-4" />{" "}
+          {student.status === "Lulus"
+            ? "Kembali ke Data Alumni"
+            : "Kembali ke daftar siswa"}
         </button>
-        <Link
-          to={`/students?edit=${student.id}`}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white hover:bg-[#13716d]"
-        >
-          <Edit3 className="h-4 w-4" /> Edit siswa
-        </Link>
+        {student.status === "Lulus" ? (
+          <Link
+            to={`/students/alumni?q=${encodeURIComponent(student.nis)}`}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white hover:bg-[#13716d]"
+          >
+            <GraduationCap className="h-4 w-4" /> Lihat di Data Alumni
+          </Link>
+        ) : (
+          <Link
+            to={`/students?edit=${student.id}`}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[#168b87] px-4 py-2 text-sm font-semibold text-white hover:bg-[#13716d]"
+          >
+            <Edit3 className="h-4 w-4" /> Edit siswa
+          </Link>
+        )}
       </div>
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="space-y-6">
@@ -141,14 +155,20 @@ function StudentDetail() {
           <dl className="grid gap-x-6 gap-y-6 pt-6 sm:grid-cols-2">
             <InfoItem label="Nama lengkap" value={student.name} />
             <InfoItem label="NIS" value={student.nis} />
+            <InfoItem label="NISN" />
+            <InfoItem label="Email" />
             <InfoItem
               label="Jenis kelamin"
               value={student.gender || "Belum diisi"}
             />
+            <InfoItem label="Nomor telepon" />
+            <InfoItem label="Tempat lahir" />
+            <InfoItem label="Tanggal lahir" />
             <InfoItem label="Kelas" value={student.Class?.name} />
             <InfoItem label="Jurusan" value={student.Jurusan?.nama} />
             <InfoItem label="Angkatan" value={student.generation} />
             <InfoItem label="Status" value={student.status} />
+            <InfoItem label="Alamat" full />
           </dl>
         </section>
       </div>
