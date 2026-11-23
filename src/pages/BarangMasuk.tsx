@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Eye, PackagePlus, Plus, RotateCcw, Search, X } from "lucide-react";
@@ -153,6 +154,7 @@ function BarangMasuk() {
     () => [...new Set(receipts.map((item) => item.supplierName))],
     [receipts],
   );
+
   const senderSuggestions = useMemo(
     () => [...new Set(receipts.map((item) => item.senderName))],
     [receipts],
@@ -313,7 +315,63 @@ function BarangMasuk() {
   ];
 
   return (
-    <div>
+    <div className="barang-masuk-page">
+      <style>{`
+        @keyframes barangMasukFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes barangMasukFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .barang-masuk-page {
+          animation: barangMasukFadeUp 0.45s ease-out both;
+        }
+
+        .barang-masuk-section {
+          animation: barangMasukFadeUp 0.5s ease-out both;
+        }
+
+        .barang-masuk-summary {
+          animation-delay: 50ms;
+        }
+
+        .barang-masuk-filter {
+          animation-delay: 100ms;
+        }
+
+        .barang-masuk-table {
+          animation-delay: 150ms;
+        }
+
+        .barang-masuk-row {
+          animation: barangMasukFadeIn 0.35s ease-out both;
+          transition: background-color 180ms ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .barang-masuk-page,
+          .barang-masuk-section,
+          .barang-masuk-row {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <PageHeader
         title="Barang Masuk"
         description="Catat penerimaan barang dari supplier"
@@ -329,7 +387,7 @@ function BarangMasuk() {
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="barang-masuk-section barang-masuk-summary mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {summaryTiles.map((tile) => (
           <div
             key={tile.label}
@@ -345,7 +403,7 @@ function BarangMasuk() {
         ))}
       </div>
 
-      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+      <div className="barang-masuk-section barang-masuk-filter mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -402,7 +460,7 @@ function BarangMasuk() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div className="barang-masuk-section barang-masuk-table overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="flex flex-col gap-1 border-b border-gray-200 dark:border-[#263449] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Riwayat Barang Masuk
@@ -431,7 +489,10 @@ function BarangMasuk() {
               {filteredReceipts.map((item, index) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                  style={{
+                    animationDelay: `${Math.min(index * 35, 350)}ms`,
+                  }}
+                  className="barang-masuk-row hover:bg-teal-50 dark:hover:bg-teal-950/20"
                 >
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {index + 1}

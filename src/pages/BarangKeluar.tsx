@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Eye, PackageMinus, Plus, RotateCcw, Search, X } from "lucide-react";
@@ -187,6 +188,7 @@ function BarangKeluar() {
     () => [...new Set(issues.map((item) => item.recipientName))],
     [issues],
   );
+
   const officerSuggestions = useMemo(
     () => [...new Set(issues.map((item) => item.officerName))],
     [issues],
@@ -362,7 +364,63 @@ function BarangKeluar() {
     ];
 
   return (
-    <div>
+    <div className="barang-keluar-page">
+      <style>{`
+        @keyframes barangKeluarFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes barangKeluarFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .barang-keluar-page {
+          animation: barangKeluarFadeUp 0.45s ease-out both;
+        }
+
+        .barang-keluar-section {
+          animation: barangKeluarFadeUp 0.5s ease-out both;
+        }
+
+        .barang-keluar-summary {
+          animation-delay: 50ms;
+        }
+
+        .barang-keluar-filter {
+          animation-delay: 100ms;
+        }
+
+        .barang-keluar-table {
+          animation-delay: 150ms;
+        }
+
+        .barang-keluar-row {
+          animation: barangKeluarFadeIn 0.35s ease-out both;
+          transition: background-color 180ms ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .barang-keluar-page,
+          .barang-keluar-section,
+          .barang-keluar-row {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <PageHeader
         title="Barang Keluar"
         description="Catat pengeluaran barang dari stok koperasi"
@@ -378,14 +436,14 @@ function BarangKeluar() {
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
+      <div className="barang-keluar-section barang-keluar-summary mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
         {summaryTiles.map((tile) => (
           <button
             key={tile.label}
             type="button"
             onClick={() => setReasonFilter(tile.filter)}
             aria-pressed={reasonFilter === tile.filter}
-            className={`cursor-pointer rounded-xl bg-white dark:bg-[#111c2e] p-4 text-left shadow-sm ${
+            className={`cursor-pointer rounded-xl bg-white dark:bg-[#111c2e] p-4 text-left shadow-sm transition-colors duration-200 hover:bg-teal-50 dark:hover:bg-teal-950/20 ${
               reasonFilter === tile.filter ? "ring-2 ring-[#168b87]" : ""
             }`}
           >
@@ -399,7 +457,7 @@ function BarangKeluar() {
         ))}
       </div>
 
-      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+      <div className="barang-keluar-section barang-keluar-filter mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -474,7 +532,7 @@ function BarangKeluar() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div className="barang-keluar-section barang-keluar-table overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="flex flex-col gap-1 border-b border-gray-200 dark:border-[#263449] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Riwayat Barang Keluar
@@ -502,7 +560,10 @@ function BarangKeluar() {
               {filteredIssues.map((item, index) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                  style={{
+                    animationDelay: `${Math.min(index * 35, 350)}ms`,
+                  }}
+                  className="barang-keluar-row hover:bg-teal-50 dark:hover:bg-teal-950/20"
                 >
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {index + 1}
