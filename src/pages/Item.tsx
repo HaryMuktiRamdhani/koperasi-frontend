@@ -1,5 +1,7 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { createPortal } from "react-dom";
 import {
   ImageOff,
   ImagePlus,
@@ -360,14 +362,97 @@ function Item() {
     ];
 
   return (
-    <div>
+    <div className="student-page">
+      <style>{`
+        @keyframes studentFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes studentFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes itemModalFade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes itemModalScale {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .student-page {
+          animation: studentFadeUp 0.45s ease-out both;
+        }
+
+        .student-section {
+          animation: studentFadeUp 0.5s ease-out both;
+        }
+
+        .student-section-form {
+          animation-delay: 70ms;
+        }
+
+        .student-section-table {
+          animation-delay: 120ms;
+        }
+
+        .student-row {
+          animation: studentFadeIn 0.35s ease-out both;
+          transition: background-color 180ms ease;
+        }
+
+        .item-modal-backdrop {
+          animation: itemModalFade 0.2s ease-out both;
+        }
+
+        .item-modal {
+          animation: itemModalScale 0.25s ease-out both;
+          transform-origin: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .student-page,
+          .student-section,
+          .student-row,
+          .item-modal-backdrop,
+          .item-modal {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <PageHeader
         title="Barang"
         description="Kelola data barang koperasi"
         icon={Package}
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="student-section mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         {summaryTiles.map((tile) => (
           <button
             key={tile.label}
@@ -388,7 +473,7 @@ function Item() {
         ))}
       </div>
 
-      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+      <div className="student-section student-section-form mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -445,18 +530,20 @@ function Item() {
             Reset
           </button>
 
-          {canManage && <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" />
-            Tambah Barang
-          </button>}
+          {canManage && (
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4" />
+              Tambah Barang
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div className="student-section student-section-table overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="flex flex-col gap-1 border-b border-gray-200 dark:border-[#263449] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Daftar Barang
@@ -488,7 +575,10 @@ function Item() {
                 return (
                   <tr
                     key={item.id}
-                    className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                    className="student-row hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                    style={{
+                      animationDelay: `${Math.min(index * 35, 350)}ms`,
+                    }}
                   >
                     <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                       {index + 1}
@@ -525,28 +615,32 @@ function Item() {
 
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        {canManage && <button
-                          type="button"
-                          onClick={() => openEdit(item)}
-                          aria-label={`Edit ${item.name}`}
-                          title="Edit barang"
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>}
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={() => openEdit(item)}
+                            aria-label={`Edit ${item.name}`}
+                            title="Edit barang"
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        )}
 
-                        {canManage && <button
-                          type="button"
-                          onClick={() => {
-                            setDeleteId(item.id);
-                            setDeleteError("");
-                          }}
-                          aria-label={`Hapus ${item.name}`}
-                          title="Hapus barang"
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>}
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDeleteId(item.id);
+                              setDeleteError("");
+                            }}
+                            aria-label={`Hapus ${item.name}`}
+                            title="Hapus barang"
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -597,229 +691,234 @@ function Item() {
         </div>
       </div>
 
-      {canManage && modalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeModal();
-          }}
-        >
+      {canManage &&
+        modalOpen &&
+        createPortal(
           <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="item-modal-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
+            className="item-modal-backdrop fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) closeModal();
+            }}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-              <div>
-                <h2
-                  id="item-modal-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
-                >
-                  {editId ? "Edit Barang" : "Tambah Barang"}
-                </h2>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  {editId
-                    ? "Perbarui data barang koperasi."
-                    : "Isi data barang yang akan dijual di koperasi."}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={closeModal}
-                disabled={saving}
-                aria-label="Tutup"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
-              <div className="mb-5">
-                <p className="mb-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]">
-                  Gambar Barang
-                </p>
-                <div className="flex items-center gap-4">
-                  <ItemThumb
-                    key={imagePreview ?? "tanpa-gambar"}
-                    src={imagePreview}
-                    alt="Pratinjau gambar barang"
-                    sizeClass="h-24 w-24"
-                  />
-                  <div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={saving}
-                        className="inline-flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-3 py-2 text-sm font-semibold text-gray-700 dark:text-slate-100 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <ImagePlus className="h-4 w-4" />
-                        {imagePreview ? "Ganti Gambar" : "Pilih Gambar"}
-                      </button>
-
-                      {imagePreview && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveImage}
-                          disabled={saving}
-                          className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Hapus
-                        </button>
-                      )}
-                    </div>
-                    <p className="mt-2 text-xs text-gray-500 dark:text-[#a7b4c7]">
-                      PNG, JPG, atau WEBP. Maksimal 2MB.
-                    </p>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="item-name"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                >
-                  Nama Barang
-                </label>
-                <input
-                  id="item-name"
-                  type="text"
-                  value={name}
-                  maxLength={150}
-                  autoFocus
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Contoh: Baju Batik"
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="item-modal-title"
+              className="item-modal my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
                 <div>
-                  <label
-                    htmlFor="item-price"
-                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  <h2
+                    id="item-modal-title"
+                    className="text-lg font-semibold text-gray-900 dark:text-slate-100"
                   >
-                    Harga
-                  </label>
-                  <input
-                    id="item-price"
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    step="1"
-                    value={price}
-                    onChange={(event) => setPrice(event.target.value)}
-                    placeholder="Contoh: 50000"
-                    className={inputClass}
-                  />
-                  {pricePreview && (
-                    <p className="mt-1 text-xs text-gray-500 dark:text-[#a7b4c7]">
-                      Tampil sebagai {pricePreview}
-                    </p>
-                  )}
+                    {editId ? "Edit Barang" : "Tambah Barang"}
+                  </h2>
+                  <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                    {editId
+                      ? "Perbarui data barang koperasi."
+                      : "Isi data barang yang akan dijual di koperasi."}
+                  </p>
                 </div>
-
-                <div>
-                  <label
-                    htmlFor="item-status"
-                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                  >
-                    Status Barang
-                  </label>
-                  <select
-                    id="item-status"
-                    value={status}
-                    onChange={(event) =>
-                      setStatus(event.target.value as ItemStatus)
-                    }
-                    className={inputClass}
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="item-stock"
-                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                  >
-                    Stok
-                  </label>
-                  <input
-                    id="item-stock"
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    step="1"
-                    value={stock}
-                    onChange={(event) => setStock(event.target.value)}
-                    placeholder="Contoh: 20"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              {formError && (
-                <p
-                  role="alert"
-                  className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
-                >
-                  {formError}
-                </p>
-              )}
-
-              <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeModal}
                   disabled={saving}
-                  className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  aria-label="Tutup"
+                  className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {saving
-                    ? "Menyimpan..."
-                    : editId
-                      ? "Simpan Perubahan"
-                      : "Tambah Barang"}
+                  <X className="h-4 w-4" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {canManage && <ConfirmModal
-        open={Boolean(deleteId)}
-        title="Hapus Barang?"
-        description="Data barang yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
-        loading={deleteLoading}
-        error={deleteError}
-        onCancel={() => {
-          if (!deleteLoading) setDeleteId(null);
-        }}
-        onConfirm={() => void handleDelete()}
-      />}
+              <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
+                <div className="mb-5">
+                  <p className="mb-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]">
+                    Gambar Barang
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <ItemThumb
+                      key={imagePreview ?? "tanpa-gambar"}
+                      src={imagePreview}
+                      alt="Pratinjau gambar barang"
+                      sizeClass="h-24 w-24"
+                    />
+                    <div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={saving}
+                          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-3 py-2 text-sm font-semibold text-gray-700 dark:text-slate-100 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <ImagePlus className="h-4 w-4" />
+                          {imagePreview ? "Ganti Gambar" : "Pilih Gambar"}
+                        </button>
+
+                        {imagePreview && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            disabled={saving}
+                            className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Hapus
+                          </button>
+                        )}
+                      </div>
+                      <p className="mt-2 text-xs text-gray-500 dark:text-[#a7b4c7]">
+                        PNG, JPG, atau WEBP. Maksimal 2MB.
+                      </p>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label
+                    htmlFor="item-name"
+                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  >
+                    Nama Barang
+                  </label>
+                  <input
+                    id="item-name"
+                    type="text"
+                    value={name}
+                    maxLength={150}
+                    autoFocus
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Contoh: Baju Batik"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="item-price"
+                      className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                    >
+                      Harga
+                    </label>
+                    <input
+                      id="item-price"
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      step="1"
+                      value={price}
+                      onChange={(event) => setPrice(event.target.value)}
+                      placeholder="Contoh: 50000"
+                      className={inputClass}
+                    />
+                    {pricePreview && (
+                      <p className="mt-1 text-xs text-gray-500 dark:text-[#a7b4c7]">
+                        Tampil sebagai {pricePreview}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="item-status"
+                      className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                    >
+                      Status Barang
+                    </label>
+                    <select
+                      id="item-status"
+                      value={status}
+                      onChange={(event) =>
+                        setStatus(event.target.value as ItemStatus)
+                      }
+                      className={inputClass}
+                    >
+                      {STATUS_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="item-stock"
+                      className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                    >
+                      Stok
+                    </label>
+                    <input
+                      id="item-stock"
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      step="1"
+                      value={stock}
+                      onChange={(event) => setStock(event.target.value)}
+                      placeholder="Contoh: 20"
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+
+                {formError && (
+                  <p
+                    role="alert"
+                    className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
+                  >
+                    {formError}
+                  </p>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={saving}
+                    className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {saving
+                      ? "Menyimpan..."
+                      : editId
+                        ? "Simpan Perubahan"
+                        : "Tambah Barang"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {canManage && (
+        <ConfirmModal
+          open={Boolean(deleteId)}
+          title="Hapus Barang?"
+          description="Data barang yang dipilih akan dihapus. Tindakan ini tidak dapat dibatalkan."
+          loading={deleteLoading}
+          error={deleteError}
+          onCancel={() => {
+            if (!deleteLoading) setDeleteId(null);
+          }}
+          onConfirm={() => void handleDelete()}
+        />
+      )}
     </div>
   );
 }
