@@ -1,5 +1,7 @@
+
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { ClipboardCheck, Eye, Plus, RotateCcw, Search, X } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
@@ -157,7 +159,9 @@ function Opname() {
     Number.isInteger(physicalNumber) &&
     physicalNumber >= 0;
   const difference =
-    selectedItem && physicalValid ? (physicalNumber as number) - systemStock : null;
+    selectedItem && physicalValid
+      ? (physicalNumber as number) - systemStock
+      : null;
 
   function resetForm() {
     setItemId("");
@@ -247,7 +251,90 @@ function Opname() {
     ];
 
   return (
-    <div>
+    <div className="student-page">
+      <style>{`
+        @keyframes studentFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes studentFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes opnameModalFade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes opnameModalScale {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .student-page {
+          animation: studentFadeUp 0.45s ease-out both;
+        }
+
+        .student-section {
+          animation: studentFadeUp 0.5s ease-out both;
+        }
+
+        .student-section-form {
+          animation-delay: 70ms;
+        }
+
+        .student-section-table {
+          animation-delay: 120ms;
+        }
+
+        .student-row {
+          animation: studentFadeIn 0.35s ease-out both;
+          transition: background-color 180ms ease;
+        }
+
+        .opname-modal-backdrop {
+          animation: opnameModalFade 0.2s ease-out both;
+        }
+
+        .opname-modal {
+          animation: opnameModalScale 0.25s ease-out both;
+          transform-origin: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .student-page,
+          .student-section,
+          .student-row,
+          .opname-modal-backdrop,
+          .opname-modal {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       <PageHeader
         title="Opname"
         description="Catat hasil pemeriksaan stok fisik barang"
@@ -263,7 +350,7 @@ function Opname() {
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="student-section mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         {summaryTiles.map((tile) => (
           <button
             key={tile.label}
@@ -284,7 +371,7 @@ function Opname() {
         ))}
       </div>
 
-      <div className="mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+      <div className="student-section student-section-form mb-6 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -339,7 +426,7 @@ function Opname() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div className="student-section student-section-table overflow-hidden rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="flex flex-col gap-1 border-b border-gray-200 dark:border-[#263449] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
             Riwayat Opname
@@ -366,7 +453,10 @@ function Opname() {
               {filteredOpname.map((item, index) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                  className="student-row hover:bg-teal-50 dark:hover:bg-teal-950/20"
+                  style={{
+                    animationDelay: `${Math.min(index * 35, 350)}ms`,
+                  }}
                 >
                   <td className="px-6 py-4 text-gray-600 dark:text-[#a7b4c7]">
                     {index + 1}
@@ -457,312 +547,317 @@ function Opname() {
         </div>
       </div>
 
-      {canManage && modalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeModal();
-          }}
-        >
+      {canManage &&
+        modalOpen &&
+        createPortal(
           <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="opname-modal-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
+            className="fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) closeModal();
+            }}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-              <div>
-                <h2
-                  id="opname-modal-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
-                >
-                  Tambah Opname
-                </h2>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  Catat hasil pemeriksaan stok fisik barang.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={closeModal}
-                disabled={saving}
-                aria-label="Tutup"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
-              <div className="mb-4">
-                <label
-                  htmlFor="opname-item"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                >
-                  Barang
-                </label>
-                <select
-                  id="opname-item"
-                  value={itemId}
-                  onChange={(event) => setItemId(event.target.value)}
-                  className={inputClass}
-                >
-                  <option value="">Pilih barang</option>
-                  {barang.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="opname-modal-title"
+              className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
                 <div>
-                  <label
-                    htmlFor="opname-system"
-                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  <h2
+                    id="opname-modal-title"
+                    className="text-lg font-semibold text-gray-900 dark:text-slate-100"
                   >
-                    Stok Sistem
-                  </label>
-                  <input
-                    id="opname-system"
-                    type="number"
-                    readOnly
-                    value={selectedItem ? systemStock : ""}
-                    placeholder="Pilih barang"
-                    className="w-full rounded-lg border border-gray-300 dark:border-[#263449] bg-gray-50 dark:bg-[#1b2a3d] px-3 py-2.5 text-gray-600 dark:text-[#a7b4c7] outline-none"
-                  />
+                    Tambah Opname
+                  </h2>
+                  <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                    Catat hasil pemeriksaan stok fisik barang.
+                  </p>
                 </div>
-
-                <div>
-                  <label
-                    htmlFor="opname-physical"
-                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                  >
-                    Stok Fisik
-                  </label>
-                  <input
-                    id="opname-physical"
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    step="1"
-                    value={physicalStock}
-                    onChange={(event) => setPhysicalStock(event.target.value)}
-                    placeholder="Hasil hitung fisik"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4 flex items-center justify-between rounded-lg border border-gray-200 dark:border-[#263449] px-4 py-3">
-                <span className="text-sm font-medium text-gray-700 dark:text-[#a7b4c7]">
-                  Selisih
-                </span>
-                {difference === null ? (
-                  <span className="text-sm text-gray-400 dark:text-[#64748b]">
-                    -
-                  </span>
-                ) : (
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(difference))}`}
-                  >
-                    {formatDifference(difference)} ({resultOf(difference)})
-                  </span>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="opname-date"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                >
-                  Tanggal Opname
-                </label>
-                <input
-                  id="opname-date"
-                  type="date"
-                  value={opnameDate}
-                  onChange={(event) => setOpnameDate(event.target.value)}
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="opname-notes"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
-                >
-                  Catatan (opsional)
-                </label>
-                <textarea
-                  id="opname-notes"
-                  rows={3}
-                  maxLength={500}
-                  value={notes}
-                  onChange={(event) => setNotes(event.target.value)}
-                  placeholder="Contoh: barang rusak, salah catat, dll."
-                  className={inputClass}
-                />
-              </div>
-
-              {difference !== null && (
-                <p className="mb-4 rounded-lg bg-teal-50 px-3 py-2 text-xs text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
-                  Setelah disimpan, stok barang akan diperbarui menjadi{" "}
-                  {physicalNumber}.
-                </p>
-              )}
-
-              {formError && (
-                <p
-                  role="alert"
-                  className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
-                >
-                  {formError}
-                </p>
-              )}
-
-              <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeModal}
                   disabled={saving}
-                  className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  aria-label="Tutup"
+                  className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {saving ? "Menyimpan..." : "Simpan Opname"}
+                  <X className="h-4 w-4" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {detail && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setDetail(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="opname-detail-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
-          >
-            <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-              <div>
-                <h2
-                  id="opname-detail-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
-                >
-                  Detail Opname
-                </h2>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  {detail.Item?.name || "-"}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDetail(null)}
-                aria-label="Tutup"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+              <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
+                <div className="mb-4">
+                  <label
+                    htmlFor="opname-item"
+                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  >
+                    Barang
+                  </label>
+                  <select
+                    id="opname-item"
+                    value={itemId}
+                    onChange={(event) => setItemId(event.target.value)}
+                    className={inputClass}
+                  >
+                    <option value="">Pilih barang</option>
+                    {barang.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="px-6 py-5">
-              <div className="mb-4 grid grid-cols-3 gap-3 text-center">
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
-                    Stok Sistem
-                  </p>
-                  <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
-                    {detail.systemStock}
-                  </p>
+                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="opname-system"
+                      className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                    >
+                      Stok Sistem
+                    </label>
+                    <input
+                      id="opname-system"
+                      type="number"
+                      readOnly
+                      value={selectedItem ? systemStock : ""}
+                      placeholder="Pilih barang"
+                      className="w-full rounded-lg border border-gray-300 dark:border-[#263449] bg-gray-50 dark:bg-[#1b2a3d] px-3 py-2.5 text-gray-600 dark:text-[#a7b4c7] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="opname-physical"
+                      className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                    >
+                      Stok Fisik
+                    </label>
+                    <input
+                      id="opname-physical"
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      step="1"
+                      value={physicalStock}
+                      onChange={(event) => setPhysicalStock(event.target.value)}
+                      placeholder="Hasil hitung fisik"
+                      className={inputClass}
+                    />
+                  </div>
                 </div>
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
-                    Stok Fisik
-                  </p>
-                  <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
-                    {detail.physicalStock}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+
+                <div className="mb-4 flex items-center justify-between rounded-lg border border-gray-200 dark:border-[#263449] px-4 py-3">
+                  <span className="text-sm font-medium text-gray-700 dark:text-[#a7b4c7]">
                     Selisih
-                  </p>
-                  <p className="mt-1">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(detail.difference))}`}
-                    >
-                      {formatDifference(detail.difference)}
+                  </span>
+                  {difference === null ? (
+                    <span className="text-sm text-gray-400 dark:text-[#64748b]">
+                      -
                     </span>
-                  </p>
+                  ) : (
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(difference))}`}
+                    >
+                      {formatDifference(difference)} ({resultOf(difference)})
+                    </span>
+                  )}
                 </div>
-              </div>
 
-              <dl className="space-y-3 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                <div className="mb-4">
+                  <label
+                    htmlFor="opname-date"
+                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  >
                     Tanggal Opname
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {formatDate(detail.opnameDate)}
-                  </dd>
+                  </label>
+                  <input
+                    id="opname-date"
+                    type="date"
+                    value={opnameDate}
+                    onChange={(event) => setOpnameDate(event.target.value)}
+                    className={inputClass}
+                  />
                 </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Hasil
-                  </dt>
-                  <dd>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(detail.difference))}`}
-                    >
-                      {resultOf(detail.difference)}
-                    </span>
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Dicatat oleh
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {detail.User?.name || "-"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="mb-1 text-gray-500 dark:text-[#a7b4c7]">
-                    Catatan
-                  </dt>
-                  <dd className="rounded-lg bg-gray-50 px-3 py-2 text-gray-900 dark:bg-[#1b2a3d] dark:text-slate-100">
-                    {detail.notes || "-"}
-                  </dd>
-                </div>
-              </dl>
 
-              <div className="mt-5 flex justify-end">
+                <div className="mb-4">
+                  <label
+                    htmlFor="opname-notes"
+                    className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+                  >
+                    Catatan (opsional)
+                  </label>
+                  <textarea
+                    id="opname-notes"
+                    rows={3}
+                    maxLength={500}
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                    placeholder="Contoh: barang rusak, salah catat, dll."
+                    className={inputClass}
+                  />
+                </div>
+
+                {difference !== null && (
+                  <p className="mb-4 rounded-lg bg-teal-50 px-3 py-2 text-xs text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
+                    Setelah disimpan, stok barang akan diperbarui menjadi{" "}
+                    {physicalNumber}.
+                  </p>
+                )}
+
+                {formError && (
+                  <p
+                    role="alert"
+                    className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
+                  >
+                    {formError}
+                  </p>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={saving}
+                    className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {saving ? "Menyimpan..." : "Simpan Opname"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {detail &&
+        createPortal(
+          <div
+            className="opname-modal-backdrop fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setDetail(null);
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="opname-detail-title"
+              className="opname-modal my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
+                <div>
+                  <h2
+                    id="opname-detail-title"
+                    className="text-lg font-semibold text-gray-900 dark:text-slate-100"
+                  >
+                    Detail Opname
+                  </h2>
+                  <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                    {detail.Item?.name || "-"}
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setDetail(null)}
-                  className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200"
+                  aria-label="Tutup"
+                  className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
                 >
-                  Tutup
+                  <X className="h-4 w-4" />
                 </button>
               </div>
+
+              <div className="px-6 py-5">
+                <div className="mb-4 grid grid-cols-3 gap-3 text-center">
+                  <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                    <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                      Stok Sistem
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
+                      {detail.systemStock}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                    <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                      Stok Fisik
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
+                      {detail.physicalStock}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                    <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                      Selisih
+                    </p>
+                    <p className="mt-1">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(detail.difference))}`}
+                      >
+                        {formatDifference(detail.difference)}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <dl className="space-y-3 text-sm">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                      Tanggal Opname
+                    </dt>
+                    <dd className="font-medium text-gray-900 dark:text-slate-100">
+                      {formatDate(detail.opnameDate)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                      Hasil
+                    </dt>
+                    <dd>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${resultClass(resultOf(detail.difference))}`}
+                      >
+                        {resultOf(detail.difference)}
+                      </span>
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                      Dicatat oleh
+                    </dt>
+                    <dd className="font-medium text-gray-900 dark:text-slate-100">
+                      {detail.User?.name || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="mb-1 text-gray-500 dark:text-[#a7b4c7]">
+                      Catatan
+                    </dt>
+                    <dd className="rounded-lg bg-gray-50 px-3 py-2 text-gray-900 dark:bg-[#1b2a3d] dark:text-slate-100">
+                      {detail.notes || "-"}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="mt-5 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setDetail(null)}
+                    className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

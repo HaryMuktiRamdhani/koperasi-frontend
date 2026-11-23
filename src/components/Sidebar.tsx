@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -70,24 +69,29 @@ function Sidebar() {
 
   try {
     const storedUser = localStorage.getItem("user");
-    if (storedUser)
+    if (storedUser) {
       role = (JSON.parse(storedUser) as { role?: string }).role || "";
+    }
   } catch {
     role = "";
   }
 
   const navLinkClass = (isActive: boolean) =>
     [
-      "relative flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors duration-150",
+      "sidebar-link relative flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm",
       compact ? "justify-center px-2" : "",
       isActive
         ? "border-transparent bg-white font-semibold text-teal-800 before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-teal-600 dark:bg-teal-900/40 dark:text-teal-300 dark:before:bg-teal-400"
         : "border-transparent text-teal-50 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:bg-teal-900/20 dark:hover:text-teal-300",
     ].join(" ");
 
+  const expandingTextClass = appearance.autoHideSidebar
+    ? "sidebar-expanding-text max-w-0 overflow-hidden whitespace-nowrap opacity-0 group-hover/sidebar:max-w-48 group-hover/sidebar:opacity-100"
+    : "";
+
   return (
     <aside
-      className={`group/sidebar sticky top-0 flex h-screen shrink-0 flex-col overflow-hidden border-r border-teal-700 bg-teal-600 text-white dark:border-[#292929] dark:bg-[#111111] dark:text-slate-50 ${
+      className={`group/sidebar sidebar-shell sticky top-0 flex h-screen shrink-0 flex-col overflow-hidden border-r border-teal-700 bg-teal-600 text-white dark:border-[#292929] dark:bg-[#111111] dark:text-slate-50 ${
         appearance.autoHideSidebar
           ? "w-16 hover:w-64"
           : compact
@@ -95,6 +99,92 @@ function Sidebar() {
             : "w-64"
       } ${compact ? "px-2" : "px-4"}`}
     >
+      <style>{`
+        .sidebar-shell {
+          transition:
+            width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+            padding 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-link {
+          transition:
+            background-color 200ms ease,
+            color 200ms ease,
+            border-color 200ms ease,
+            transform 200ms ease;
+        }
+
+        .sidebar-link:hover {
+          transform: translateX(2px);
+        }
+
+        .sidebar-link:active {
+          transform: scale(0.98);
+        }
+
+        .sidebar-link span {
+          transition:
+            color 200ms ease,
+            background-color 200ms ease;
+        }
+
+        .sidebar-expanding-text {
+          display: inline-flex;
+          transition:
+            max-width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 200ms ease;
+        }
+
+        .sidebar-brand {
+          transition:
+            height 300ms cubic-bezier(0.22, 1, 0.36, 1),
+            width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+            border-radius 200ms ease;
+        }
+
+        .sidebar-logo {
+          transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-shell:hover .sidebar-logo {
+          transform: scale(1.04);
+        }
+
+        .sidebar-group {
+          animation: sidebarFadeIn 350ms ease both;
+        }
+
+        @keyframes sidebarFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .sidebar-shell,
+          .sidebar-link,
+          .sidebar-link span,
+          .sidebar-expanding-text,
+          .sidebar-brand,
+          .sidebar-logo,
+          .sidebar-group {
+            animation: none !important;
+            transition: none !important;
+          }
+
+          .sidebar-link:hover,
+          .sidebar-link:active {
+            transform: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Logo dan Nama Aplikasi */}
       <div
         className={`flex h-45 shrink-0 flex-col items-center justify-center border-b border-white/20 text-center dark:border-[#292929] ${
           appearance.autoHideSidebar
@@ -103,14 +193,14 @@ function Sidebar() {
         }`}
       >
         <div
-          className={`flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/40 bg-white dark:border-[#292929] dark:bg-[#171717] ${
+          className={`sidebar-brand flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/40 bg-white dark:border-[#292929] dark:bg-[#171717] ${
             compact ? "h-14 w-14" : "h-20 w-20"
           }`}
         >
           <img
             src="/stokpedia.png"
             alt="Logo Stokpedia"
-            className="h-full w-full object-contain p-1.5"
+            className="sidebar-logo h-full w-full object-contain p-1.5"
           />
         </div>
 
@@ -118,22 +208,23 @@ function Sidebar() {
           <div
             className={
               appearance.autoHideSidebar
-                ? "hidden group-hover/sidebar:block"
+                ? "sidebar-expanding-text mt-3 max-h-8"
                 : ""
             }
           >
-            <h2 className="mt-3 max-w-47.5 truncate text-sm font-semibold tracking-wide">
+            <h2 className="max-w-47.5 truncate text-sm font-semibold tracking-wide">
               Stokpedia
             </h2>
           </div>
         )}
       </div>
 
+      {/* Navigasi */}
       <nav
         aria-label="Navigasi utama"
         className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pt-5 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
-        {sidebarGroups.map((group) => {
+        {sidebarGroups.map((group, groupIndex) => {
           const groupItems = menuItems.filter(
             (item) =>
               group.paths.some((path) => path === item.to) &&
@@ -143,12 +234,18 @@ function Sidebar() {
           if (!groupItems.length) return null;
 
           return (
-            <div key={group.label} className="mb-3">
+            <div
+              key={group.label}
+              className="sidebar-group mb-3"
+              style={{
+                animationDelay: `${groupIndex * 45}ms`,
+              }}
+            >
               {(!compact || appearance.autoHideSidebar) && (
                 <p
                   className={`mb-1 px-3 text-[10px] font-semibold tracking-[0.16em] text-teal-100 dark:text-slate-500 ${
                     appearance.autoHideSidebar
-                      ? "hidden group-hover/sidebar:block"
+                      ? "sidebar-expanding-text"
                       : ""
                   }`}
                 >
@@ -185,7 +282,7 @@ function Sidebar() {
                             <span
                               className={
                                 appearance.autoHideSidebar
-                                  ? "hidden group-hover/sidebar:inline"
+                                  ? expandingTextClass
                                   : ""
                               }
                             >
@@ -203,13 +300,14 @@ function Sidebar() {
         })}
       </nav>
 
+      {/* Bagian Bawah Sidebar */}
       <div className="mt-auto border-t border-white/20 pt-5 dark:border-[#292929]">
         {appearance.showWorkspaceCard &&
           (!compact || appearance.autoHideSidebar) && (
             <div
               className={`mb-4 rounded-lg bg-white/10 px-3 py-3 text-xs text-teal-50 dark:bg-teal-900/20 dark:text-slate-300 ${
                 appearance.autoHideSidebar
-                  ? "hidden group-hover/sidebar:block"
+                  ? "sidebar-expanding-text"
                   : ""
               }`}
             >
@@ -226,7 +324,7 @@ function Sidebar() {
           <p
             className={`mb-1 px-3 text-[10px] font-semibold tracking-[0.16em] text-teal-100 dark:text-slate-500 ${
               appearance.autoHideSidebar
-                ? "hidden group-hover/sidebar:block"
+                ? "sidebar-expanding-text"
                 : ""
             }`}
           >
@@ -259,7 +357,7 @@ function Sidebar() {
                   <span
                     className={
                       appearance.autoHideSidebar
-                        ? "hidden group-hover/sidebar:inline"
+                        ? expandingTextClass
                         : ""
                     }
                   >

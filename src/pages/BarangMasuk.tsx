@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { Eye, PackagePlus, Plus, RotateCcw, Search, X } from "lucide-react";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
@@ -337,6 +338,26 @@ function BarangMasuk() {
           }
         }
 
+        @keyframes barangMasukModalFade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes barangMasukModalScale {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
         .barang-masuk-page {
           animation: barangMasukFadeUp 0.45s ease-out both;
         }
@@ -362,10 +383,20 @@ function BarangMasuk() {
           transition: background-color 180ms ease;
         }
 
+        .barang-masuk-modal-backdrop {
+          animation: barangMasukModalFade 0.2s ease-out both;
+        }
+
+        .barang-masuk-modal {
+          animation: barangMasukModalScale 0.25s ease-out both;
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .barang-masuk-page,
           .barang-masuk-section,
-          .barang-masuk-row {
+          .barang-masuk-row,
+          .barang-masuk-modal-backdrop,
+          .barang-masuk-modal {
             animation: none !important;
             transition: none !important;
           }
@@ -583,366 +614,373 @@ function BarangMasuk() {
         </div>
       </div>
 
-      {canManage && modalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeModal();
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="receipt-modal-title"
-            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
-          >
-            <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-              <div>
-                <h2
-                  id="receipt-modal-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
-                >
-                  Tambah Barang Masuk
-                </h2>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  Stok barang otomatis bertambah setelah transaksi disimpan.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={closeModal}
-                disabled={saving}
-                aria-label="Tutup"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
+      {/* Modal dirender ke document.body agar overlay mencakup seluruh viewport */}
+      {((canManage && modalOpen) || detail) &&
+        createPortal(
+          <>
+            {canManage && modalOpen && (
+              <div
+                className="barang-masuk-modal-backdrop fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+                onMouseDown={(event) => {
+                  if (event.target === event.currentTarget) closeModal();
+                }}
               >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
-              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="receipt-number" className={labelClass}>
-                    No. Transaksi
-                  </label>
-                  <input
-                    id="receipt-number"
-                    type="text"
-                    readOnly
-                    value={transactionNumber}
-                    placeholder="Dibuat otomatis saat disimpan"
-                    className={readOnlyClass}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="receipt-date" className={labelClass}>
-                    Tanggal Barang Masuk
-                  </label>
-                  <input
-                    id="receipt-date"
-                    type="date"
-                    value={receiptDate}
-                    onChange={(event) => setReceiptDate(event.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="receipt-supplier" className={labelClass}>
-                    Nama Supplier
-                  </label>
-                  <input
-                    id="receipt-supplier"
-                    type="text"
-                    list="receipt-supplier-list"
-                    maxLength={150}
-                    autoFocus
-                    value={supplierName}
-                    onChange={(event) => setSupplierName(event.target.value)}
-                    placeholder="Contoh: CV Sumber Makmur"
-                    className={inputClass}
-                  />
-                  <datalist id="receipt-supplier-list">
-                    {supplierSuggestions.map((name) => (
-                      <option key={name} value={name} />
-                    ))}
-                  </datalist>
-                </div>
-
-                <div>
-                  <label htmlFor="receipt-sender" className={labelClass}>
-                    Nama Pengirim
-                  </label>
-                  <input
-                    id="receipt-sender"
-                    type="text"
-                    list="receipt-sender-list"
-                    maxLength={150}
-                    value={senderName}
-                    onChange={(event) => setSenderName(event.target.value)}
-                    placeholder="Contoh: Budi"
-                    className={inputClass}
-                  />
-                  <datalist id="receipt-sender-list">
-                    {senderSuggestions.map((name) => (
-                      <option key={name} value={name} />
-                    ))}
-                  </datalist>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="receipt-item" className={labelClass}>
-                  Nama Barang
-                </label>
-                <select
-                  id="receipt-item"
-                  value={itemId}
-                  onChange={(event) => setItemId(event.target.value)}
-                  className={inputClass}
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="receipt-modal-title"
+                  className="barang-masuk-modal my-auto max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
                 >
-                  <option value="">Pilih barang</option>
-                  {barang.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name} (stok {option.stock ?? 0})
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
+                    <div>
+                      <h2
+                        id="receipt-modal-title"
+                        className="text-lg font-semibold text-gray-900 dark:text-slate-100"
+                      >
+                        Tambah Barang Masuk
+                      </h2>
+                      <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                        Stok barang otomatis bertambah setelah transaksi disimpan.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      disabled={saving}
+                      aria-label="Tutup"
+                      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
 
-              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div>
-                  <label htmlFor="receipt-quantity" className={labelClass}>
-                    Jumlah Masuk
-                  </label>
-                  <input
-                    id="receipt-quantity"
-                    type="number"
-                    inputMode="numeric"
-                    min="1"
-                    step="1"
-                    value={quantity}
-                    onChange={(event) => setQuantity(event.target.value)}
-                    placeholder="Contoh: 20"
-                    className={inputClass}
-                  />
+                  <form onSubmit={handleSubmit} noValidate className="px-6 py-5">
+                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="receipt-number" className={labelClass}>
+                          No. Transaksi
+                        </label>
+                        <input
+                          id="receipt-number"
+                          type="text"
+                          readOnly
+                          value={transactionNumber}
+                          placeholder="Dibuat otomatis saat disimpan"
+                          className={readOnlyClass}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="receipt-date" className={labelClass}>
+                          Tanggal Barang Masuk
+                        </label>
+                        <input
+                          id="receipt-date"
+                          type="date"
+                          value={receiptDate}
+                          onChange={(event) => setReceiptDate(event.target.value)}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="receipt-supplier" className={labelClass}>
+                          Nama Supplier
+                        </label>
+                        <input
+                          id="receipt-supplier"
+                          type="text"
+                          list="receipt-supplier-list"
+                          maxLength={150}
+                          autoFocus
+                          value={supplierName}
+                          onChange={(event) => setSupplierName(event.target.value)}
+                          placeholder="Contoh: CV Sumber Makmur"
+                          className={inputClass}
+                        />
+                        <datalist id="receipt-supplier-list">
+                          {supplierSuggestions.map((name) => (
+                            <option key={name} value={name} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <label htmlFor="receipt-sender" className={labelClass}>
+                          Nama Pengirim
+                        </label>
+                        <input
+                          id="receipt-sender"
+                          type="text"
+                          list="receipt-sender-list"
+                          maxLength={150}
+                          value={senderName}
+                          onChange={(event) => setSenderName(event.target.value)}
+                          placeholder="Contoh: Budi"
+                          className={inputClass}
+                        />
+                        <datalist id="receipt-sender-list">
+                          {senderSuggestions.map((name) => (
+                            <option key={name} value={name} />
+                          ))}
+                        </datalist>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="receipt-item" className={labelClass}>
+                        Nama Barang
+                      </label>
+                      <select
+                        id="receipt-item"
+                        value={itemId}
+                        onChange={(event) => setItemId(event.target.value)}
+                        className={inputClass}
+                      >
+                        <option value="">Pilih barang</option>
+                        {barang.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.name} (stok {option.stock ?? 0})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div>
+                        <label htmlFor="receipt-quantity" className={labelClass}>
+                          Jumlah Masuk
+                        </label>
+                        <input
+                          id="receipt-quantity"
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          step="1"
+                          value={quantity}
+                          onChange={(event) => setQuantity(event.target.value)}
+                          placeholder="Contoh: 20"
+                          className={inputClass}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="receipt-price" className={labelClass}>
+                          Harga Beli / Satuan
+                        </label>
+                        <input
+                          id="receipt-price"
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          step="1"
+                          value={unitPrice}
+                          onChange={(event) => setUnitPrice(event.target.value)}
+                          placeholder="Contoh: 35000"
+                          className={inputClass}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="receipt-total" className={labelClass}>
+                          Total Harga
+                        </label>
+                        <input
+                          id="receipt-total"
+                          type="text"
+                          readOnly
+                          value={totalPrice === null ? "" : formatCurrency(totalPrice)}
+                          placeholder="Otomatis"
+                          className={readOnlyClass}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="receipt-notes" className={labelClass}>
+                        Catatan (opsional)
+                      </label>
+                      <textarea
+                        id="receipt-notes"
+                        rows={3}
+                        maxLength={500}
+                        value={notes}
+                        onChange={(event) => setNotes(event.target.value)}
+                        placeholder="Contoh: nomor surat jalan, kondisi barang, dll."
+                        className={inputClass}
+                      />
+                    </div>
+
+                    {nextStock !== null && (
+                      <p className="mb-4 rounded-lg bg-teal-50 px-3 py-2 text-xs text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
+                        Stok {selectedItem?.name} akan bertambah dari{" "}
+                        {selectedItem?.stock ?? 0} menjadi {nextStock}.
+                      </p>
+                    )}
+
+                    {formError && (
+                      <p
+                        role="alert"
+                        className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
+                      >
+                        {formError}
+                      </p>
+                    )}
+
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={closeModal}
+                        disabled={saving}
+                        className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {saving ? "Menyimpan..." : "Simpan Barang Masuk"}
+                      </button>
+                    </div>
+                  </form>
                 </div>
-
-                <div>
-                  <label htmlFor="receipt-price" className={labelClass}>
-                    Harga Beli / Satuan
-                  </label>
-                  <input
-                    id="receipt-price"
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    step="1"
-                    value={unitPrice}
-                    onChange={(event) => setUnitPrice(event.target.value)}
-                    placeholder="Contoh: 35000"
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="receipt-total" className={labelClass}>
-                    Total Harga
-                  </label>
-                  <input
-                    id="receipt-total"
-                    type="text"
-                    readOnly
-                    value={totalPrice === null ? "" : formatCurrency(totalPrice)}
-                    placeholder="Otomatis"
-                    className={readOnlyClass}
-                  />
-                </div>
               </div>
+            )}
 
-              <div className="mb-4">
-                <label htmlFor="receipt-notes" className={labelClass}>
-                  Catatan (opsional)
-                </label>
-                <textarea
-                  id="receipt-notes"
-                  rows={3}
-                  maxLength={500}
-                  value={notes}
-                  onChange={(event) => setNotes(event.target.value)}
-                  placeholder="Contoh: nomor surat jalan, kondisi barang, dll."
-                  className={inputClass}
-                />
-              </div>
-
-              {nextStock !== null && (
-                <p className="mb-4 rounded-lg bg-teal-50 px-3 py-2 text-xs text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
-                  Stok {selectedItem?.name} akan bertambah dari{" "}
-                  {selectedItem?.stock ?? 0} menjadi {nextStock}.
-                </p>
-              )}
-
-              {formError && (
-                <p
-                  role="alert"
-                  className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300"
-                >
-                  {formError}
-                </p>
-              )}
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  disabled={saving}
-                  className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {saving ? "Menyimpan..." : "Simpan Barang Masuk"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {detail && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setDetail(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="receipt-detail-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
-          >
-            <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
-              <div>
-                <h2
-                  id="receipt-detail-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
-                >
-                  Detail Barang Masuk
-                </h2>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  {detail.transactionNumber}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDetail(null)}
-                aria-label="Tutup"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
+            {detail && (
+              <div
+                className="barang-masuk-modal-backdrop fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+                onMouseDown={(event) => {
+                  if (event.target === event.currentTarget) setDetail(null);
+                }}
               >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="px-6 py-5">
-              <div className="mb-4 grid grid-cols-3 gap-3 text-center">
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
-                    Jumlah
-                  </p>
-                  <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
-                    {detail.quantity}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
-                    Harga Beli
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-slate-100">
-                    {formatCurrency(detail.unitPrice)}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
-                  <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
-                    Total Harga
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-slate-100">
-                    {formatCurrency(detail.totalPrice)}
-                  </p>
-                </div>
-              </div>
-
-              <dl className="space-y-3 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Tanggal Barang Masuk
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {formatDate(detail.receiptDate)}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Nama Barang
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {detail.Item?.name || "-"}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Supplier
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {detail.supplierName}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Pengirim
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {detail.senderName}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-gray-500 dark:text-[#a7b4c7]">
-                    Dicatat oleh
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-slate-100">
-                    {detail.User?.name || "-"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="mb-1 text-gray-500 dark:text-[#a7b4c7]">
-                    Catatan
-                  </dt>
-                  <dd className="rounded-lg bg-gray-50 px-3 py-2 text-gray-900 dark:bg-[#1b2a3d] dark:text-slate-100">
-                    {detail.notes || "-"}
-                  </dd>
-                </div>
-              </dl>
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setDetail(null)}
-                  className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200"
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="receipt-detail-title"
+                  className="barang-masuk-modal my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#111c2e] shadow-xl"
                 >
-                  Tutup
-                </button>
+                  <div className="flex items-start justify-between gap-4 border-b border-gray-200 dark:border-[#263449] px-6 py-4">
+                    <div>
+                      <h2
+                        id="receipt-detail-title"
+                        className="text-lg font-semibold text-gray-900 dark:text-slate-100"
+                      >
+                        Detail Barang Masuk
+                      </h2>
+                      <p className="mt-0.5 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                        {detail.transactionNumber}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDetail(null)}
+                      aria-label="Tutup"
+                      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="px-6 py-5">
+                    <div className="mb-4 grid grid-cols-3 gap-3 text-center">
+                      <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                        <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                          Jumlah
+                        </p>
+                        <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-slate-100">
+                          {detail.quantity}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                        <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                          Harga Beli
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-slate-100">
+                          {formatCurrency(detail.unitPrice)}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-gray-200 dark:border-[#263449] px-3 py-3">
+                        <p className="text-xs text-gray-500 dark:text-[#a7b4c7]">
+                          Total Harga
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-slate-100">
+                          {formatCurrency(detail.totalPrice)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <dl className="space-y-3 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                          Tanggal Barang Masuk
+                        </dt>
+                        <dd className="font-medium text-gray-900 dark:text-slate-100">
+                          {formatDate(detail.receiptDate)}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                          Nama Barang
+                        </dt>
+                        <dd className="font-medium text-gray-900 dark:text-slate-100">
+                          {detail.Item?.name || "-"}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                          Supplier
+                        </dt>
+                        <dd className="font-medium text-gray-900 dark:text-slate-100">
+                          {detail.supplierName}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                          Pengirim
+                        </dt>
+                        <dd className="font-medium text-gray-900 dark:text-slate-100">
+                          {detail.senderName}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-gray-500 dark:text-[#a7b4c7]">
+                          Dicatat oleh
+                        </dt>
+                        <dd className="font-medium text-gray-900 dark:text-slate-100">
+                          {detail.User?.name || "-"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="mb-1 text-gray-500 dark:text-[#a7b4c7]">
+                          Catatan
+                        </dt>
+                        <dd className="rounded-lg bg-gray-50 px-3 py-2 text-gray-900 dark:bg-[#1b2a3d] dark:text-slate-100">
+                          {detail.notes || "-"}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <div className="mt-5 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setDetail(null)}
+                        className="rounded-lg bg-gray-100 dark:bg-[#1b2a3d] px-5 py-2.5 font-semibold text-gray-700 dark:text-[#a7b4c7] hover:bg-gray-200"
+                      >
+                        Tutup
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
+          </>,
+          document.body,
+        )}
     </div>
   );
 }
