@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   GraduationCap,
   Pencil,
+  Plus,
   Search,
   SlidersHorizontal,
   Trash2,
@@ -114,6 +115,7 @@ function Student() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({
     nis: "",
@@ -305,6 +307,7 @@ function Student() {
   }
   function startEdit(student: Student) {
     setEditId(student.id);
+    setShowForm(true);
     setForm({
       nis: student.nis,
       name: student.name,
@@ -317,6 +320,7 @@ function Student() {
   }
   function resetForm() {
     setEditId(null);
+    setShowForm(false);
     setForm({
       nis: "",
       name: "",
@@ -326,6 +330,12 @@ function Student() {
       gender: "",
       status: "Aktif",
     });
+  }
+  function openAddForm() {
+    // Kosongkan dulu supaya tidak membawa data siswa yang sedang diedit.
+    resetForm();
+    setError("");
+    setShowForm(true);
   }
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -731,6 +741,14 @@ function Student() {
             <FileSpreadsheet className="h-4 w-4" />
             Export Excel
           </button>
+          <button
+            type="button"
+            onClick={openAddForm}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Siswa
+          </button>
         </div>
       </div>
       {error && (
@@ -752,117 +770,132 @@ function Student() {
           periksa relasi pada sumber data.
         </div>
       )}
-      <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
-        <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-slate-100">
-          {editId ? "Edit Siswa" : "Tambah Siswa"}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
-            <input
-              required
-              placeholder="NIS"
-              value={form.nis}
-              onChange={(event) =>
-                setForm({ ...form, nis: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
-            />
-            <input
-              required
-              placeholder="Nama siswa"
-              value={form.name}
-              onChange={(event) =>
-                setForm({ ...form, name: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
-            />
-            <select
-              required={!editId}
-              aria-label="Jenis kelamin"
-              value={form.gender}
-              onChange={(event) =>
-                setForm({ ...form, gender: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
-            >
-              <option value="" disabled={Boolean(editingStudent?.gender)}>
-                Pilih jenis kelamin
-              </option>
-              {genders.map((gender) => (
-                <option key={gender} value={gender}>
-                  {gender}
-                </option>
-              ))}
-            </select>
-            <select
-              required
-              value={form.classId}
-              onChange={(event) => setClass(event.target.value)}
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
-            >
-              <option value="">Pilih kelas</option>
-              {availableClasses.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name} - {item.academicYear}
-                </option>
-              ))}
-            </select>
-            <select
-              required
-              value={form.jurusanId}
-              onChange={(event) =>
-                setForm({ ...form, jurusanId: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
-            >
-              <option value="">Pilih jurusan</option>
-              {formMajors.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nama} ({item.kode})
-                </option>
-              ))}
-            </select>
-            <input
-              required
-              placeholder="Angkatan (contoh: 2024)"
-              value={form.generation}
-              onChange={(event) =>
-                setForm({ ...form, generation: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
-            />
-            <select
-              value={form.status}
-              onChange={(event) =>
-                setForm({ ...form, status: event.target.value })
-              }
-              className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
-            >
-              {statuses.map((status) => (
-                <option key={status}>{status}</option>
-              ))}
-            </select>
-          </div>
-          {editId && !editingStudent?.gender && (
-            <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
-              Jenis kelamin siswa ini belum diisi. Pilih jenis kelamin untuk
-              melengkapi data.
-            </p>
-          )}
-          {form.classId && relationIdsForClass(form.classId).length === 0 && (
-            <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
-              Kelas ini belum memiliki jurusan yang tersimpan pada data siswa.
-              Pilih jurusan untuk menetapkan relasi pertama kelas ini.
-            </p>
-          )}
-          <div className="mt-3 flex justify-end gap-2">
+      {showForm && (
+        <div className="mb-4 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
+              {editId ? "Edit Siswa" : "Tambah Siswa"}
+            </h2>
             <button
-              disabled={saving}
-              className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              type="button"
+              onClick={resetForm}
+              aria-label="Tutup form"
+              title="Tutup form"
+              className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
             >
-              {saving ? "Menyimpan..." : editId ? "Simpan Perubahan" : "Tambah"}
+              <X className="h-4 w-4" />
             </button>
-            {editId && (
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
+              <input
+                required
+                placeholder="NIS"
+                value={form.nis}
+                onChange={(event) =>
+                  setForm({ ...form, nis: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
+              />
+              <input
+                required
+                placeholder="Nama siswa"
+                value={form.name}
+                onChange={(event) =>
+                  setForm({ ...form, name: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
+              />
+              <select
+                required={!editId}
+                aria-label="Jenis kelamin"
+                value={form.gender}
+                onChange={(event) =>
+                  setForm({ ...form, gender: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              >
+                <option value="" disabled={Boolean(editingStudent?.gender)}>
+                  Pilih jenis kelamin
+                </option>
+                {genders.map((gender) => (
+                  <option key={gender} value={gender}>
+                    {gender}
+                  </option>
+                ))}
+              </select>
+              <select
+                required
+                value={form.classId}
+                onChange={(event) => setClass(event.target.value)}
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              >
+                <option value="">Pilih kelas</option>
+                {availableClasses.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name} - {item.academicYear}
+                  </option>
+                ))}
+              </select>
+              <select
+                required
+                value={form.jurusanId}
+                onChange={(event) =>
+                  setForm({ ...form, jurusanId: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              >
+                <option value="">Pilih jurusan</option>
+                {formMajors.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.nama} ({item.kode})
+                  </option>
+                ))}
+              </select>
+              <input
+                required
+                placeholder="Angkatan (contoh: 2024)"
+                value={form.generation}
+                onChange={(event) =>
+                  setForm({ ...form, generation: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm"
+              />
+              <select
+                value={form.status}
+                onChange={(event) =>
+                  setForm({ ...form, status: event.target.value })
+                }
+                className="rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm"
+              >
+                {statuses.map((status) => (
+                  <option key={status}>{status}</option>
+                ))}
+              </select>
+            </div>
+            {editId && !editingStudent?.gender && (
+              <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                Jenis kelamin siswa ini belum diisi. Pilih jenis kelamin untuk
+                melengkapi data.
+              </p>
+            )}
+            {form.classId && relationIdsForClass(form.classId).length === 0 && (
+              <p className="mt-2 text-xs text-slate-500 dark:text-[#a7b4c7]">
+                Kelas ini belum memiliki jurusan yang tersimpan pada data siswa.
+                Pilih jurusan untuk menetapkan relasi pertama kelas ini.
+              </p>
+            )}
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                disabled={saving}
+                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {saving
+                  ? "Menyimpan..."
+                  : editId
+                    ? "Simpan Perubahan"
+                    : "Tambah"}
+              </button>
               <button
                 type="button"
                 onClick={resetForm}
@@ -870,10 +903,10 @@ function Student() {
               >
                 Batal
               </button>
-            )}
-          </div>
-        </form>
-      </div>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
         <div className="border-b border-gray-200 dark:border-[#263449] p-4">
