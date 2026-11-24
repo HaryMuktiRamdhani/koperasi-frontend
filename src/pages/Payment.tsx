@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  FileSpreadsheet,
   GraduationCap,
   Plus,
   Receipt,
@@ -17,6 +18,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
+import * as XLSX from "xlsx-js-style";
 import api from "../services/api";
 import PageHeader from "../components/PageHeader";
 import IconBadge from "../components/IconBadge";
@@ -95,12 +97,338 @@ function dateOnly(value?: string) {
   return value ? value.slice(0, 10) : "";
 }
 
+/* ------------------------------------------------------------------ */
+/* Export Excel                                                        */
+/* ------------------------------------------------------------------ */
+
+const EXPORT_SHEET_NAME = "Riwayat Pembayaran";
+const EXPORT_TITLE = "LAPORAN RIWAYAT PEMBAYARAN";
+const CURRENCY_FORMAT = '"Rp" #,##0';
+
+interface ExportColumn {
+  header: string;
+  width: number;
+  align?: "left" | "center" | "right";
+  currency?: boolean;
+  wrap?: boolean;
+  value: (
+    item: PembayaranData,
+    index: number,
+    formatDate: (value: string) => string,
+  ) => string | number;
+}
+
+// Urutan grup harus sama dengan urutan kolom pada EXPORT_COLUMNS.
+const EXPORT_GROUPS = [
+  { label: "A. Informasi Transaksi", span: 6 },
+  { label: "B. Informasi Siswa", span: 2 },
+  { label: "C. Informasi Akademik", span: 5 },
+  { label: "D. Informasi Tagihan", span: 5 },
+  { label: "E. Informasi Pencatatan", span: 2 },
+];
+
+function dash(value: unknown): string {
+  if (value === null || value === undefined) return "-";
+  const text = String(value).trim();
+  return text ? text : "-";
+}
+
+function numberOrDash(value: unknown): number | string {
+  return typeof value === "number" && Number.isFinite(value) ? value : "-";
+}
+
+const EXPORT_COLUMNS: ExportColumn[] = [
+  // A. Informasi Transaksi
+  { header: "No", width: 6, align: "center", value: (_item, index) => index + 1 },
+  { header: "ID Pembayaran", width: 38, value: (item) => dash(item.id) },
+  {
+    header: "Tanggal Pembayaran",
+    width: 20,
+    align: "center",
+    value: (item, _index, formatDate) =>
+      item.paymentDate ? dash(formatDate(item.paymentDate)) : "-",
+  },
+  {
+    header: "Nominal Dibayar",
+    width: 20,
+    align: "right",
+    currency: true,
+    value: (item) => numberOrDash(item.amount),
+  },
+  {
+    header: "Metode Pembayaran",
+    width: 20,
+    align: "center",
+    value: (item) => dash(item.paymentMethod),
+  },
+  { header: "Catatan", width: 34, wrap: true, value: (item) => dash(item.notes) },
+
+  // B. Informasi Siswa
+  {
+    header: "Nama Siswa",
+    width: 28,
+    value: (item) => dash(item.Bill?.Student?.name),
+  },
+  { header: "NIS", width: 16, value: (item) => dash(item.Bill?.Student?.nis) },
+
+  // C. Informasi Akademik
+  {
+    header: "Kelas",
+    width: 16,
+    value: (item) => dash(item.Bill?.Student?.Class?.name),
+  },
+  {
+    header: "Tingkat Kelas",
+    width: 16,
+    align: "center",
+    value: (item) => dash(item.Bill?.Student?.Class?.level),
+  },
+  {
+    header: "Tahun Ajaran",
+    width: 16,
+    align: "center",
+    value: (item) => dash(item.Bill?.Student?.Class?.academicYear),
+  },
+  {
+    header: "Jurusan",
+    width: 30,
+    value: (item) => dash(item.Bill?.Student?.Jurusan?.nama),
+  },
+  {
+    header: "Kode Jurusan",
+    width: 16,
+    align: "center",
+    value: (item) => dash(item.Bill?.Student?.Jurusan?.kode),
+  },
+
+  // D. Informasi Tagihan
+  { header: "ID Tagihan", width: 38, value: (item) => dash(item.Bill?.id) },
+  {
+    header: "Nama Barang",
+    width: 28,
+    value: (item) => dash(item.Bill?.Item?.name),
+  },
+  {
+    header: "Harga Barang",
+    width: 20,
+    align: "right",
+    currency: true,
+    value: (item) => numberOrDash(item.Bill?.Item?.price),
+  },
+  {
+    header: "Total Tagihan",
+    width: 20,
+    align: "right",
+    currency: true,
+    value: (item) => numberOrDash(item.Bill?.amount),
+  },
+  {
+    header: "Status Tagihan",
+    width: 18,
+    align: "center",
+    value: (item) => dash(item.Bill?.status),
+  },
+
+  // E. Informasi Pencatatan
+  {
+    header: "Nama Petugas yang Mencatat",
+    width: 28,
+    value: (item) => dash(item.User?.name),
+  },
+  { header: "Email Petugas", width: 32, value: (item) => dash(item.User?.email) },
+];
+
+const EXPORT_COLUMN_COUNT = EXPORT_COLUMNS.length;
+// Baris (0-based): 0 judul, 1 tanggal export, 2 filter, 3 ringkasan,
+// 4 grup kolom, 5 header kolom, data mulai baris 6.
+const EXPORT_GROUP_ROW = 4;
+const EXPORT_HEADER_ROW = 5;
+const EXPORT_DATA_START_ROW = 6;
+
+function pad2(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function localDateString(date: Date) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+function localTimeString(date: Date) {
+  return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+function singleCellRow(text: string): string[] {
+  return [text, ...Array(EXPORT_COLUMN_COUNT - 1).fill("")];
+}
+
+const thinBorder = (rgb: string) => ({
+  top: { style: "thin", color: { rgb } },
+  bottom: { style: "thin", color: { rgb } },
+  left: { style: "thin", color: { rgb } },
+  right: { style: "thin", color: { rgb } },
+});
+
+interface ExportOptions {
+  items: PembayaranData[];
+  activeFilters: string[];
+  totalNominalText: string;
+  formatDate: (value: string) => string;
+}
+
+function buildPaymentWorkbook({
+  items,
+  activeFilters,
+  totalNominalText,
+  formatDate,
+}: ExportOptions) {
+  const now = new Date();
+  const todayText = localDateString(now);
+
+  const groupRow: string[] = [];
+  EXPORT_GROUPS.forEach((group) => {
+    groupRow.push(group.label);
+    for (let i = 1; i < group.span; i += 1) groupRow.push("");
+  });
+
+  const rows: (string | number)[][] = [
+    singleCellRow(EXPORT_TITLE),
+    singleCellRow(
+      `Tanggal export: ${formatDate(todayText)} ${localTimeString(now)}`,
+    ),
+    singleCellRow(
+      activeFilters.length
+        ? `Filter aktif: ${activeFilters.join(" | ")}`
+        : "Filter aktif: Tidak ada (semua data)",
+    ),
+    singleCellRow(
+      `Jumlah data: ${items.length} pembayaran | Total nominal: ${totalNominalText}`,
+    ),
+    groupRow,
+    EXPORT_COLUMNS.map((column) => column.header),
+    ...items.map((item, index) =>
+      EXPORT_COLUMNS.map((column) => column.value(item, index, formatDate)),
+    ),
+  ];
+
+  const sheet = XLSX.utils.aoa_to_sheet(rows);
+  const lastRow = rows.length - 1;
+  const lastCol = EXPORT_COLUMN_COUNT - 1;
+
+  // Lebar kolom dan tinggi baris
+  sheet["!cols"] = EXPORT_COLUMNS.map((column) => ({ wch: column.width }));
+  sheet["!rows"] = [
+    { hpt: 30 },
+    { hpt: 18 },
+    { hpt: 18 },
+    { hpt: 18 },
+    { hpt: 22 },
+    { hpt: 26 },
+  ];
+
+  // Merge judul/info (A:T) dan baris grup
+  const merges: XLSX.Range[] = [0, 1, 2, 3].map((row) => ({
+    s: { r: row, c: 0 },
+    e: { r: row, c: lastCol },
+  }));
+  let groupStart = 0;
+  EXPORT_GROUPS.forEach((group) => {
+    merges.push({
+      s: { r: EXPORT_GROUP_ROW, c: groupStart },
+      e: { r: EXPORT_GROUP_ROW, c: groupStart + group.span - 1 },
+    });
+    groupStart += group.span;
+  });
+  sheet["!merges"] = merges;
+
+  // Autofilter pada header kolom
+  sheet["!autofilter"] = {
+    ref: XLSX.utils.encode_range({
+      s: { r: EXPORT_HEADER_ROW, c: 0 },
+      e: { r: Math.max(lastRow, EXPORT_HEADER_ROW), c: lastCol },
+    }),
+  };
+
+  // Freeze sampai baris header
+  (sheet as unknown as Record<string, unknown>)["!freeze"] = {
+    xSplit: "0",
+    ySplit: String(EXPORT_DATA_START_ROW),
+    topLeftCell: `A${EXPORT_DATA_START_ROW + 1}`,
+    activePane: "bottomLeft",
+    state: "frozen",
+  };
+
+  // Styling
+  for (let r = 0; r <= lastRow; r += 1) {
+    for (let c = 0; c <= lastCol; c += 1) {
+      const address = XLSX.utils.encode_cell({ r, c });
+      const cell = sheet[address];
+      if (!cell) continue;
+
+      if (r === 0) {
+        cell.s = {
+          font: { bold: true, sz: 16, color: { rgb: "0F766E" } },
+          alignment: { horizontal: "left", vertical: "center" },
+        };
+      } else if (r >= 1 && r <= 3) {
+        cell.s = {
+          font: { sz: 10, color: { rgb: "475569" } },
+          alignment: { horizontal: "left", vertical: "center" },
+        };
+      } else if (r === EXPORT_GROUP_ROW) {
+        cell.s = {
+          fill: { patternType: "solid", fgColor: { rgb: "134E4A" } },
+          font: { bold: true, color: { rgb: "FFFFFF" } },
+          alignment: { horizontal: "center", vertical: "center" },
+          border: thinBorder("FFFFFF"),
+        };
+      } else if (r === EXPORT_HEADER_ROW) {
+        cell.s = {
+          fill: { patternType: "solid", fgColor: { rgb: "0F766E" } },
+          font: { bold: true, color: { rgb: "FFFFFF" } },
+          alignment: {
+            horizontal: "center",
+            vertical: "center",
+            wrapText: true,
+          },
+          border: thinBorder("FFFFFF"),
+        };
+      } else {
+        const column = EXPORT_COLUMNS[c];
+        cell.s = {
+          font: { sz: 10 },
+          alignment: {
+            horizontal: column.align || "left",
+            vertical: "center",
+            wrapText: Boolean(column.wrap),
+          },
+          border: thinBorder("CBD5E1"),
+        };
+        if (column.currency && typeof cell.v === "number") {
+          cell.t = "n";
+          cell.z = CURRENCY_FORMAT;
+        }
+        if (column.header === "NIS") {
+          cell.t = "s";
+          cell.z = "@";
+        }
+      }
+    }
+  }
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet, EXPORT_SHEET_NAME);
+  return { workbook, fileName: `Laporan_Pembayaran_${todayText}.xlsx` };
+}
+
+/* ------------------------------------------------------------------ */
+
 function Payment() {
   const { formatCurrency, formatDate } = useLanguage();
   const [tagihan, setTagihan] = useState<TagihanData[]>([]);
   const [pembayaran, setPembayaran] = useState<PembayaranData[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
+  const [exportError, setExportError] = useState("");
 
   // filter
   const [search, setSearch] = useState("");
@@ -155,6 +483,12 @@ function Payment() {
     const timer = window.setTimeout(() => setNotice(""), 4000);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  useEffect(() => {
+    if (!exportError) return;
+    const timer = window.setTimeout(() => setExportError(""), 5000);
+    return () => window.clearTimeout(timer);
+  }, [exportError]);
 
   // Esc menutup modal
   useEffect(() => {
@@ -249,6 +583,34 @@ function Payment() {
     setPage(1);
   }
 
+  function exportExcel() {
+    setExportError("");
+    if (!filtered.length) {
+      setNotice("");
+      setExportError(
+        pembayaran.length
+          ? "Tidak ada pembayaran yang cocok dengan filter, jadi tidak ada data untuk diekspor."
+          : "Belum ada riwayat pembayaran untuk diekspor.",
+      );
+      return;
+    }
+
+    try {
+      const { workbook, fileName } = buildPaymentWorkbook({
+        items: filtered,
+        activeFilters: chips.map(([, label]) => label).filter(Boolean),
+        totalNominalText: formatCurrency(totalNominal),
+        formatDate,
+      });
+      XLSX.writeFile(workbook, fileName);
+      setNotice(`Export berhasil: ${filtered.length} data pembayaran (${fileName}).`);
+    } catch (error) {
+      console.error("Gagal mengekspor data pembayaran", error);
+      setNotice("");
+      setExportError("Gagal mengekspor data pembayaran ke Excel.");
+    }
+  }
+
   function handleBillChange(value: string) {
     setBillId(value);
     const selectedBill = tagihan.find((item) => item.id === value);
@@ -324,14 +686,24 @@ function Payment() {
           description="Kelola pembayaran tagihan siswa"
           icon={Wallet}
         />
-        <button
-          type="button"
-          onClick={openAdd}
-          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
-        >
-          <Plus className="h-4 w-4" />
-          Tambah Pembayaran
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={exportExcel}
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            Export Excel
+          </button>
+          <button
+            type="button"
+            onClick={openAdd}
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Pembayaran
+          </button>
+        </div>
       </div>
 
       {notice && (
@@ -340,6 +712,15 @@ function Payment() {
           className="mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700 dark:border-green-900/70 dark:bg-green-950/40 dark:text-green-300"
         >
           {notice}
+        </div>
+      )}
+
+      {exportError && (
+        <div
+          role="alert"
+          className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300"
+        >
+          {exportError}
         </div>
       )}
 
