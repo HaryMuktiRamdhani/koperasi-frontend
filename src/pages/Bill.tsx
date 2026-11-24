@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import {
@@ -24,12 +25,14 @@ interface Major {
   nama: string;
   kode: string;
 }
+
 interface ClassData {
   id: string;
   name: string;
   level: string;
   jurusanId?: string | null;
 }
+
 interface StudentData {
   id: string;
   nis: string;
@@ -41,16 +44,19 @@ interface StudentData {
   Class?: ClassData;
   Jurusan?: Major;
 }
+
 interface ItemData {
   id: string;
   name: string;
   price: number;
   status?: string;
 }
+
 interface BillData {
   id: string;
   studentId: string;
   itemId: string;
+  quantity: number;
   amount: number;
   status: string;
   billDate?: string | null;
@@ -58,7 +64,9 @@ interface BillData {
   Student?: StudentData;
   Item?: ItemData;
 }
+
 type SortKey = "student" | "item" | "amount" | "status" | "billDate";
+
 type FilterState = {
   search: string;
   status: string;
@@ -100,31 +108,47 @@ const defaults: FilterState = {
   page: 1,
   pageSize: 10,
 };
-const dateValue = (value?: string | null) => (value ? value.slice(0, 10) : "");
+
+const dateValue = (value?: string | null) =>
+  value ? value.slice(0, 10) : "";
+
 const errorMessage = (error: unknown, fallback: string) =>
   (error as { response?: { data?: { message?: string } } }).response?.data
     ?.message || fallback;
 
 function readParams(params: URLSearchParams): FilterState {
   const next = { ...defaults };
+
   (Object.keys(next) as (keyof FilterState)[]).forEach((key) => {
     const value = params.get(key);
+
     if (value === null) return;
+
     if (key === "page" || key === "pageSize")
       next[key] = Number(value) as never;
-    else if (key === "overdue") next[key] = (value === "1") as never;
-    else next[key] = value as never;
+    else if (key === "overdue")
+      next[key] = (value === "1") as never;
+    else
+      next[key] = value as never;
   });
+
   if (!["student", "item", "amount", "status", "billDate"].includes(next.sort))
     next.sort = defaults.sort;
+
   if (!["asc", "desc"].includes(next.direction))
     next.direction = defaults.direction;
-  if (![10, 25, 50].includes(next.pageSize)) next.pageSize = 10;
+
+  if (![10, 25, 50].includes(next.pageSize))
+    next.pageSize = 10;
+
   next.page = Math.max(1, next.page || 1);
+
   return next;
 }
+
 function writeParams(filters: FilterState) {
   const params = new URLSearchParams();
+
   (
     Object.entries(filters) as [
       keyof FilterState,
@@ -134,8 +158,13 @@ function writeParams(filters: FilterState) {
     if (value !== "" && value !== false && value !== defaults[key])
       params.set(key, String(value));
   });
-  if (filters.page > 1) params.set("page", String(filters.page));
-  if (filters.pageSize !== 10) params.set("pageSize", String(filters.pageSize));
+
+  if (filters.page > 1)
+    params.set("page", String(filters.page));
+
+  if (filters.pageSize !== 10)
+    params.set("pageSize", String(filters.pageSize));
+
   return params;
 }
 
@@ -143,75 +172,55 @@ function writeParams(filters: FilterState) {
 /* Animasi                                                             */
 /* ------------------------------------------------------------------ */
 
-/*
-  Semua animasi ada di sini supaya file ini tetap single-file.
-  Daftar animasi:
-  1.  Fade Up          -> .um-fade-up
-  2.  Fade In          -> .um-fade-in
-  3.  Stagger          -> variabel --um-delay (header, filter, kartu, baris)
-  4.  Row Fade In      -> .um-row-in
-  5.  Card Hover       -> .um-card
-  6.  Row Hover        -> .um-row
-  7.  Button Hover     -> .um-btn
-  8.  Button Press     -> .um-btn:active (scale)
-  9.  Input Focus      -> .um-input
-  10. Badge Hover      -> .um-badge
-  11. Loading Spinner  -> .um-spinner
-  12. Reduced Motion   -> @media (prefers-reduced-motion: reduce)
-  Tambahan: Alert Slide Down (.um-alert), Pulse teks loading (.um-pulse).
-
-  Animasi masuk memakai fill-mode "backwards" supaya efek hover
-  (transform) tetap jalan setelah animasi selesai.
-*/
 const ANIMATION_CSS = `
 .um-root {
   --um-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 1. Fade Up */
 @keyframes um-fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .um-fade-up {
   animation: um-fade-up 0.5s var(--um-ease) backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
-/* 2. Fade In */
 @keyframes um-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
 .um-fade-in {
   animation: um-fade-in 0.4s ease-out backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
-/* 4. Row Fade In (dipakai bersama stagger lewat --um-delay) */
 @keyframes um-row-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .um-row-in {
   animation: um-row-in 0.4s var(--um-ease) backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
-/* Alert / notice slide down */
 @keyframes um-alert {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .um-alert {
   animation: um-alert 0.3s var(--um-ease) backwards;
 }
 
-/* 5. Card Hover */
 .um-card {
   transition: transform 0.25s var(--um-ease), box-shadow 0.25s var(--um-ease),
     border-color 0.25s ease;
 }
+
 @media (hover: hover) {
   .um-card:hover {
     transform: translateY(-2px);
@@ -220,51 +229,53 @@ const ANIMATION_CSS = `
   }
 }
 
-/* 6. Row Hover */
 .um-row {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 @media (hover: hover) {
   .um-row:hover {
     box-shadow: inset 3px 0 0 #20b2aa;
   }
 }
 
-/* 7. Button Hover + 8. Button Press */
 .um-btn {
   transition: transform 0.18s var(--um-ease), background-color 0.18s ease,
     box-shadow 0.18s ease, opacity 0.18s ease, color 0.18s ease,
     border-color 0.18s ease;
 }
+
 @media (hover: hover) {
   .um-btn:not(:disabled):hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 14px -6px rgba(22, 139, 135, 0.55);
   }
 }
+
 .um-btn:not(:disabled):active {
   transform: scale(0.95);
   box-shadow: none;
 }
+
 .um-btn:focus-visible {
   outline: 2px solid #20b2aa;
   outline-offset: 2px;
 }
 
-/* 9. Input Focus */
 .um-input {
   transition: border-color 0.2s ease, box-shadow 0.2s ease,
     background-color 0.2s ease;
 }
+
 .um-input:focus {
   border-color: #20b2aa;
   box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.22);
 }
 
-/* 10. Badge Hover */
 .um-badge {
   transition: transform 0.2s var(--um-ease), box-shadow 0.2s ease;
 }
+
 @media (hover: hover) {
   .um-badge:hover {
     transform: scale(1.08);
@@ -272,10 +283,10 @@ const ANIMATION_CSS = `
   }
 }
 
-/* 11. Loading Spinner */
 @keyframes um-spin {
   to { transform: rotate(360deg); }
 }
+
 .um-spinner {
   display: inline-block;
   width: 1rem;
@@ -286,16 +297,15 @@ const ANIMATION_CSS = `
   animation: um-spin 0.7s linear infinite;
 }
 
-/* Pulse teks loading */
 @keyframes um-pulse {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
 }
+
 .um-pulse {
   animation: um-pulse 1.4s ease-in-out infinite;
 }
 
-/* 12. Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .um-root *,
   .um-root *::before,
@@ -307,12 +317,14 @@ const ANIMATION_CSS = `
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
+
   .um-card:hover,
   .um-btn:hover,
   .um-btn:active,
   .um-badge:hover {
     transform: none !important;
   }
+
   .um-spinner {
     animation: none !important;
     border-right-color: currentColor;
@@ -321,8 +333,12 @@ const ANIMATION_CSS = `
 }
 `;
 
-/* Stagger helper: delay naik per index, dibatasi supaya tidak kelamaan */
-function stagger(index: number, base = 0, step = 45, max = 12): CSSProperties {
+function stagger(
+  index: number,
+  base = 0,
+  step = 45,
+  max = 12,
+): CSSProperties {
   return {
     "--um-delay": `${base + Math.min(index, max) * step}ms`,
   } as CSSProperties;
@@ -334,9 +350,9 @@ function stagger(index: number, base = 0, step = 45, max = 12): CSSProperties {
 
 const inputClass =
   "um-input w-full rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-2 text-sm outline-none";
+
 const dateInputClass = `${inputClass} text-[#102a43] dark:text-slate-100`;
 
-/* Satu kolom filter dengan label di atasnya */
 function Field({
   label,
   className = "",
@@ -356,7 +372,6 @@ function Field({
   );
 }
 
-/* Kelompok filter dengan judul, keterangan singkat, dan aksi opsional */
 function FilterGroup({
   title,
   description,
@@ -379,14 +394,17 @@ function FilterGroup({
           <h3 className="text-sm font-semibold text-[#102a43] dark:text-slate-100">
             {title}
           </h3>
+
           {description && (
             <p className="mt-0.5 text-xs text-slate-500 dark:text-[#a7b4c7]">
               {description}
             </p>
           )}
         </div>
+
         {action}
       </div>
+
       {children}
     </div>
   );
@@ -394,57 +412,84 @@ function FilterGroup({
 
 function Bill() {
   const { formatCurrency, formatDate } = useLanguage();
+
   const canDelete = getStoredRole() === "admin";
   const formatRupiah = formatCurrency;
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [filters, setFilters] = useState(() => readParams(searchParams));
   const [searchDraft, setSearchDraft] = useState(filters.search);
+
   const [bills, setBills] = useState<BillData[]>([]);
   const [students, setStudents] = useState<StudentData[]>([]);
   const [items, setItems] = useState<ItemData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
+
   const [formOpen, setFormOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [studentSearch, setStudentSearch] = useState("");
   const [studentMajor, setStudentMajor] = useState("");
   const [studentLevel, setStudentLevel] = useState("");
   const [studentClass, setStudentClass] = useState("");
+
   const [itemId, setItemId] = useState("");
-  const [amount, setAmount] = useState("");
+  const [quantity, setQuantity] = useState("1");
+
   const [billDate, setBillDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
   const [deleteTarget, setDeleteTarget] = useState<BillData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  function updateFilters(patch: Partial<FilterState>, resetPage = true) {
-    const next = { ...filters, ...patch, ...(resetPage ? { page: 1 } : {}) };
+  function updateFilters(
+    patch: Partial<FilterState>,
+    resetPage = true,
+  ) {
+    const next = {
+      ...filters,
+      ...patch,
+      ...(resetPage ? { page: 1 } : {}),
+    };
+
     setFilters(next);
     setSearchParams(writeParams(next), { replace: true });
   }
+
   useEffect(() => {
     const next = readParams(searchParams);
+
     setFilters(next);
     setSearchDraft(next.search);
   }, [searchParams]);
+
   useEffect(() => {
     if (searchDraft === filters.search) return;
+
     const timer = window.setTimeout(
       () => updateFilters({ search: searchDraft }),
       300,
     );
+
     return () => window.clearTimeout(timer);
   }, [searchDraft, filters.search]);
+
   useEffect(() => {
     let cancelled = false;
+
     async function load() {
       setLoading(true);
+
       try {
         const [
           billResponse,
@@ -459,6 +504,7 @@ function Bill() {
           api.get<Major[]>("/jurusan"),
           api.get<ClassData[]>("/classes"),
         ]);
+
         if (!cancelled) {
           setBills(billResponse.data);
           setStudents(studentResponse.data);
@@ -468,12 +514,16 @@ function Bill() {
         }
       } catch (loadError) {
         if (!cancelled)
-          setError(errorMessage(loadError, "Data tagihan gagal dimuat."));
+          setError(
+            errorMessage(loadError, "Data tagihan gagal dimuat."),
+          );
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
+
     void load();
+
     return () => {
       cancelled = true;
     };
@@ -488,8 +538,10 @@ function Bill() {
       ),
     [classes, filters.jurusan, filters.level],
   );
+
   const filteredStudents = useMemo(() => {
     const query = studentSearch.trim().toLowerCase();
+
     return students.filter(
       (student) =>
         student.status === "Aktif" &&
@@ -499,7 +551,14 @@ function Bill() {
         (!query ||
           `${student.name} ${student.nis}`.toLowerCase().includes(query)),
     );
-  }, [students, studentSearch, studentMajor, studentLevel, studentClass]);
+  }, [
+    students,
+    studentSearch,
+    studentMajor,
+    studentLevel,
+    studentClass,
+  ]);
+
   useEffect(() => {
     if (
       filters.classId &&
@@ -508,29 +567,36 @@ function Bill() {
       updateFilters({ classId: "" });
     }
   }, [availableClasses, filters.classId]);
+
   const filteredBills = useMemo(() => {
     const query = filters.search.trim().toLowerCase();
+
     const result = bills.filter((bill) => {
       const student = bill.Student;
+
       const billDateValue = dateValue(bill.billDate);
       const dueDateValue = dateValue(bill.dueDate);
+
       const matchesSearch =
         !query ||
         `${student?.name || ""} ${student?.nis || ""} ${bill.Item?.name || ""}`
           .toLowerCase()
           .includes(query);
+
       const overdue = Boolean(
         dueDateValue &&
         dueDateValue < new Date().toISOString().slice(0, 10) &&
         bill.status !== "Lunas",
       );
+
       return (
         matchesSearch &&
         (!filters.status || bill.status === filters.status) &&
         (!filters.jurusan || student?.jurusanId === filters.jurusan) &&
         (!filters.level || student?.Class?.level === filters.level) &&
         (!filters.classId || student?.classId === filters.classId) &&
-        (!filters.generation || student?.generation === filters.generation) &&
+        (!filters.generation ||
+          student?.generation === filters.generation) &&
         (!filters.itemId || bill.itemId === filters.itemId) &&
         (!filters.min || bill.amount >= Number(filters.min)) &&
         (!filters.max || bill.amount <= Number(filters.max)) &&
@@ -540,62 +606,113 @@ function Bill() {
           (billDateValue && billDateValue <= filters.billTo)) &&
         (!filters.dueFrom ||
           (dueDateValue && dueDateValue >= filters.dueFrom)) &&
-        (!filters.dueTo || (dueDateValue && dueDateValue <= filters.dueTo)) &&
+        (!filters.dueTo ||
+          (dueDateValue && dueDateValue <= filters.dueTo)) &&
         (!filters.overdue || overdue)
       );
     });
+
     const direction = filters.direction === "asc" ? 1 : -1;
+
     return result.sort((a, b) => {
       const value =
         filters.sort === "student"
-          ? (a.Student?.name || "").localeCompare(b.Student?.name || "")
+          ? (a.Student?.name || "").localeCompare(
+              b.Student?.name || "",
+            )
           : filters.sort === "item"
-            ? (a.Item?.name || "").localeCompare(b.Item?.name || "")
+            ? (a.Item?.name || "").localeCompare(
+                b.Item?.name || "",
+              )
             : filters.sort === "amount"
               ? a.amount - b.amount
               : filters.sort === "status"
                 ? a.status.localeCompare(b.status)
-                : dateValue(a.billDate).localeCompare(dateValue(b.billDate));
+                : dateValue(a.billDate).localeCompare(
+                    dateValue(b.billDate),
+                  );
+
       return value * direction;
     });
   }, [bills, filters]);
+
   const totalPages = Math.max(
     1,
     Math.ceil(filteredBills.length / filters.pageSize),
   );
+
   useEffect(() => {
-    if (filters.page > totalPages) updateFilters({ page: totalPages }, false);
+    if (filters.page > totalPages)
+      updateFilters({ page: totalPages }, false);
   }, [filters.page, totalPages]);
+
   const visibleBills = filteredBills.slice(
     (filters.page - 1) * filters.pageSize,
     filters.page * filters.pageSize,
   );
+
   const generations = [
     ...new Set(students.map((student) => student.generation)),
   ].filter(Boolean);
+
   const selectedItem = items.find((item) => item.id === itemId);
-  const studentSelectionTotal = selectedStudents.length * Number(amount || 0);
-  const hasFilters = (Object.keys(filters) as (keyof FilterState)[]).some(
+
+  // Total harga barang untuk satu siswa.
+  const itemTotal =
+    (selectedItem?.price || 0) * Number(quantity || 0);
+
+  // Total keseluruhan untuk seluruh siswa yang dipilih.
+  const studentSelectionTotal =
+    selectedStudents.length * itemTotal;
+
+  const hasFilters = (
+    Object.keys(filters) as (keyof FilterState)[]
+  ).some(
     (key) =>
-      filters[key] !== defaults[key] && key !== "page" && key !== "pageSize",
+      filters[key] !== defaults[key] &&
+      key !== "page" &&
+      key !== "pageSize",
   );
+
   const resetFilters = () => {
     setSearchDraft("");
+
     const next = { ...defaults };
+
     setFilters(next);
     setSearchParams(writeParams(next), { replace: true });
   };
-  const activeFilterChips: { key: keyof FilterState; label: string }[] = [
-    filters.search && { key: "search", label: `Cari: ${filters.search}` },
-    filters.status && { key: "status", label: `Status: ${filters.status}` },
+
+  const activeFilterChips: {
+    key: keyof FilterState;
+    label: string;
+  }[] = [
+    filters.search && {
+      key: "search",
+      label: `Cari: ${filters.search}`,
+    },
+    filters.status && {
+      key: "status",
+      label: `Status: ${filters.status}`,
+    },
     filters.jurusan && {
       key: "jurusan",
-      label: `Jurusan: ${majors.find((item) => item.id === filters.jurusan)?.nama || filters.jurusan}`,
+      label: `Jurusan: ${
+        majors.find((item) => item.id === filters.jurusan)?.nama ||
+        filters.jurusan
+      }`,
     },
-    filters.level && { key: "level", label: `Tingkat: ${filters.level}` },
+    filters.level && {
+      key: "level",
+      label: `Tingkat: ${filters.level}`,
+    },
     filters.classId && {
       key: "classId",
-      label: `Kelas: ${availableClasses.find((item) => item.id === filters.classId)?.name || filters.classId}`,
+      label: `Kelas: ${
+        availableClasses.find(
+          (item) => item.id === filters.classId,
+        )?.name || filters.classId
+      }`,
     },
     filters.generation && {
       key: "generation",
@@ -603,7 +720,10 @@ function Bill() {
     },
     filters.itemId && {
       key: "itemId",
-      label: `Barang: ${items.find((item) => item.id === filters.itemId)?.name || filters.itemId}`,
+      label: `Barang: ${
+        items.find((item) => item.id === filters.itemId)?.name ||
+        filters.itemId
+      }`,
     },
     filters.min && {
       key: "min",
@@ -629,43 +749,52 @@ function Bill() {
       key: "dueTo",
       label: `Jatuh tempo sampai: ${filters.dueTo}`,
     },
-    filters.overdue && { key: "overdue", label: "Terlambat" },
-  ].filter(Boolean) as { key: keyof FilterState; label: string }[];
+    filters.overdue && {
+      key: "overdue",
+      label: "Terlambat",
+    },
+  ].filter(Boolean) as {
+    key: keyof FilterState;
+    label: string;
+  }[];
 
   function toggleSort(sort: SortKey) {
     updateFilters(
       {
         sort,
         direction:
-          filters.sort === sort && filters.direction === "asc" ? "desc" : "asc",
+          filters.sort === sort && filters.direction === "asc"
+            ? "desc"
+            : "asc",
       },
       false,
     );
   }
+
   function resetForm() {
     setFormOpen(false);
     setEditId(null);
     setSelectedStudents([]);
     setItemId("");
-    setAmount("");
+    setQuantity("1");
     setBillDate("");
     setDueDate("");
   }
+
   function startEdit(bill: BillData) {
     setFormOpen(true);
     setEditId(bill.id);
     setSelectedStudents([bill.studentId]);
     setItemId(bill.itemId);
-    setAmount(String(bill.amount));
+    setQuantity(String(bill.quantity || 1));
     setBillDate(dateValue(bill.billDate));
     setDueDate(dateValue(bill.dueDate));
   }
+
   function selectItem(value: string) {
     setItemId(value);
-    const item = items.find((entry) => entry.id === value);
-    if (item && (!amount || Number(amount) === selectedItem?.price))
-      setAmount(String(item.price));
   }
+
   function toggleStudent(id: string) {
     setSelectedStudents((current) =>
       current.includes(id)
@@ -673,62 +802,102 @@ function Bill() {
         : [...current, id],
     );
   }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+
     setError("");
     setNotice("");
-    if (!itemId || !amount || selectedStudents.length === 0) {
-      setError("Pilih siswa, barang, dan nominal tagihan.");
+
+    const parsedQuantity = Number(quantity);
+
+    if (
+      !itemId ||
+      !Number.isInteger(parsedQuantity) ||
+      parsedQuantity < 1 ||
+      selectedStudents.length === 0
+    ) {
+      setError(
+        "Pilih siswa, barang, dan jumlah barang yang valid.",
+      );
       return;
     }
+
     setSaving(true);
+
     try {
-      if (editId)
+      if (editId) {
         await api.put(`/bills/${editId}`, {
           studentId: selectedStudents[0],
           itemId,
-          amount: Number(amount),
+          quantity: parsedQuantity,
           billDate: billDate || null,
           dueDate: dueDate || null,
         });
-      else
+      } else {
         await api.post("/bills/bulk", {
           studentIds: selectedStudents,
           itemId,
-          amount: Number(amount),
+          quantity: parsedQuantity,
           billDate: billDate || null,
           dueDate: dueDate || null,
         });
+      }
+
       resetForm();
+
       setNotice(
-        editId ? "Tagihan berhasil diperbarui." : "Tagihan berhasil dibuat.",
+        editId
+          ? "Tagihan berhasil diperbarui."
+          : "Tagihan berhasil dibuat.",
       );
+
       const response = await api.get<BillData[]>("/bills");
+
       setBills(response.data);
     } catch (saveError) {
-      setError(errorMessage(saveError, "Gagal menyimpan tagihan."));
+      setError(
+        errorMessage(saveError, "Gagal menyimpan tagihan."),
+      );
     } finally {
       setSaving(false);
     }
   }
+
   async function handleDelete() {
     if (!deleteTarget) return;
+
     setDeleteLoading(true);
     setDeleteError("");
+
     try {
       await api.delete(`/bills/${deleteTarget.id}`);
+
       setDeleteTarget(null);
+
       setBills((current) =>
-        current.filter((bill) => bill.id !== deleteTarget.id),
+        current.filter(
+          (bill) => bill.id !== deleteTarget.id,
+        ),
       );
     } catch (deleteError) {
-      setDeleteError(errorMessage(deleteError, "Gagal menghapus tagihan."));
+      setDeleteError(
+        errorMessage(deleteError, "Gagal menghapus tagihan."),
+      );
     } finally {
       setDeleteLoading(false);
     }
   }
-  function SortHeader({ label, sort }: { label: string; sort: SortKey }) {
+
+  function SortHeader({
+    label,
+    sort,
+  }: {
+    label: string;
+    sort: SortKey;
+  }) {
     const active = filters.sort === sort;
+
     return (
       <button
         type="button"
@@ -736,6 +905,7 @@ function Bill() {
         className="um-btn inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold"
       >
         {label}
+
         {active ? (
           filters.direction === "asc" ? (
             <ChevronUp className="h-3.5 w-3.5" />
@@ -746,6 +916,7 @@ function Bill() {
       </button>
     );
   }
+
   return (
     <div className="um-root mx-auto w-full max-w-7xl space-y-4">
       <style>{ANIMATION_CSS}</style>
@@ -755,8 +926,10 @@ function Bill() {
           style={stagger(0)}
           className="um-fade-up flex items-center gap-2 text-sm text-slate-500 dark:text-[#a7b4c7]"
         >
-          <ReceiptText className="h-4 w-4" /> Tagihan
+          <ReceiptText className="h-4 w-4" />
+          Tagihan
         </div>
+
         <button
           type="button"
           onClick={() => {
@@ -766,9 +939,11 @@ function Bill() {
           style={stagger(1, 0, 80)}
           className="um-btn um-fade-up inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
         >
-          <Plus className="h-4 w-4" /> Tambah Tagihan
+          <Plus className="h-4 w-4" />
+          Tambah Tagihan
         </button>
       </div>
+
       {error && (
         <div
           role="alert"
@@ -777,6 +952,7 @@ function Bill() {
           {error}
         </div>
       )}
+
       {notice && (
         <div
           role="status"
@@ -785,12 +961,14 @@ function Bill() {
           {notice}
         </div>
       )}
+
       {formOpen && (
         <section className="um-fade-up rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold">
               {editId ? "Edit Tagihan" : "Tambah Tagihan"}
             </h2>
+
             <button
               type="button"
               onClick={resetForm}
@@ -800,15 +978,19 @@ function Bill() {
               <X className="h-4 w-4" />
             </button>
           </div>
+
           <form onSubmit={handleSubmit} className="space-y-3">
             {!editId && (
               <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
                 <input
                   value={studentSearch}
-                  onChange={(event) => setStudentSearch(event.target.value)}
+                  onChange={(event) =>
+                    setStudentSearch(event.target.value)
+                  }
                   placeholder="Cari nama atau NIS siswa"
                   className={inputClass}
                 />
+
                 <select
                   value={studentMajor}
                   onChange={(event) => {
@@ -818,12 +1000,14 @@ function Bill() {
                   className={inputClass}
                 >
                   <option value="">Semua jurusan</option>
+
                   {majors.map((major) => (
                     <option key={major.id} value={major.id}>
                       {major.nama}
                     </option>
                   ))}
                 </select>
+
                 <select
                   value={studentLevel}
                   onChange={(event) => {
@@ -833,21 +1017,28 @@ function Bill() {
                   className={inputClass}
                 >
                   <option value="">Semua tingkat</option>
+
                   {["X", "XI", "XII"].map((level) => (
                     <option key={level}>{level}</option>
                   ))}
                 </select>
+
                 <select
                   value={studentClass}
-                  onChange={(event) => setStudentClass(event.target.value)}
+                  onChange={(event) =>
+                    setStudentClass(event.target.value)
+                  }
                   className={inputClass}
                 >
                   <option value="">Semua kelas</option>
+
                   {classes
                     .filter(
                       (item) =>
-                        (!studentMajor || item.jurusanId === studentMajor) &&
-                        (!studentLevel || item.level === studentLevel),
+                        (!studentMajor ||
+                          item.jurusanId === studentMajor) &&
+                        (!studentLevel ||
+                          item.level === studentLevel),
                     )
                     .map((item) => (
                       <option key={item.id} value={item.id}>
@@ -857,19 +1048,23 @@ function Bill() {
                 </select>
               </div>
             )}
+
             {!editId && (
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <button
                   type="button"
                   onClick={() =>
                     setSelectedStudents(
-                      filteredStudents.map((student) => student.id),
+                      filteredStudents.map(
+                        (student) => student.id,
+                      ),
                     )
                   }
                   className="um-btn rounded-lg border border-slate-200 dark:border-[#263449] px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                 >
                   Pilih Semua Hasil Filter
                 </button>
+
                 <button
                   type="button"
                   onClick={() => setSelectedStudents([])}
@@ -877,11 +1072,13 @@ function Bill() {
                 >
                   Hapus Pilihan
                 </button>
+
                 <span className="text-slate-500 dark:text-[#a7b4c7]">
                   {selectedStudents.length} siswa terpilih
                 </span>
               </div>
             )}
+
             {!editId && (
               <div className="max-h-36 overflow-y-auto rounded-lg border border-slate-200 dark:border-[#263449] p-2">
                 {filteredStudents.map((student) => (
@@ -891,13 +1088,19 @@ function Bill() {
                   >
                     <input
                       type="checkbox"
-                      checked={selectedStudents.includes(student.id)}
-                      onChange={() => toggleStudent(student.id)}
+                      checked={selectedStudents.includes(
+                        student.id,
+                      )}
+                      onChange={() =>
+                        toggleStudent(student.id)
+                      }
                     />
+
                     {student.name} - {student.nis} -{" "}
                     {student.Class?.name || "-"}
                   </label>
                 ))}
+
                 {filteredStudents.length === 0 && (
                   <p className="p-2 text-sm text-slate-500 dark:text-[#a7b4c7]">
                     Siswa aktif tidak ditemukan.
@@ -905,76 +1108,127 @@ function Bill() {
                 )}
               </div>
             )}
+
+            {/* Barang, quantity, harga, dan total tagihan */}
             <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
               <select
                 value={itemId}
-                onChange={(event) => selectItem(event.target.value)}
+                onChange={(event) =>
+                  selectItem(event.target.value)
+                }
                 className={inputClass}
               >
                 <option value="">Pilih barang</option>
+
                 {items
-                  .filter((item) => item.status !== "Nonaktif")
+                  .filter(
+                    (item) => item.status !== "Nonaktif",
+                  )
                   .map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.name} - {formatRupiah(item.price)}
                     </option>
                   ))}
               </select>
+
               <div>
                 <input
                   type="number"
                   min="1"
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Nominal"
+                  step="1"
+                  value={quantity}
+                  onChange={(event) =>
+                    setQuantity(event.target.value)
+                  }
+                  placeholder="Jumlah barang"
                   className={inputClass}
                 />
-                {selectedItem && Number(amount) !== selectedItem.price && (
-                  <span className="um-fade-in text-xs text-amber-600">
-                    Nominal manual
-                  </span>
-                )}
+
+                <span className="text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Jumlah barang
+                </span>
               </div>
+
+              <div>
+                <div className={`${inputClass} bg-slate-50 dark:bg-[#1b2a3d]`}>
+                  {selectedItem
+                    ? formatRupiah(selectedItem.price)
+                    : "Pilih barang"}
+                </div>
+
+                <span className="text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Harga satuan
+                </span>
+              </div>
+
+              <div>
+                <div className={`${inputClass} bg-slate-50 dark:bg-[#1b2a3d] font-semibold`}>
+                  {formatRupiah(itemTotal)}
+                </div>
+
+                <span className="text-xs text-slate-500 dark:text-[#a7b4c7]">
+                  Total tagihan per siswa
+                </span>
+              </div>
+
               <label className="text-xs font-medium text-slate-500 dark:text-[#a7b4c7]">
                 Tanggal Tagihan
+
                 <input
                   type="date"
                   value={billDate}
-                  onChange={(event) => setBillDate(event.target.value)}
+                  onChange={(event) =>
+                    setBillDate(event.target.value)
+                  }
                   className={`mt-1 ${dateInputClass}`}
                 />
               </label>
+
               <label className="text-xs font-medium text-slate-500 dark:text-[#a7b4c7]">
                 Tanggal Jatuh Tempo
+
                 <input
                   type="date"
                   min={billDate || undefined}
                   value={dueDate}
-                  onChange={(event) => setDueDate(event.target.value)}
+                  onChange={(event) =>
+                    setDueDate(event.target.value)
+                  }
                   className={`mt-1 ${dateInputClass}`}
                 />
               </label>
             </div>
+
             {!editId && selectedStudents.length > 0 && (
               <p className="um-fade-in text-sm text-slate-500 dark:text-[#a7b4c7]">
-                {selectedStudents.length} siswa x{" "}
-                {formatRupiah(Number(amount || 0))} ={" "}
-                <strong>{formatRupiah(studentSelectionTotal)}</strong>
+                {selectedStudents.length} siswa × {quantity} barang ×{" "}
+                {formatRupiah(selectedItem?.price || 0)} ={" "}
+                <strong>
+                  {formatRupiah(studentSelectionTotal)}
+                </strong>
               </p>
             )}
+
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={saving}
                 className="um-btn inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
               >
-                {saving && <span className="um-spinner" aria-hidden="true" />}
+                {saving && (
+                  <span
+                    className="um-spinner"
+                    aria-hidden="true"
+                  />
+                )}
+
                 {saving
                   ? "Menyimpan..."
                   : editId
                     ? "Simpan Perubahan"
                     : "Simpan Tagihan"}
               </button>
+
               <button
                 type="button"
                 onClick={resetForm}
@@ -988,37 +1242,41 @@ function Bill() {
       )}
 
       {/* ------------------------------------------------------------ */}
-      {/* Filter (didesain ulang: semua kolom punya label & kelompok)   */}
+      {/* Filter                                                        */}
       {/* ------------------------------------------------------------ */}
+
       <section
         style={stagger(2, 0, 80)}
         className="um-fade-up space-y-4 rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e] p-4"
       >
-        {/* Judul + reset */}
         <div className="flex items-center justify-between gap-3">
           <h2 className="inline-flex items-center gap-2 text-sm font-semibold text-[#102a43] dark:text-slate-100">
             <SlidersHorizontal className="h-4 w-4 text-teal-600 dark:text-teal-300" />
             Filter Tagihan
           </h2>
+
           {hasFilters && (
             <button
               type="button"
               onClick={resetFilters}
               className="um-btn um-fade-in inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
             >
-              <X className="h-3.5 w-3.5" /> Reset Semua Filter
+              <X className="h-3.5 w-3.5" />
+              Reset Semua Filter
             </button>
           )}
         </div>
 
-        {/* Baris utama: pencarian, status, keterlambatan */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_auto_auto] lg:items-end">
           <Field label="Pencarian">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-blue-500 dark:text-blue-300" />
+
               <input
                 value={searchDraft}
-                onChange={(event) => setSearchDraft(event.target.value)}
+                onChange={(event) =>
+                  setSearchDraft(event.target.value)
+                }
                 placeholder="Cari siswa, NIS, atau barang"
                 className={`${inputClass} pl-9`}
               />
@@ -1029,6 +1287,7 @@ function Bill() {
             <span className="mb-1 block text-xs font-medium text-slate-600 dark:text-[#a7b4c7]">
               Status pembayaran
             </span>
+
             <div
               role="group"
               aria-label="Status pembayaran"
@@ -1040,7 +1299,11 @@ function Bill() {
                   type="button"
                   aria-pressed={filters.status === status}
                   onClick={() => updateFilters({ status })}
-                  className={`um-btn flex-1 rounded-md px-3 py-1.5 text-sm ${filters.status === status ? "bg-teal-600 text-white" : "hover:bg-slate-100 dark:hover:bg-[#1b2a3d]"}`}
+                  className={`um-btn flex-1 rounded-md px-3 py-1.5 text-sm ${
+                    filters.status === status
+                      ? "bg-teal-600 text-white"
+                      : "hover:bg-slate-100 dark:hover:bg-[#1b2a3d]"
+                  }`}
                 >
                   {status || "Semua"}
                 </button>
@@ -1052,29 +1315,40 @@ function Bill() {
             <span className="mb-1 block text-xs font-medium text-slate-600 dark:text-[#a7b4c7]">
               Jatuh tempo
             </span>
+
             <button
               type="button"
               aria-pressed={filters.overdue}
-              onClick={() => updateFilters({ overdue: !filters.overdue })}
-              className={`um-btn w-full rounded-lg px-3 py-2 text-sm lg:w-auto ${filters.overdue ? "bg-amber-500 text-white" : "border border-slate-200 hover:bg-slate-50 dark:border-[#263449] dark:hover:bg-[#1b2a3d]"}`}
+              onClick={() =>
+                updateFilters({
+                  overdue: !filters.overdue,
+                })
+              }
+              className={`um-btn w-full rounded-lg px-3 py-2 text-sm lg:w-auto ${
+                filters.overdue
+                  ? "bg-amber-500 text-white"
+                  : "border border-slate-200 hover:bg-slate-50 dark:border-[#263449] dark:hover:bg-[#1b2a3d]"
+              }`}
             >
               Hanya yang terlambat
             </button>
           </div>
         </div>
 
-        {/* Chip filter aktif */}
         {activeFilterChips.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-slate-500 dark:text-[#a7b4c7]">
               Filter aktif:
             </span>
+
             {activeFilterChips.map((chip) => (
               <button
                 key={chip.key}
                 type="button"
                 onClick={() => {
-                  if (chip.key === "search") setSearchDraft("");
+                  if (chip.key === "search")
+                    setSearchDraft("");
+
                   updateFilters({
                     [chip.key]: defaults[chip.key],
                   } as Partial<FilterState>);
@@ -1088,7 +1362,6 @@ function Bill() {
           </div>
         )}
 
-        {/* Kelompok filter */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           <FilterGroup
             className="lg:col-span-2"
@@ -1098,7 +1371,11 @@ function Bill() {
               <button
                 type="button"
                 onClick={() =>
-                  updateFilters({ jurusan: "", level: "", classId: "" })
+                  updateFilters({
+                    jurusan: "",
+                    level: "",
+                    classId: "",
+                  })
                 }
                 title="Kosongkan pilihan jurusan, tingkat, dan kelas"
                 className="um-btn shrink-0 rounded-lg border border-slate-200 px-2.5 py-1 text-xs hover:bg-slate-50 dark:border-[#263449] dark:hover:bg-[#1b2a3d]"
@@ -1112,11 +1389,15 @@ function Bill() {
                 <select
                   value={filters.jurusan}
                   onChange={(event) =>
-                    updateFilters({ jurusan: event.target.value, classId: "" })
+                    updateFilters({
+                      jurusan: event.target.value,
+                      classId: "",
+                    })
                   }
                   className={inputClass}
                 >
                   <option value="">Semua jurusan</option>
+
                   {majors.map((major) => (
                     <option key={major.id} value={major.id}>
                       {major.nama}
@@ -1124,29 +1405,38 @@ function Bill() {
                   ))}
                 </select>
               </Field>
+
               <Field label="Tingkat">
                 <select
                   value={filters.level}
                   onChange={(event) =>
-                    updateFilters({ level: event.target.value, classId: "" })
+                    updateFilters({
+                      level: event.target.value,
+                      classId: "",
+                    })
                   }
                   className={inputClass}
                 >
                   <option value="">Semua tingkat</option>
+
                   {["X", "XI", "XII"].map((level) => (
                     <option key={level}>{level}</option>
                   ))}
                 </select>
               </Field>
+
               <Field label="Kelas">
                 <select
                   value={filters.classId}
                   onChange={(event) =>
-                    updateFilters({ classId: event.target.value })
+                    updateFilters({
+                      classId: event.target.value,
+                    })
                   }
                   className={inputClass}
                 >
                   <option value="">Semua kelas</option>
+
                   {availableClasses.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.name}
@@ -1154,17 +1444,23 @@ function Bill() {
                   ))}
                 </select>
               </Field>
+
               <Field label="Angkatan">
                 <select
                   value={filters.generation}
                   onChange={(event) =>
-                    updateFilters({ generation: event.target.value })
+                    updateFilters({
+                      generation: event.target.value,
+                    })
                   }
                   className={inputClass}
                 >
                   <option value="">Semua angkatan</option>
+
                   {generations.map((generation) => (
-                    <option key={generation}>{generation}</option>
+                    <option key={generation}>
+                      {generation}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -1181,11 +1477,14 @@ function Bill() {
                 <select
                   value={filters.itemId}
                   onChange={(event) =>
-                    updateFilters({ itemId: event.target.value })
+                    updateFilters({
+                      itemId: event.target.value,
+                    })
                   }
                   className={inputClass}
                 >
                   <option value="">Semua barang</option>
+
                   {items.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.name}
@@ -1193,34 +1492,42 @@ function Bill() {
                   ))}
                 </select>
               </Field>
+
               <Field label="Nominal minimum">
                 <div className="relative">
                   <span className="pointer-events-none absolute left-3 top-2 text-sm text-slate-400">
                     Rp
                   </span>
+
                   <input
                     type="number"
                     min="0"
                     value={filters.min}
                     onChange={(event) =>
-                      updateFilters({ min: event.target.value })
+                      updateFilters({
+                        min: event.target.value,
+                      })
                     }
                     placeholder="0"
                     className={`${inputClass} pl-9`}
                   />
                 </div>
               </Field>
+
               <Field label="Nominal maksimum">
                 <div className="relative">
                   <span className="pointer-events-none absolute left-3 top-2 text-sm text-slate-400">
                     Rp
                   </span>
+
                   <input
                     type="number"
                     min="0"
                     value={filters.max}
                     onChange={(event) =>
-                      updateFilters({ max: event.target.value })
+                      updateFilters({
+                        max: event.target.value,
+                      })
                     }
                     placeholder="Tanpa batas"
                     className={`${inputClass} pl-9`}
@@ -1241,18 +1548,23 @@ function Bill() {
                   value={filters.billFrom}
                   max={filters.billTo || undefined}
                   onChange={(event) =>
-                    updateFilters({ billFrom: event.target.value })
+                    updateFilters({
+                      billFrom: event.target.value,
+                    })
                   }
                   className={dateInputClass}
                 />
               </Field>
+
               <Field label="Sampai tanggal">
                 <input
                   type="date"
                   value={filters.billTo}
                   min={filters.billFrom || undefined}
                   onChange={(event) =>
-                    updateFilters({ billTo: event.target.value })
+                    updateFilters({
+                      billTo: event.target.value,
+                    })
                   }
                   className={dateInputClass}
                 />
@@ -1271,18 +1583,23 @@ function Bill() {
                   value={filters.dueFrom}
                   max={filters.dueTo || undefined}
                   onChange={(event) =>
-                    updateFilters({ dueFrom: event.target.value })
+                    updateFilters({
+                      dueFrom: event.target.value,
+                    })
                   }
                   className={dateInputClass}
                 />
               </Field>
+
               <Field label="Sampai tanggal">
                 <input
                   type="date"
                   value={filters.dueTo}
                   min={filters.dueFrom || undefined}
                   onChange={(event) =>
-                    updateFilters({ dueTo: event.target.value })
+                    updateFilters({
+                      dueTo: event.target.value,
+                    })
                   }
                   className={dateInputClass}
                 />
@@ -1297,11 +1614,15 @@ function Bill() {
           ["Total Tagihan", filteredBills.length],
           [
             "Lunas",
-            filteredBills.filter((bill) => bill.status === "Lunas").length,
+            filteredBills.filter(
+              (bill) => bill.status === "Lunas",
+            ).length,
           ],
           [
             "Belum Bayar",
-            filteredBills.filter((bill) => bill.status !== "Lunas").length,
+            filteredBills.filter(
+              (bill) => bill.status !== "Lunas",
+            ).length,
           ],
         ].map(([label, value], index) => (
           <div
@@ -1312,10 +1633,14 @@ function Bill() {
             <p className="text-xs text-slate-500 dark:text-[#a7b4c7]">
               {label}
             </p>
-            <p className="mt-1 text-xl font-semibold">{value}</p>
+
+            <p className="mt-1 text-xl font-semibold">
+              {value}
+            </p>
           </div>
         ))}
       </div>
+
       <section
         style={stagger(0, 460)}
         className="um-fade-up overflow-hidden rounded-xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#111c2e]"
@@ -1326,16 +1651,25 @@ function Bill() {
             {visibleBills.length
               ? (filters.page - 1) * filters.pageSize + 1
               : 0}
-            -{Math.min(filters.page * filters.pageSize, filteredBills.length)}{" "}
+            -
+            {Math.min(
+              filters.page * filters.pageSize,
+              filteredBills.length,
+            )}{" "}
             dari {filteredBills.length} tagihan
           </span>
+
           <label className="flex items-center gap-2">
             Per halaman
+
             <select
               value={filters.pageSize}
               onChange={(event) =>
                 updateFilters(
-                  { pageSize: Number(event.target.value), page: 1 },
+                  {
+                    pageSize: Number(event.target.value),
+                    page: 1,
+                  },
                   false,
                 )
               }
@@ -1347,30 +1681,58 @@ function Bill() {
             </select>
           </label>
         </div>
+
         <div className="max-h-[55vh] overflow-auto">
           <table className="w-full min-w-215 text-left text-sm">
             <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#1b2a3d] text-xs text-slate-500 dark:text-[#a7b4c7]">
               <tr>
                 <th className="px-3 py-2">No</th>
+
                 <th className="px-3 py-2">
-                  <SortHeader label="Siswa" sort="student" />
+                  <SortHeader
+                    label="Siswa"
+                    sort="student"
+                  />
                 </th>
+
                 <th className="px-3 py-2">
-                  <SortHeader label="Barang" sort="item" />
+                  <SortHeader
+                    label="Barang"
+                    sort="item"
+                  />
                 </th>
+
                 <th className="px-3 py-2">
-                  <SortHeader label="Nominal" sort="amount" />
+                  <SortHeader
+                    label="Nominal"
+                    sort="amount"
+                  />
                 </th>
+
                 <th className="px-3 py-2">
-                  <SortHeader label="Status" sort="status" />
+                  <SortHeader
+                    label="Status"
+                    sort="status"
+                  />
                 </th>
+
                 <th className="px-3 py-2">
-                  <SortHeader label="Tanggal Tagihan" sort="billDate" />
+                  <SortHeader
+                    label="Tanggal Tagihan"
+                    sort="billDate"
+                  />
                 </th>
-                <th className="px-3 py-2">Jatuh Tempo</th>
-                <th className="px-3 py-2">Aksi</th>
+
+                <th className="px-3 py-2">
+                  Jatuh Tempo
+                </th>
+
+                <th className="px-3 py-2">
+                  Aksi
+                </th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-200 dark:divide-[#263449]">
               {loading ? (
                 <tr>
@@ -1380,7 +1742,10 @@ function Bill() {
                         className="um-spinner text-teal-600 dark:text-teal-300"
                         aria-hidden="true"
                       />
-                      <span className="um-pulse">Memuat data...</span>
+
+                      <span className="um-pulse">
+                        Memuat data...
+                      </span>
                     </span>
                   </td>
                 </tr>
@@ -1392,35 +1757,60 @@ function Bill() {
                     className="um-row um-row-in hover:bg-slate-50 dark:hover:bg-[#1b2a3d]"
                   >
                     <td className="px-3 py-2">
-                      {(filters.page - 1) * filters.pageSize + index + 1}
+                      {(filters.page - 1) *
+                        filters.pageSize +
+                        index +
+                        1}
                     </td>
+
                     <td className="px-3 py-2">
                       <div className="font-medium">
                         {bill.Student?.name || "-"}
                       </div>
+
                       <div className="text-xs text-slate-500 dark:text-[#a7b4c7]">
                         {bill.Student?.nis || "-"}
                       </div>
                     </td>
-                    <td className="px-3 py-2">{bill.Item?.name || "-"}</td>
+
+                    <td className="px-3 py-2">
+                      <div className="font-medium">
+                        {bill.Item?.name || "-"}
+                      </div>
+
+                      <div className="text-xs text-slate-500 dark:text-[#a7b4c7]">
+                        {bill.quantity || 1} barang
+                      </div>
+                    </td>
+
                     <td className="px-3 py-2 font-medium">
                       {formatRupiah(bill.amount)}
                     </td>
+
                     <td className="px-3 py-2">
                       <span
-                        className={`um-badge inline-block rounded-full px-2 py-1 text-xs font-semibold ${bill.status === "Lunas" ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300" : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"}`}
+                        className={`um-badge inline-block rounded-full px-2 py-1 text-xs font-semibold ${
+                          bill.status === "Lunas"
+                            ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+                            : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                        }`}
                       >
                         {bill.status}
                       </span>
                     </td>
+
                     <td className="px-3 py-2">
                       {bill.billDate
                         ? formatDate(bill.billDate)
                         : "Belum diatur"}
                     </td>
+
                     <td className="px-3 py-2">
-                      {bill.dueDate ? formatDate(bill.dueDate) : "Belum diatur"}
+                      {bill.dueDate
+                        ? formatDate(bill.dueDate)
+                        : "Belum diatur"}
                     </td>
+
                     <td className="px-3 py-2">
                       <div className="flex gap-2">
                         <button
@@ -1432,6 +1822,7 @@ function Bill() {
                         >
                           <Edit3 className="h-4 w-4" />
                         </button>
+
                         {canDelete && (
                           <button
                             type="button"
@@ -1451,6 +1842,7 @@ function Bill() {
                   </tr>
                 ))
               )}
+
               {!loading && visibleBills.length === 0 && (
                 <tr>
                   <td
@@ -1459,6 +1851,7 @@ function Bill() {
                   >
                     <span className="um-fade-in inline-block">
                       Tidak ada hasil tagihan.
+
                       {hasFilters && (
                         <button
                           type="button"
@@ -1475,23 +1868,34 @@ function Bill() {
             </tbody>
           </table>
         </div>
+
         <div className="flex items-center justify-end gap-2 border-t border-slate-200 dark:border-[#263449] px-4 py-3 text-sm">
           <button
             type="button"
             disabled={filters.page <= 1}
-            onClick={() => updateFilters({ page: filters.page - 1 }, false)}
+            onClick={() =>
+              updateFilters({
+                page: filters.page - 1,
+              }, false)
+            }
             aria-label="Halaman sebelumnya"
             className="um-btn rounded border border-slate-200 dark:border-[#263449] p-1 disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
+
           <span>
             Halaman {filters.page} dari {totalPages}
           </span>
+
           <button
             type="button"
             disabled={filters.page >= totalPages}
-            onClick={() => updateFilters({ page: filters.page + 1 }, false)}
+            onClick={() =>
+              updateFilters({
+                page: filters.page + 1,
+              }, false)
+            }
             aria-label="Halaman berikutnya"
             className="um-btn rounded border border-slate-200 dark:border-[#263449] p-1 disabled:opacity-40"
           >
@@ -1499,6 +1903,7 @@ function Bill() {
           </button>
         </div>
       </section>
+
       {canDelete && (
         <ConfirmModal
           open={Boolean(deleteTarget)}
@@ -1507,7 +1912,8 @@ function Bill() {
           loading={deleteLoading}
           error={deleteError}
           onCancel={() => {
-            if (!deleteLoading) setDeleteTarget(null);
+            if (!deleteLoading)
+              setDeleteTarget(null);
           }}
           onConfirm={() => void handleDelete()}
         />
@@ -1515,4 +1921,5 @@ function Bill() {
     </div>
   );
 }
+
 export default Bill;
