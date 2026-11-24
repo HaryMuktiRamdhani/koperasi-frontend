@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import {
   Users,
@@ -28,8 +28,213 @@ interface DashboardData {
 
 const ACCENT = "var(--accent-color, #20b2aa)";
 
+/* ------------------------------------------------------------------ */
+/* Animasi                                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+  Semua animasi ada di sini supaya file ini tetap single-file.
+  Daftar animasi:
+  1.  Fade Up          -> .um-fade-up
+  2.  Fade In          -> .um-fade-in
+  3.  Stagger          -> variabel --um-delay (hero, kartu, baris, dll)
+  4.  Row Fade In      -> .um-row-in
+  5.  Card Hover       -> .um-card
+  6.  Row Hover        -> .um-row
+  7.  Button Hover     -> .um-btn
+  8.  Button Press     -> .um-btn:active (scale)
+  9.  Input Focus      -> .um-input
+  10. Badge Hover      -> .um-badge
+  11. Loading Spinner  -> .um-spinner
+  12. Reduced Motion   -> @media (prefers-reduced-motion: reduce)
+  Tambahan: Alert Slide Down (.um-alert), Modal Backdrop (.um-backdrop),
+  Modal Pop (.um-modal), Pulse teks loading (.um-pulse).
+
+  Catatan: animasi masuk memakai fill-mode "backwards" (bukan "both"),
+  supaya setelah selesai, efek hover (transform) tetap bisa jalan.
+*/
+const ANIMATION_CSS = `
+.um-root {
+  --um-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 1. Fade Up */
+@keyframes um-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-fade-up {
+  animation: um-fade-up 0.5s var(--um-ease) backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* 2. Fade In */
+@keyframes um-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.um-fade-in {
+  animation: um-fade-in 0.4s ease-out backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* 4. Row Fade In (dipakai bersama stagger lewat --um-delay) */
+@keyframes um-row-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-row-in {
+  animation: um-row-in 0.4s var(--um-ease) backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* Alert / notice slide down */
+@keyframes um-alert {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-alert {
+  animation: um-alert 0.3s var(--um-ease) backwards;
+}
+
+/* Modal backdrop + pop */
+@keyframes um-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.um-backdrop {
+  animation: um-backdrop 0.2s ease-out backwards;
+}
+@keyframes um-modal {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.um-modal {
+  animation: um-modal 0.3s var(--um-ease) backwards;
+}
+
+/* 5. Card Hover */
+.um-card {
+  transition: transform 0.25s var(--um-ease), box-shadow 0.25s var(--um-ease),
+    border-color 0.25s ease, background-color 0.25s ease;
+}
+@media (hover: hover) {
+  .um-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -14px rgba(15, 23, 42, 0.3);
+  }
+}
+
+/* 6. Row Hover */
+.um-row {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .um-row:hover {
+    box-shadow: inset 3px 0 0 #20b2aa;
+  }
+}
+
+/* 7. Button Hover + 8. Button Press */
+.um-btn {
+  transition: transform 0.18s var(--um-ease), background-color 0.18s ease,
+    box-shadow 0.18s ease, opacity 0.18s ease, border-color 0.18s ease;
+}
+@media (hover: hover) {
+  .um-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -6px rgba(22, 139, 135, 0.55);
+  }
+}
+.um-btn:not(:disabled):active {
+  transform: scale(0.95);
+  box-shadow: none;
+}
+.um-btn:focus-visible {
+  outline: 2px solid #20b2aa;
+  outline-offset: 2px;
+}
+
+/* 9. Input Focus */
+.um-input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+.um-input:focus {
+  border-color: #20b2aa;
+  box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.22);
+}
+
+/* 10. Badge Hover */
+.um-badge {
+  transition: transform 0.2s var(--um-ease), box-shadow 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease;
+}
+@media (hover: hover) {
+  .um-badge:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px -4px rgba(22, 139, 135, 0.5);
+  }
+}
+
+/* 11. Loading Spinner */
+@keyframes um-spin {
+  to { transform: rotate(360deg); }
+}
+.um-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: um-spin 0.7s linear infinite;
+}
+
+/* Pulse teks loading */
+@keyframes um-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.um-pulse {
+  animation: um-pulse 1.4s ease-in-out infinite;
+}
+
+/* 12. Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .um-root *,
+  .um-root *::before,
+  .um-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .um-card:hover,
+  .um-btn:hover,
+  .um-btn:active,
+  .um-badge:hover {
+    transform: none !important;
+  }
+  .um-spinner {
+    animation: none !important;
+    border-right-color: currentColor;
+    opacity: 0.6;
+  }
+}
+`;
+
+/* Stagger helper: delay naik per index, dibatasi supaya tidak kelamaan */
+function stagger(index: number, base = 0, step = 80, max = 10): CSSProperties {
+  return {
+    "--um-delay": `${base + Math.min(index, max) * step}ms`,
+  } as CSSProperties;
+}
+
 const cardClass =
-  "rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--app-primary)] hover:shadow-lg hover:shadow-teal-900/5 motion-reduce:transition-none";
+  "um-card rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-sm hover:border-(--app-primary)";
 
 type Tone = "teal";
 
@@ -47,6 +252,7 @@ interface StatCardProps {
   to: string;
   linkLabel: string;
   tone: Tone;
+  delay?: number;
 }
 
 function StatCard({
@@ -56,11 +262,15 @@ function StatCard({
   to,
   linkLabel,
   tone,
+  delay = 0,
 }: StatCardProps) {
   const style = tones[tone];
 
   return (
-    <div className={`${cardClass} group relative overflow-hidden p-5`}>
+    <div
+      style={stagger(0, delay)}
+      className={`${cardClass} um-fade-up group relative overflow-hidden p-5`}
+    >
       <span
         aria-hidden="true"
         className={`absolute inset-x-0 top-0 h-1 ${style.bar} origin-left transition-transform duration-500 group-hover:scale-x-105`}
@@ -68,9 +278,7 @@ function StatCard({
 
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-(--app-muted)">
-            {label}
-          </p>
+          <p className="text-sm font-medium text-(--app-muted)">{label}</p>
 
           <p className="mt-3 text-3xl font-semibold tracking-tight text-(--app-text) tabular-nums transition-colors duration-300">
             {value}
@@ -119,7 +327,7 @@ function PaymentRing({ percentage }: { percentage: number }) {
     : circumference;
 
   return (
-    <div className="relative h-40 w-40 shrink-0 transition-transform duration-300 hover:scale-105 motion-reduce:transition-none">
+    <div className="um-badge relative h-40 w-40 shrink-0">
       <svg
         viewBox="0 0 120 120"
         className="h-full w-full -rotate-90"
@@ -166,7 +374,6 @@ function Dashboard() {
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pageVisible, setPageVisible] = useState(false);
 
   async function getDashboard() {
     try {
@@ -183,32 +390,16 @@ function Dashboard() {
     getDashboard();
   }, []);
 
-  // Animasi masuk setelah data dashboard selesai dimuat.
-  useEffect(() => {
-    if (loading || !data) return;
-
-    const frame = requestAnimationFrame(() => {
-      setPageVisible(true);
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [loading, data]);
-
-  const revealStyle = (delay = 0) => ({
-    opacity: pageVisible ? 1 : 0,
-    transform: pageVisible ? "translateY(0)" : "translateY(12px)",
-    transitionDelay: `${delay}ms`,
-  });
-
   if (loading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center">
-        <div className={`${cardClass} flex items-center gap-3 px-6 py-4`}>
+      <div className="um-root flex min-h-[70vh] items-center justify-center">
+        <style>{ANIMATION_CSS}</style>
+        <div className={`${cardClass} um-fade-in flex items-center gap-3 px-6 py-4`}>
           <span
             aria-hidden="true"
-            className="h-2.5 w-2.5 animate-pulse rounded-full bg-(--app-primary)"
+            className="um-spinner text-(--app-primary)"
           />
-          <p className="text-sm text-(--app-muted)">
+          <p className="um-pulse text-sm text-(--app-muted)">
             {t("dashboard")}...
           </p>
         </div>
@@ -218,18 +409,24 @@ function Dashboard() {
 
   if (!data) {
     return (
-      <div className={`${cardClass} mx-auto max-w-xl p-8 text-center`}>
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-300">
-          <CircleAlert className="h-6 w-6" strokeWidth={1.8} />
-        </span>
+      <div className="um-root">
+        <style>{ANIMATION_CSS}</style>
+        <div
+          role="alert"
+          className={`${cardClass} um-fade-up mx-auto max-w-xl p-8 text-center`}
+        >
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-300">
+            <CircleAlert className="h-6 w-6" strokeWidth={1.8} />
+          </span>
 
-        <h2 className="mt-4 text-lg font-semibold text-(--app-text)">
-          {t("dashboard")} unavailable
-        </h2>
+          <h2 className="mt-4 text-lg font-semibold text-(--app-text)">
+            {t("dashboard")} unavailable
+          </h2>
 
-        <p className="mt-2 text-sm text-(--app-muted)">
-          Silakan coba muat ulang halaman.
-        </p>
+          <p className="mt-2 text-sm text-(--app-muted)">
+            Silakan coba muat ulang halaman.
+          </p>
+        </div>
       </div>
     );
   }
@@ -309,19 +506,21 @@ function Dashboard() {
   ];
 
   return (
-    <div className="space-y-7">
+    <div className="um-root space-y-7">
+      <style>{ANIMATION_CSS}</style>
+
       {/* Hero Section */}
       <section
         style={{
-          ...revealStyle(0),
+          ...stagger(0),
           backgroundImage:
             "linear-gradient(135deg, #115e59 0%, #0f766e 55%, #0d9488 100%)",
         }}
-        className="relative overflow-hidden rounded-3xl border border-teal-700/20 p-6 text-white shadow-sm shadow-teal-900/10 transition-[opacity,transform,box-shadow] duration-500 ease-out hover:shadow-lg hover:shadow-teal-900/15 motion-reduce:transition-none sm:p-8"
+        className="um-card um-fade-up relative overflow-hidden rounded-3xl border border-teal-700/20 p-6 text-white shadow-sm shadow-teal-900/10 sm:p-8"
       >
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10 transition-transform duration-700 hover:scale-110"
+          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10"
         />
 
         <span
@@ -331,20 +530,32 @@ function Dashboard() {
 
         <div className="relative flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100">
+            <p
+              style={stagger(1, 0, 90)}
+              className="um-fade-up text-xs font-semibold uppercase tracking-[0.18em] text-teal-100"
+            >
               {t("schoolSystem")}
             </p>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h1
+              style={stagger(2, 0, 90)}
+              className="um-fade-up mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+            >
               Dashboard
             </h1>
 
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-teal-50/85">
+            <p
+              style={stagger(3, 0, 90)}
+              className="um-fade-up mt-2 max-w-xl text-sm leading-relaxed text-teal-50/85"
+            >
               {t("dashboardSubtitle")}
             </p>
           </div>
 
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur transition-all duration-300 hover:border-white/40 hover:bg-white/20">
+          <span
+            style={stagger(4, 0, 90)}
+            className="um-badge um-fade-up inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur hover:border-white/40 hover:bg-white/20"
+          >
             <Activity className="h-3.5 w-3.5 text-teal-100" />
             {t("operationalData")}
           </span>
@@ -352,10 +563,7 @@ function Dashboard() {
       </section>
 
       {/* Statistics Cards */}
-      <div
-        style={revealStyle(100)}
-        className="grid grid-cols-1 gap-4 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none md:grid-cols-2 xl:grid-cols-4"
-      >
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label={t("totalStudents")}
           value={formatNumber(data.totalStudents)}
@@ -363,6 +571,7 @@ function Dashboard() {
           to="/students"
           linkLabel={t("viewStudents")}
           tone="teal"
+          delay={120}
         />
 
         <StatCard
@@ -372,6 +581,7 @@ function Dashboard() {
           to="/items"
           linkLabel={t("viewItems")}
           tone="teal"
+          delay={200}
         />
 
         <StatCard
@@ -381,11 +591,13 @@ function Dashboard() {
           to="/bills"
           linkLabel={t("viewBills")}
           tone="teal"
+          delay={280}
         />
 
         {appearance.dashboardWidgets.cashSummary && (
           <div
-            className={`${cardClass} group relative overflow-hidden p-5`}
+            style={stagger(0, 360)}
+            className={`${cardClass} um-fade-up group relative overflow-hidden p-5`}
           >
             <span
               aria-hidden="true"
@@ -423,12 +635,12 @@ function Dashboard() {
       </div>
 
       {/* Payment Status and Summary */}
-      <div
-        style={revealStyle(200)}
-        className="grid grid-cols-1 gap-6 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2"
-      >
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {appearance.dashboardWidgets.chart && (
-          <div className={`${cardClass} flex flex-col p-6`}>
+          <div
+            style={stagger(0, 440)}
+            className={`${cardClass} um-fade-up flex flex-col p-6`}
+          >
             <div>
               <h2 className="text-base font-semibold text-(--app-text)">
                 {t("paymentStatus")}
@@ -443,7 +655,10 @@ function Dashboard() {
               <PaymentRing percentage={paymentPercentage} />
 
               <div className="grid w-full flex-1 grid-cols-2 gap-3 sm:grid-cols-1">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-emerald-900/70 dark:bg-emerald-950/40 motion-reduce:transition-none">
+                <div
+                  style={stagger(0, 600)}
+                  className="um-card um-fade-up rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 dark:border-emerald-900/70 dark:bg-emerald-950/40"
+                >
                   <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
                     <CheckCircle2 className="h-4 w-4" />
                     <p className="text-sm font-medium">{t("paid")}</p>
@@ -454,7 +669,10 @@ function Dashboard() {
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-900/70 dark:bg-amber-950/40 motion-reduce:transition-none">
+                <div
+                  style={stagger(0, 680)}
+                  className="um-card um-fade-up rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900/70 dark:bg-amber-950/40"
+                >
                   <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
                     <Clock3 className="h-4 w-4" />
                     <p className="text-sm font-medium">{t("unpaid")}</p>
@@ -470,7 +688,10 @@ function Dashboard() {
         )}
 
         {/* Summary */}
-        <div className={`${cardClass} p-6`}>
+        <div
+          style={stagger(0, 520)}
+          className={`${cardClass} um-fade-up p-6`}
+        >
           <h2 className="text-base font-semibold text-(--app-text)">
             {t("summary")}
           </h2>
@@ -480,17 +701,15 @@ function Dashboard() {
           </p>
 
           <div className="mt-4 divide-y divide-(--app-border)">
-            {summaryRows.map((row) => (
+            {summaryRows.map((row, index) => (
               <div
                 key={row.label}
-                className="group/row flex items-center justify-between gap-3 rounded-lg py-3 transition-colors duration-200 hover:bg-(--app-primary-soft)"
+                style={stagger(index, 620, 70)}
+                className="um-row um-row-in group/row flex items-center justify-between gap-3 rounded-lg px-2 py-3 hover:bg-(--app-primary-soft)"
               >
                 <span className="flex items-center gap-3 text-sm text-(--app-muted)">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--app-primary-soft) text-(--app-primary) transition-transform duration-300 group-hover/row:scale-110">
-                    <row.icon
-                      className="h-4 w-4"
-                      strokeWidth={1.9}
-                    />
+                    <row.icon className="h-4 w-4" strokeWidth={1.9} />
                   </span>
 
                   {row.label}
@@ -507,8 +726,8 @@ function Dashboard() {
 
       {/* Quick Actions */}
       <div
-        style={revealStyle(300)}
-        className={`${cardClass} p-6 transition-[opacity,transform,box-shadow] duration-500 ease-out motion-reduce:transition-none`}
+        style={stagger(0, 700)}
+        className={`${cardClass} um-fade-up p-6`}
       >
         <div>
           <h2 className="text-base font-semibold text-(--app-text)">
@@ -521,11 +740,12 @@ function Dashboard() {
         </div>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action) => (
+          {quickActions.map((action, index) => (
             <Link
               key={action.to}
               to={action.to}
-              className="group flex items-center gap-3 rounded-xl border border-(--app-border) bg-(--app-surface-muted) p-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-(--app-primary) hover:bg-(--app-primary-soft) hover:shadow-md motion-reduce:transition-none"
+              style={stagger(index, 780, 70)}
+              className="um-card um-btn um-fade-up group flex items-center gap-3 rounded-xl border border-(--app-border) bg-(--app-surface-muted) p-4 hover:border-(--app-primary) hover:bg-(--app-primary-soft)"
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tones[action.tone].tile}`}

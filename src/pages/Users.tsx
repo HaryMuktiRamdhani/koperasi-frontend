@@ -57,7 +57,7 @@ const ANIMATION_CSS = `
   to { opacity: 1; transform: translateY(0); }
 }
 .um-fade-up {
-  animation: um-fade-up 0.5s var(--um-ease) both;
+  animation: um-fade-up 0.5s var(--um-ease) backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
@@ -67,7 +67,7 @@ const ANIMATION_CSS = `
   to { opacity: 1; }
 }
 .um-fade-in {
-  animation: um-fade-in 0.4s ease-out both;
+  animation: um-fade-in 0.4s ease-out backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
@@ -77,7 +77,7 @@ const ANIMATION_CSS = `
   to { opacity: 1; transform: translateY(0); }
 }
 .um-row-in {
-  animation: um-row-in 0.4s var(--um-ease) both;
+  animation: um-row-in 0.4s var(--um-ease) backwards;
   animation-delay: var(--um-delay, 0ms);
 }
 
@@ -87,7 +87,7 @@ const ANIMATION_CSS = `
   to { opacity: 1; transform: translateY(0); }
 }
 .um-alert {
-  animation: um-alert 0.3s var(--um-ease) both;
+  animation: um-alert 0.3s var(--um-ease) backwards;
 }
 
 /* Modal backdrop + pop */
@@ -96,14 +96,14 @@ const ANIMATION_CSS = `
   to { opacity: 1; }
 }
 .um-backdrop {
-  animation: um-backdrop 0.2s ease-out both;
+  animation: um-backdrop 0.2s ease-out backwards;
 }
 @keyframes um-modal {
   from { opacity: 0; transform: translateY(12px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .um-modal {
-  animation: um-modal 0.3s var(--um-ease) both;
+  animation: um-modal 0.3s var(--um-ease) backwards;
 }
 
 /* Step form slide */
@@ -112,7 +112,7 @@ const ANIMATION_CSS = `
   to { opacity: 1; transform: translateX(0); }
 }
 .um-step {
-  animation: um-step 0.3s var(--um-ease) both;
+  animation: um-step 0.3s var(--um-ease) backwards;
 }
 
 /* 5. Card Hover */

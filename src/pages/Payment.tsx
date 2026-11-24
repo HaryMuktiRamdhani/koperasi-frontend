@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import {
   BookOpen,
   CalendarDays,
@@ -85,7 +85,7 @@ interface PembayaranData {
 const METHODS = ["Tunai", "Transfer"];
 
 const fieldClass =
-  "rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm";
+  "um-input rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm outline-none";
 
 function methodBadge(method: string) {
   return method === "Tunai"
@@ -95,6 +95,207 @@ function methodBadge(method: string) {
 
 function dateOnly(value?: string) {
   return value ? value.slice(0, 10) : "";
+}
+
+/* ------------------------------------------------------------------ */
+/* Animasi                                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+  Semua animasi ada di sini supaya file ini tetap single-file.
+  Daftar animasi:
+  1.  Fade Up          -> .um-fade-up
+  2.  Fade In          -> .um-fade-in
+  3.  Stagger          -> variabel --um-delay (header, kartu, tabel, dll)
+  4.  Row Fade In      -> .um-row-in
+  5.  Card Hover       -> .um-card
+  6.  Row Hover        -> .um-row
+  7.  Button Hover     -> .um-btn
+  8.  Button Press     -> .um-btn:active (scale)
+  9.  Input Focus      -> .um-input
+  10. Badge Hover      -> .um-badge
+  11. Loading Spinner  -> .um-spinner
+  12. Reduced Motion   -> @media (prefers-reduced-motion: reduce)
+  Tambahan: Alert Slide Down (.um-alert), Modal Backdrop (.um-backdrop),
+  Modal Pop (.um-modal), Detail Item Stagger.
+*/
+const ANIMATION_CSS = `
+.um-root {
+  --um-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 1. Fade Up */
+@keyframes um-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-fade-up {
+  animation: um-fade-up 0.5s var(--um-ease) backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* 2. Fade In */
+@keyframes um-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.um-fade-in {
+  animation: um-fade-in 0.4s ease-out backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* 4. Row Fade In (dipakai bersama stagger lewat --um-delay) */
+@keyframes um-row-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-row-in {
+  animation: um-row-in 0.4s var(--um-ease) backwards;
+  animation-delay: var(--um-delay, 0ms);
+}
+
+/* Alert / notice slide down */
+@keyframes um-alert {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.um-alert {
+  animation: um-alert 0.3s var(--um-ease) backwards;
+}
+
+/* Modal backdrop + pop */
+@keyframes um-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.um-backdrop {
+  animation: um-backdrop 0.2s ease-out backwards;
+}
+@keyframes um-modal {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.um-modal {
+  animation: um-modal 0.3s var(--um-ease) backwards;
+}
+
+/* 5. Card Hover */
+.um-card {
+  transition: transform 0.25s var(--um-ease), box-shadow 0.25s var(--um-ease),
+    border-color 0.25s ease;
+}
+@media (hover: hover) {
+  .um-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -12px rgba(15, 23, 42, 0.25);
+  }
+}
+
+/* 6. Row Hover */
+.um-row {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .um-row:hover {
+    box-shadow: inset 3px 0 0 #20b2aa;
+  }
+}
+
+/* 7. Button Hover + 8. Button Press */
+.um-btn {
+  transition: transform 0.18s var(--um-ease), background-color 0.18s ease,
+    box-shadow 0.18s ease, opacity 0.18s ease;
+}
+@media (hover: hover) {
+  .um-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -6px rgba(22, 139, 135, 0.55);
+  }
+}
+.um-btn:not(:disabled):active {
+  transform: scale(0.95);
+  box-shadow: none;
+}
+.um-btn:focus-visible {
+  outline: 2px solid #20b2aa;
+  outline-offset: 2px;
+}
+
+/* 9. Input Focus */
+.um-input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+.um-input:focus {
+  border-color: #20b2aa;
+  box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.22);
+}
+
+/* 10. Badge Hover */
+.um-badge {
+  transition: transform 0.2s var(--um-ease), box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .um-badge:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px -4px rgba(22, 139, 135, 0.5);
+  }
+}
+
+/* 11. Loading Spinner */
+@keyframes um-spin {
+  to { transform: rotate(360deg); }
+}
+.um-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: um-spin 0.7s linear infinite;
+}
+
+/* Pulse teks loading */
+@keyframes um-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.um-pulse {
+  animation: um-pulse 1.4s ease-in-out infinite;
+}
+
+/* 12. Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .um-root *,
+  .um-root *::before,
+  .um-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .um-card:hover,
+  .um-btn:hover,
+  .um-btn:active,
+  .um-badge:hover {
+    transform: none !important;
+  }
+  .um-spinner {
+    animation: none !important;
+    border-right-color: currentColor;
+    opacity: 0.6;
+  }
+}
+`;
+
+/* Stagger helper: delay naik per index, dibatasi supaya tidak kelamaan */
+function stagger(index: number, base = 0, step = 45, max = 12): CSSProperties {
+  return {
+    "--um-delay": `${base + Math.min(index, max) * step}ms`,
+  } as CSSProperties;
 }
 
 /* ------------------------------------------------------------------ */
@@ -678,19 +879,24 @@ function Payment() {
   const detailStudent = detail?.Bill?.Student;
 
   return (
-    <div>
+    <div className="um-root">
+      <style>{ANIMATION_CSS}</style>
+
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader
-          className="mb-0"
-          title="Pembayaran"
-          description="Kelola pembayaran tagihan siswa"
-          icon={Wallet}
-        />
+        <div className="um-fade-up" style={stagger(0)}>
+          <PageHeader
+            className="mb-0"
+            title="Pembayaran"
+            description="Kelola pembayaran tagihan siswa"
+            icon={Wallet}
+          />
+        </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={exportExcel}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
+            style={stagger(1, 0, 80)}
+            className="um-btn um-fade-up inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
           >
             <FileSpreadsheet className="h-4 w-4" />
             Export Excel
@@ -698,7 +904,8 @@ function Payment() {
           <button
             type="button"
             onClick={openAdd}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
+            style={stagger(2, 0, 80)}
+            className="um-btn um-fade-up inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
           >
             <Plus className="h-4 w-4" />
             Tambah Pembayaran
@@ -709,7 +916,7 @@ function Payment() {
       {notice && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700 dark:border-green-900/70 dark:bg-green-950/40 dark:text-green-300"
+          className="um-alert mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700 dark:border-green-900/70 dark:bg-green-950/40 dark:text-green-300"
         >
           {notice}
         </div>
@@ -718,14 +925,17 @@ function Payment() {
       {exportError && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300"
+          className="um-alert mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300"
         >
           {exportError}
         </div>
       )}
 
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex items-center gap-3 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+        <div
+          style={stagger(2, 0, 80)}
+          className="um-card um-fade-up flex items-center gap-3 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm"
+        >
           <IconBadge icon={Receipt} tone="teal" />
           <div>
             <p className="text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
@@ -736,7 +946,10 @@ function Payment() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm">
+        <div
+          style={stagger(3, 0, 80)}
+          className="um-card um-fade-up flex items-center gap-3 rounded-xl bg-white dark:bg-[#111c2e] p-4 shadow-sm"
+        >
           <IconBadge icon={Wallet} tone="green" />
           <div>
             <p className="text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
@@ -749,7 +962,10 @@ function Payment() {
         </div>
       </div>
 
-      <div className="min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm">
+      <div
+        style={stagger(4, 0, 80)}
+        className="um-card um-fade-up min-w-0 rounded-xl bg-white dark:bg-[#111c2e] shadow-sm"
+      >
         <div className="border-b border-gray-200 dark:border-[#263449] p-4">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
@@ -765,7 +981,7 @@ function Payment() {
                   setSearch(event.target.value);
                   setPage(1);
                 }}
-                className="w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm"
+                className="um-input w-full rounded-lg border border-gray-300 dark:border-[#263449] py-2 pl-9 pr-3 text-sm outline-none"
               />
             </div>
           </div>
@@ -841,7 +1057,7 @@ function Payment() {
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 dark:text-[#a7b4c7]"
+              className="um-btn inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-[#263449] px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
             >
               <SlidersHorizontal className="h-4 w-4" /> Reset Filter
             </button>
@@ -861,7 +1077,7 @@ function Payment() {
                     key={key}
                     type="button"
                     onClick={() => removeFilter(key)}
-                    className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700 dark:bg-teal-950/40 dark:text-teal-300"
+                    className="um-badge um-fade-in inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700 dark:bg-teal-950/40 dark:text-teal-300"
                   >
                     {label}
                     <X className="h-3 w-3" />
@@ -874,7 +1090,13 @@ function Payment() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-10 text-center text-sm text-gray-500 dark:text-[#a7b4c7]">
-              Memuat data pembayaran...
+              <span className="um-fade-in inline-flex items-center gap-2">
+                <span
+                  className="um-spinner text-teal-600 dark:text-teal-300"
+                  aria-hidden="true"
+                />
+                <span className="um-pulse">Memuat data pembayaran...</span>
+              </span>
             </div>
           ) : (
             <table className="w-full min-w-212.5 text-left text-sm">
@@ -894,7 +1116,8 @@ function Payment() {
                 {pageItems.map((item, index) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
+                    style={stagger(index, 80)}
+                    className="um-row um-row-in hover:bg-gray-50 dark:hover:bg-[#1b2a3d]"
                   >
                     <td className="px-5 py-3 text-gray-500 dark:text-[#a7b4c7]">
                       {(currentPage - 1) * pageSize + index + 1}
@@ -920,7 +1143,7 @@ function Payment() {
                     </td>
                     <td className="px-5 py-3">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${methodBadge(item.paymentMethod)}`}
+                        className={`um-badge inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${methodBadge(item.paymentMethod)}`}
                       >
                         {item.paymentMethod}
                       </span>
@@ -931,7 +1154,7 @@ function Payment() {
                         onClick={() => setDetail(item)}
                         aria-label={`Lihat detail pembayaran ${item.Bill?.Student?.name || ""}`}
                         title="Lihat detail pembayaran"
-                        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-300 dark:hover:bg-teal-900/60"
+                        className="um-btn inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-teal-50 text-teal-600 hover:bg-teal-100 dark:bg-teal-950/40 dark:text-teal-300 dark:hover:bg-teal-900/60"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -945,20 +1168,22 @@ function Payment() {
                       colSpan={7}
                       className="p-10 text-center text-gray-500 dark:text-[#a7b4c7]"
                     >
-                      <p>
-                        {pembayaran.length
-                          ? "Tidak ada pembayaran yang cocok dengan filter."
-                          : "Belum ada riwayat pembayaran."}
-                      </p>
-                      {pembayaran.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={resetFilters}
-                          className="mt-3 font-medium text-teal-600"
-                        >
-                          Reset Filter
-                        </button>
-                      )}
+                      <div className="um-fade-in">
+                        <p>
+                          {pembayaran.length
+                            ? "Tidak ada pembayaran yang cocok dengan filter."
+                            : "Belum ada riwayat pembayaran."}
+                        </p>
+                        {pembayaran.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={resetFilters}
+                            className="um-btn mt-3 rounded-md px-2 py-1 font-medium text-teal-600"
+                          >
+                            Reset Filter
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -974,7 +1199,7 @@ function Payment() {
               setPageSize(Number(event.target.value));
               setPage(1);
             }}
-            className="rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm"
+            className="um-input rounded border border-gray-300 dark:border-[#263449] px-2 py-1 text-sm outline-none"
           >
             <option value={10}>10 / halaman</option>
             <option value={25}>25 / halaman</option>
@@ -985,7 +1210,8 @@ function Payment() {
               type="button"
               disabled={currentPage <= 1}
               onClick={() => setPage(currentPage - 1)}
-              className="rounded border border-gray-300 dark:border-[#263449] p-1 disabled:opacity-40"
+              aria-label="Halaman sebelumnya"
+              className="um-btn rounded border border-gray-300 dark:border-[#263449] p-1 disabled:opacity-40"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -996,7 +1222,8 @@ function Payment() {
               type="button"
               disabled={currentPage >= pageCount}
               onClick={() => setPage(currentPage + 1)}
-              className="rounded border border-gray-300 dark:border-[#263449] p-1 disabled:opacity-40"
+              aria-label="Halaman berikutnya"
+              className="um-btn rounded border border-gray-300 dark:border-[#263449] p-1 disabled:opacity-40"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -1007,14 +1234,14 @@ function Payment() {
       {/* Modal tambah pembayaran */}
       {addOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+          className="um-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
           onClick={closeAdd}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Tambah pembayaran"
-            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl dark:bg-[#111c2e]"
+            className="um-modal max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl dark:bg-[#111c2e]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between border-b border-gray-200 p-5 dark:border-[#263449]">
@@ -1030,7 +1257,7 @@ function Payment() {
                 type="button"
                 onClick={closeAdd}
                 aria-label="Tutup"
-                className="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1b2a3d]"
+                className="um-btn cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1b2a3d]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1041,7 +1268,7 @@ function Payment() {
                 {formError && (
                   <div
                     role="alert"
-                    className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300 md:col-span-2"
+                    className="um-alert rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300 md:col-span-2"
                   >
                     {formError}
                   </div>
@@ -1103,15 +1330,16 @@ function Payment() {
                   type="button"
                   onClick={closeAdd}
                   disabled={saving}
-                  className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 disabled:cursor-not-allowed dark:bg-[#1b2a3d] dark:text-[#a7b4c7]"
+                  className="um-btn cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed dark:bg-[#1b2a3d] dark:text-[#a7b4c7] dark:hover:bg-[#223449]"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="cursor-pointer rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="um-btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                  {saving && <span className="um-spinner" aria-hidden="true" />}
                   {saving ? "Memproses..." : "Proses Pembayaran"}
                 </button>
               </div>
@@ -1123,14 +1351,14 @@ function Payment() {
       {/* Modal detail pembayaran */}
       {detail && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+          className="um-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
           onClick={() => setDetail(null)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Detail pembayaran"
-            className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white shadow-xl dark:bg-[#111c2e]"
+            className="um-modal max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white shadow-xl dark:bg-[#111c2e]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between border-b border-gray-200 p-5 dark:border-[#263449]">
@@ -1149,14 +1377,17 @@ function Payment() {
                 type="button"
                 onClick={() => setDetail(null)}
                 aria-label="Tutup"
-                className="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1b2a3d]"
+                className="um-btn cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1b2a3d]"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="space-y-4 p-5">
-              <div className="flex items-center justify-between rounded-lg bg-teal-50 px-4 py-3 dark:bg-teal-950/30">
+              <div
+                className="um-fade-up flex items-center justify-between rounded-lg bg-teal-50 px-4 py-3 dark:bg-teal-950/30"
+                style={stagger(0, 80, 50)}
+              >
                 <div>
                   <p className="text-xs uppercase text-teal-700 dark:text-teal-300">
                     Nominal Dibayar
@@ -1166,7 +1397,7 @@ function Payment() {
                   </p>
                 </div>
                 <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${methodBadge(detail.paymentMethod)}`}
+                  className={`um-badge rounded-full px-2.5 py-1 text-xs font-semibold ${methodBadge(detail.paymentMethod)}`}
                 >
                   {detail.paymentMethod}
                 </span>
@@ -1177,38 +1408,50 @@ function Payment() {
                   icon={User}
                   label="Nama Siswa"
                   value={detailStudent?.name}
+                  index={1}
                 />
-                <DetailItem icon={Receipt} label="NIS" value={detailStudent?.nis} />
+                <DetailItem
+                  icon={Receipt}
+                  label="NIS"
+                  value={detailStudent?.nis}
+                  index={2}
+                />
                 <DetailItem
                   icon={GraduationCap}
                   label="Kelas"
                   value={detailStudent?.Class?.name}
+                  index={3}
                 />
                 <DetailItem
                   icon={BookOpen}
                   label="Jurusan"
                   value={detailStudent?.Jurusan?.nama}
+                  index={4}
                 />
                 <DetailItem
                   icon={Wallet}
                   label="Tagihan"
                   value={detail.Bill?.Item?.name}
+                  index={5}
                 />
                 <DetailItem
                   icon={CalendarDays}
                   label="Tanggal Bayar"
                   value={formatDate(detail.paymentDate)}
+                  index={6}
                 />
               </div>
               <DetailItem
                 icon={UserCheck}
                 label="Dicatat oleh"
                 value={detail.User?.name}
+                index={7}
               />
               <DetailItem
                 icon={StickyNote}
                 label="Catatan"
                 value={detail.notes}
+                index={8}
               />
             </div>
 
@@ -1216,7 +1459,7 @@ function Payment() {
               <button
                 type="button"
                 onClick={() => setDetail(null)}
-                className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 dark:bg-[#1b2a3d] dark:text-[#a7b4c7]"
+                className="um-btn cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-[#1b2a3d] dark:text-[#a7b4c7] dark:hover:bg-[#223449]"
               >
                 Tutup
               </button>
@@ -1232,13 +1475,18 @@ function DetailItem({
   icon: Icon,
   label,
   value,
+  index = 0,
 }: {
   icon: typeof User;
   label: string;
   value?: string | null;
+  index?: number;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-gray-200 px-3 py-2.5 dark:border-[#263449]">
+    <div
+      className="um-fade-up flex items-start gap-3 rounded-lg border border-gray-200 px-3 py-2.5 dark:border-[#263449]"
+      style={stagger(index, 80, 50)}
+    >
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-300" />
       <div className="min-w-0">
         <p className="text-xs uppercase text-gray-500 dark:text-[#a7b4c7]">
