@@ -49,7 +49,7 @@ const groups: SettingsGroup[] = [
     label: "Aplikasi",
     items: [
       { id: "appearance", label: "Tampilan", icon: MonitorCog },
-      { id: "language", label: "Bahasa & Regional", icon: Languages },
+      { id: "language", label: "Bahasa", icon: Languages },
     ],
   },
 ];
