@@ -1,8 +1,10 @@
-
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
+  CheckCircle2,
+  AlertCircle,
   Download,
   Eye,
   FileSpreadsheet,
@@ -153,6 +155,10 @@ function Student() {
   const [importFileName, setImportFileName] = useState("");
   const [importError, setImportError] = useState("");
   const [importing, setImporting] = useState(false);
+  const [importToast, setImportToast] = useState<{
+    type: "success" | "warning" | "error";
+    message: string;
+  } | null>(null);
 
   const [importSummary, setImportSummary] = useState<{
     imported: number;
@@ -218,6 +224,16 @@ function Student() {
   useEffect(() => {
     void loadData();
   }, []);
+
+  useEffect(() => {
+    if (!importToast) return;
+
+    const timer = window.setTimeout(() => {
+      setImportToast(null);
+    }, 4500);
+
+    return () => window.clearTimeout(timer);
+  }, [importToast]);
 
   useEffect(() => {
     const editStudentId = searchParams.get("edit");
@@ -984,6 +1000,23 @@ function Student() {
 
     await loadData();
 
+    if (failed === 0) {
+      setImportToast({
+        type: "success",
+        message: `${imported} data siswa berhasil diimpor.`,
+      });
+    } else if (imported > 0) {
+      setImportToast({
+        type: "warning",
+        message: `${imported} data berhasil diimpor, ${failed} data gagal disimpan.`,
+      });
+    } else {
+      setImportToast({
+        type: "error",
+        message: `Import gagal. ${failed} data siswa tidak berhasil disimpan.`,
+      });
+    }
+
     setImporting(false);
   }
 
@@ -1027,6 +1060,55 @@ function Student() {
 
   return (
     <div className="student-page">
+      {importToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed right-4 top-4 z-100 w-[calc(100%-2rem)] max-w-sm animate-[studentFadeUp_0.25s_ease-out] rounded-xl border bg-white px-4 py-3 shadow-lg dark:bg-[#111c2e]"
+          style={{
+            borderColor:
+              importToast.type === "success"
+                ? "#99f6e4"
+                : importToast.type === "warning"
+                  ? "#fcd34d"
+                  : "#fca5a5",
+          }}
+        >
+          <div className="flex items-start gap-3">
+            {importToast.type === "success" ? (
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-teal-600 dark:text-teal-400" />
+            ) : (
+              <AlertCircle
+                className={`mt-0.5 h-5 w-5 shrink-0 ${
+                  importToast.type === "warning"
+                    ? "text-amber-500"
+                    : "text-red-500"
+                }`}
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
+                {importToast.type === "success"
+                  ? "Import berhasil"
+                  : importToast.type === "warning"
+                    ? "Import selesai sebagian"
+                    : "Import gagal"}
+              </p>
+              <p className="mt-0.5 text-xs leading-relaxed text-gray-600 dark:text-[#a7b4c7]">
+                {importToast.message}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setImportToast(null)}
+              aria-label="Tutup notifikasi"
+              className="rounded-md p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-[#1b2a3d] dark:hover:text-slate-200"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes studentFadeUp {
           from {
@@ -1690,163 +1772,165 @@ function Student() {
         onConfirm={() => void handleDelete()}
       />
 
-      {importOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-xl dark:bg-[#111c2e]">
-            <div className="flex items-start justify-between border-b border-gray-200 p-5 dark:border-[#263449]">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                  Import Data Siswa
-                </h2>
+      {importOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-[2px]">
+            <div className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-xl dark:bg-[#111c2e]">
+              <div className="flex items-start justify-between border-b border-gray-200 p-5 dark:border-[#263449]">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                    Import Data Siswa
+                  </h2>
 
-                <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                  {importFileName ||
-                    "Pilih file .xlsx dengan template yang tersedia."}
-                </p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                    {importFileName ||
+                      "Pilih file .xlsx dengan template yang tersedia."}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closeImport}
+                  disabled={importing}
+                  aria-label="Tutup import"
+                  className="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed dark:hover:bg-[#1b2a3d]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={closeImport}
-                disabled={importing}
-                aria-label="Tutup import"
-                className="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed dark:hover:bg-[#1b2a3d]"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="max-h-[calc(90vh-180px)] overflow-auto p-5">
-              {importError && (
-                <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
-                  {importError}
-                </div>
-              )}
-
-              {importRows.length > 0 && (
-                <>
-                  <div className="mb-3 flex flex-wrap gap-2 text-sm">
-                    <span className="rounded-full bg-green-100 px-3 py-1 font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300">
-                      Valid: {validImportCount}
-                    </span>
-
-                    <span className="rounded-full bg-red-100 px-3 py-1 font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300">
-                      Tidak valid: {invalidImportCount}
-                    </span>
+              <div className="max-h-[calc(90vh-180px)] overflow-auto p-5">
+                {importError && (
+                  <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                    {importError}
                   </div>
+                )}
 
-                  <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-[#263449]">
-                    <table className="w-full min-w-225 text-left text-sm">
-                      <thead className="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-[#1b2a3d] dark:text-[#a7b4c7]">
-                        <tr>
-                          <th className="px-3 py-2">Baris</th>
+                {importRows.length > 0 && (
+                  <>
+                    <div className="mb-3 flex flex-wrap gap-2 text-sm">
+                      <span className="rounded-full bg-green-100 px-3 py-1 font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                        Valid: {validImportCount}
+                      </span>
 
-                          {excelHeaders.map((header) => (
-                            <th
-                              key={header}
-                              className="px-3 py-2"
-                            >
-                              {header}
+                      <span className="rounded-full bg-red-100 px-3 py-1 font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                        Tidak valid: {invalidImportCount}
+                      </span>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-[#263449]">
+                      <table className="w-full min-w-225 text-left text-sm">
+                        <thead className="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-[#1b2a3d] dark:text-[#a7b4c7]">
+                          <tr>
+                            <th className="px-3 py-2">Baris</th>
+
+                            {excelHeaders.map((header) => (
+                              <th
+                                key={header}
+                                className="px-3 py-2"
+                              >
+                                {header}
+                              </th>
+                            ))}
+
+                            <th className="px-3 py-2">
+                              Keterangan
                             </th>
-                          ))}
-
-                          <th className="px-3 py-2">
-                            Keterangan
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
-                        {importRows.map((row) => (
-                          <tr key={row.rowNumber}>
-                            <td className="px-3 py-2">
-                              {row.rowNumber}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.nis}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.name}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.gender}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.className}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.majorName}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.generation}
-                            </td>
-
-                            <td className="px-3 py-2">
-                              {row.status}
-                            </td>
-
-                            <td
-                              className={`px-3 py-2 text-xs ${
-                                row.errors.length
-                                  ? "text-red-600 dark:text-red-300"
-                                  : "text-green-600 dark:text-green-300"
-                              }`}
-                            >
-                              {row.errors.length
-                                ? row.errors.join(" ")
-                                : "Siap diimpor"}
-                            </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
+                        </thead>
 
-              {importSummary && (
-                <p className="mt-3 rounded-lg bg-teal-50 px-4 py-2.5 text-sm text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
-                  Import selesai: {importSummary.imported} data
-                  tersimpan dan {importSummary.failed} data gagal
-                  disimpan.
-                </p>
-              )}
+                        <tbody className="divide-y divide-gray-200 dark:divide-[#263449]">
+                          {importRows.map((row) => (
+                            <tr key={row.rowNumber}>
+                              <td className="px-3 py-2">
+                                {row.rowNumber}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.nis}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.name}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.gender}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.className}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.majorName}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.generation}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {row.status}
+                              </td>
+
+                              <td
+                                className={`px-3 py-2 text-xs ${
+                                  row.errors.length
+                                    ? "text-red-600 dark:text-red-300"
+                                    : "text-green-600 dark:text-green-300"
+                                }`}
+                              >
+                                {row.errors.length
+                                  ? row.errors.join(" ")
+                                  : "Siap diimpor"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+
+                {importSummary && (
+                  <p className="mt-3 rounded-lg bg-teal-50 px-4 py-2.5 text-sm text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
+                    Import selesai: {importSummary.imported} data
+                    tersimpan dan {importSummary.failed} data gagal
+                    disimpan.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2 border-t border-gray-200 p-5 dark:border-[#263449]">
+                <button
+                  type="button"
+                  onClick={closeImport}
+                  disabled={importing}
+                  className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 disabled:cursor-not-allowed dark:bg-[#1b2a3d] dark:text-[#a7b4c7]"
+                >
+                  Tutup
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => void importValidRows()}
+                  disabled={
+                    !validImportCount ||
+                    importing ||
+                    Boolean(importSummary)
+                  }
+                  className="cursor-pointer rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {importing
+                    ? "Menyimpan..."
+                    : `Simpan ${validImportCount} Data Valid`}
+                </button>
+              </div>
             </div>
-
-            <div className="flex justify-end gap-2 border-t border-gray-200 p-5 dark:border-[#263449]">
-              <button
-                type="button"
-                onClick={closeImport}
-                disabled={importing}
-                className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 disabled:cursor-not-allowed dark:bg-[#1b2a3d] dark:text-[#a7b4c7]"
-              >
-                Tutup
-              </button>
-
-              <button
-                type="button"
-                onClick={() => void importValidRows()}
-                disabled={
-                  !validImportCount ||
-                  importing ||
-                  Boolean(importSummary)
-                }
-                className="cursor-pointer rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {importing
-                  ? "Menyimpan..."
-                  : `Simpan ${validImportCount} Data Valid`}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
