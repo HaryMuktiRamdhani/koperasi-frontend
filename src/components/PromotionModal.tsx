@@ -491,9 +491,7 @@ function PromotionModal({
         </div>
 
         {/* MODAL CONTENT */}
-        <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 scrollbar-none [&::-webkit-scrollbar]:hidden sm:px-6"
-        >
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 scrollbar-none [&::-webkit-scrollbar]:hidden sm:px-6">
           {loadError && (
             <div
               role="alert"
@@ -719,9 +717,6 @@ function PromotionModal({
                                     >
                                       {destination.name} (
                                       {destination.academicYear})
-                                      {destination.sameCohort
-                                        ? ""
-                                        : " – periode berbeda"}
                                     </option>
                                   ),
                                 )}
