@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -30,6 +29,7 @@ interface PromotionDestination {
   name: string;
   academicYear: string;
   sameCohort: boolean;
+  coversTargetYear?: boolean;
 }
 
 interface PromotionGroup {
@@ -174,10 +174,16 @@ function PromotionModal({
       const nextDestinations: Record<string, string> = {};
 
       data.groups.forEach((group) => {
+        // Kelas yang belum punya kelas tujuan (atau berisi beberapa jurusan)
+        // tidak bisa dinaikkan, sehingga default-nya tidak diproses agar
+        // tidak menghalangi kelas lain pada preview.
+        const cannotPromote =
+          group.nextLevel !== null &&
+          (group.mixedJurusan || group.destinations.length === 0);
+
         group.students.forEach((student) => {
-          nextActions[student.id] = student.locked
-            ? "skip"
-            : "promote";
+          nextActions[student.id] =
+            student.locked || cannotPromote ? "skip" : "promote";
         });
 
         if (group.suggestedDestinationId) {
@@ -539,12 +545,14 @@ function PromotionModal({
 
               {/* INFORMATION */}
               <p className="mb-4 rounded-lg bg-teal-50 px-4 py-2.5 text-xs leading-relaxed text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
-                Kelas X naik ke XI dan kelas XI naik ke XII pada kelas
-                tujuan tahun ajaran {toYear || "baru"}. Siswa kelas XII
-                diproses sebagai calon alumni (status menjadi Lulus).
-                Kelas lama setiap siswa disimpan sebagai riwayat, dan
-                siswa yang sudah diproses pada tahun ajaran ini tidak
-                dapat diproses lagi.
+                Kelas X naik ke XI dan kelas XI naik ke XII dengan
+                memilih kelas tujuan untuk tahun ajaran{" "}
+                {toYear || "baru"}. Kelas tujuan bisa berupa kelas
+                angkatan baru atau kelas lama yang digunakan kembali.
+                Siswa kelas XII diproses sebagai calon alumni (status
+                menjadi Lulus). Kelas lama setiap siswa disimpan
+                sebagai riwayat, dan siswa yang sudah diproses pada
+                tahun ajaran ini tidak dapat diproses lagi.
               </p>
 
               {/* FILTERS */}
@@ -646,9 +654,15 @@ function PromotionModal({
                       count("promote") > 0;
 
                     const missingDestination =
-                      needsDestination &&
+                      group.nextLevel !== null &&
                       !group.mixedJurusan &&
                       group.destinations.length === 0;
+
+                    const destinationNotChosen =
+                      needsDestination &&
+                      !group.mixedJurusan &&
+                      group.destinations.length > 0 &&
+                      !destinations[group.classId];
 
                     return (
                       <div
@@ -717,6 +731,10 @@ function PromotionModal({
                                     >
                                       {destination.name} (
                                       {destination.academicYear})
+                                      {destination.coversTargetYear ===
+                                      false
+                                        ? " • periode berbeda"
+                                        : ""}
                                     </option>
                                   ),
                                 )}
@@ -795,7 +813,17 @@ function PromotionModal({
                             Kelas {group.nextLevel} jurusan{" "}
                             {group.jurusanName || "ini"} untuk tahun
                             ajaran {toYear} belum tersedia. Tambahkan
-                            kelas tujuan di halaman Kelas, atau ubah
+                            kelas tujuan (status Aktif atau Akan
+                            datang) di halaman Kelas, atau biarkan
+                            siswa tinggal kelas / tidak diproses.
+                          </p>
+                        )}
+
+                        {destinationNotChosen && (
+                          <p className="mx-4 mb-3 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+                            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                            Pilih kelas tujuan {group.nextLevel} untuk{" "}
+                            {group.className} terlebih dahulu, atau ubah
                             aksi siswa menjadi tinggal kelas / tidak
                             diproses.
                           </p>
