@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import {
@@ -24,6 +23,8 @@ interface Major {
   id: string;
   nama: string;
   kode: string;
+  status?: string;
+  isActive?: boolean;
 }
 
 interface ClassData {
@@ -115,6 +116,15 @@ const dateValue = (value?: string | null) =>
 const errorMessage = (error: unknown, fallback: string) =>
   (error as { response?: { data?: { message?: string } } }).response?.data
     ?.message || fallback;
+
+// Jurusan dianggap aktif jika status "Aktif" (atau isActive bukan false
+// untuk data lama yang belum memiliki field status).
+function isMajorActive(major: Major) {
+  const status =
+    major.status || (major.isActive === false ? "Nonaktif" : "Aktif");
+
+  return status === "Aktif";
+}
 
 function readParams(params: URLSearchParams): FilterState {
   const next = { ...defaults };
@@ -426,6 +436,12 @@ function Bill() {
   const [items, setItems] = useState<ItemData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
+
+  // Hanya jurusan berstatus Aktif yang boleh muncul di dropdown.
+  const activeMajors = useMemo(
+    () => majors.filter(isMajorActive),
+    [majors],
+  );
 
   const [formOpen, setFormOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -1001,7 +1017,7 @@ function Bill() {
                 >
                   <option value="">Semua jurusan</option>
 
-                  {majors.map((major) => (
+                  {activeMajors.map((major) => (
                     <option key={major.id} value={major.id}>
                       {major.nama}
                     </option>
@@ -1398,7 +1414,7 @@ function Bill() {
                 >
                   <option value="">Semua jurusan</option>
 
-                  {majors.map((major) => (
+                  {activeMajors.map((major) => (
                     <option key={major.id} value={major.id}>
                       {major.nama}
                     </option>

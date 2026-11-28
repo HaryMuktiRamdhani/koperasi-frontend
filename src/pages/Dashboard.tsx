@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -11,6 +11,8 @@ import {
   CheckCircle2,
   CircleAlert,
   Clock3,
+  RefreshCw,
+  Percent,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import api from "../services/api";
@@ -233,6 +235,23 @@ function stagger(index: number, base = 0, step = 80, max = 10): CSSProperties {
   } as CSSProperties;
 }
 
+/*
+  Persentase pembayaran yang jujur:
+  - Jika ada tagihan lunas tapi pembulatan menjadi 0%, tampilkan 1%.
+  - Jika masih ada tagihan belum lunas tapi pembulatan menjadi 100%,
+    tampilkan 99%.
+*/
+function getPaymentPercentage(paid: number, total: number) {
+  if (total <= 0) return 0;
+
+  const rounded = Math.round((paid / total) * 100);
+
+  if (paid > 0 && rounded === 0) return 1;
+  if (paid < total && rounded === 100) return 99;
+
+  return rounded;
+}
+
 const cardClass =
   "um-card rounded-2xl border border-(--app-border) bg-(--app-surface) shadow-sm hover:border-(--app-primary)";
 
@@ -374,27 +393,59 @@ function Dashboard() {
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  async function getDashboard() {
+  // Mencegah setState setelah halaman ditinggalkan.
+  const mountedRef = useRef(true);
+
+  async function getDashboard(isRefresh = false) {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
+    setHasError(false);
+
     try {
       const response = await api.get("/dashboard");
+
+      if (!mountedRef.current) return;
+
       setData(response.data);
+      setLastUpdated(new Date());
     } catch (error) {
       console.error("Gagal mengambil data dashboard", error);
+
+      if (!mountedRef.current) return;
+
+      setHasError(true);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }
 
   useEffect(() => {
-    getDashboard();
+    mountedRef.current = true;
+    void getDashboard();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="um-root flex min-h-[70vh] items-center justify-center">
         <style>{ANIMATION_CSS}</style>
-        <div className={`${cardClass} um-fade-in flex items-center gap-3 px-6 py-4`}>
+        <div
+          className={`${cardClass} um-fade-in flex items-center gap-3 px-6 py-4`}
+        >
           <span
             aria-hidden="true"
             className="um-spinner text-(--app-primary)"
@@ -420,41 +471,50 @@ function Dashboard() {
           </span>
 
           <h2 className="mt-4 text-lg font-semibold text-(--app-text)">
-            {t("dashboard")} unavailable
+            Data dashboard tidak dapat dimuat
           </h2>
 
           <p className="mt-2 text-sm text-(--app-muted)">
-            Silakan coba muat ulang halaman.
+            Terjadi kendala saat mengambil data. Silakan coba lagi.
           </p>
+
+          <button
+            type="button"
+            onClick={() => void getDashboard()}
+            className="um-btn mt-5 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Coba lagi
+          </button>
         </div>
       </div>
     );
   }
 
-  const paymentPercentage =
-    data.totalBills > 0
-      ? Math.round((data.paidBills / data.totalBills) * 100)
-      : 0;
+  const showCashSummary = appearance.dashboardWidgets.cashSummary;
+  const showChart = appearance.dashboardWidgets.chart;
 
+  const paymentPercentage = getPaymentPercentage(
+    data.paidBills,
+    data.totalBills,
+  );
+
+  // Ringkasan fokus ke detail tagihan dan keuangan.
+  // Total siswa, barang, dan tagihan sudah tampil di kartu statistik.
   const summaryRows: {
     label: string;
     value: string;
     icon: LucideIcon;
   }[] = [
     {
-      label: "Siswa terdaftar",
-      value: formatNumber(data.totalStudents),
-      icon: Users,
-    },
-    {
-      label: "Barang tersedia",
-      value: formatNumber(data.totalItems),
-      icon: Package,
-    },
-    {
       label: "Total tagihan",
       value: formatNumber(data.totalBills),
       icon: ReceiptText,
+    },
+    {
+      label: "Tagihan lunas",
+      value: formatNumber(data.paidBills),
+      icon: CheckCircle2,
     },
     {
       label: "Tagihan belum dibayar",
@@ -462,11 +522,20 @@ function Dashboard() {
       icon: Clock3,
     },
     {
+      label: "Persentase tagihan lunas",
+      value: `${paymentPercentage}%`,
+      icon: Percent,
+    },
+  ];
+
+  // Baris pemasukan ikut tersembunyi saat widget ringkasan kas dimatikan.
+  if (showCashSummary) {
+    summaryRows.push({
       label: "Total pemasukan",
       value: formatCurrency(data.totalIncome),
       icon: Wallet,
-    },
-  ];
+    });
+  }
 
   const quickActions: {
     to: string;
@@ -504,6 +573,16 @@ function Dashboard() {
       tone: "teal",
     },
   ];
+
+  // Kolom menyesuaikan jumlah kartu yang tampil.
+  const statGridClass = showCashSummary
+    ? "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+    : "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3";
+
+  // Jika grafik dimatikan, ringkasan memakai lebar penuh.
+  const detailGridClass = showChart
+    ? "grid grid-cols-1 gap-6 lg:grid-cols-2"
+    : "grid grid-cols-1 gap-6";
 
   return (
     <div className="um-root space-y-7">
@@ -552,18 +631,71 @@ function Dashboard() {
             </p>
           </div>
 
-          <span
+          <div
             style={stagger(4, 0, 90)}
-            className="um-badge um-fade-up inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur hover:border-white/40 hover:bg-white/20"
+            className="um-fade-up flex flex-col items-start gap-2 sm:items-end"
           >
-            <Activity className="h-3.5 w-3.5 text-teal-100" />
-            {t("operationalData")}
-          </span>
+            <span className="um-badge inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur hover:border-white/40 hover:bg-white/20">
+              <Activity className="h-3.5 w-3.5 text-teal-100" />
+              {t("operationalData")}
+            </span>
+
+            <div className="flex items-center gap-2">
+              {lastUpdated && (
+                <span className="text-xs text-teal-50/80">
+                  Diperbarui{" "}
+                  {lastUpdated.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => void getDashboard(true)}
+                disabled={refreshing}
+                aria-label="Muat ulang data dashboard"
+                title="Muat ulang data"
+                className="um-btn inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+                />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Pesan error saat muat ulang gagal (data lama tetap ditampilkan) */}
+      {hasError && (
+        <div
+          role="alert"
+          className="um-alert flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span className="flex items-center gap-2">
+            <CircleAlert className="h-4 w-4 shrink-0" />
+            Data terbaru gagal dimuat. Data yang tampil mungkin belum
+            diperbarui.
+          </span>
+
+          <button
+            type="button"
+            onClick={() => void getDashboard(true)}
+            disabled={refreshing}
+            className="um-btn inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800"
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+            />
+            Coba lagi
+          </button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className={statGridClass}>
         <StatCard
           label={t("totalStudents")}
           value={formatNumber(data.totalStudents)}
@@ -594,7 +726,7 @@ function Dashboard() {
           delay={280}
         />
 
-        {appearance.dashboardWidgets.cashSummary && (
+        {showCashSummary && (
           <div
             style={stagger(0, 360)}
             className={`${cardClass} um-fade-up group relative overflow-hidden p-5`}
@@ -635,8 +767,8 @@ function Dashboard() {
       </div>
 
       {/* Payment Status and Summary */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {appearance.dashboardWidgets.chart && (
+      <div className={detailGridClass}>
+        {showChart && (
           <div
             style={stagger(0, 440)}
             className={`${cardClass} um-fade-up flex flex-col p-6`}

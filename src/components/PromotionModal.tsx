@@ -539,12 +539,15 @@ function PromotionModal({
 
               {/* INFORMATION */}
               <p className="mb-4 rounded-lg bg-teal-50 px-4 py-2.5 text-xs leading-relaxed text-teal-800 dark:bg-teal-950/30 dark:text-teal-200">
-                Kelas X naik ke XI dan kelas XI naik ke XII pada kelas
-                tujuan tahun ajaran {toYear || "baru"}. Siswa kelas XII
-                diproses sebagai calon alumni (status menjadi Lulus).
-                Kelas lama setiap siswa disimpan sebagai riwayat, dan
-                siswa yang sudah diproses pada tahun ajaran ini tidak
-                dapat diproses lagi.
+                Kelas digunakan kembali secara bergantian: siswa X
+                menempati kelas XI sebelumnya, sedangkan siswa XI
+                menempati kelas XII sebelumnya. Tahun angkatan kelas
+                tujuan akan mengikuti angkatan siswa yang masuk.
+                Siswa kelas XII diproses sebagai calon alumni (status
+                menjadi Lulus). Kelas lama setiap siswa disimpan
+                sebagai riwayat. Kelas tujuan hanya bisa digunakan
+                jika seluruh siswa aktif di dalamnya ikut diproses
+                naik kelas atau lulus.
               </p>
 
               {/* FILTERS */}
@@ -706,7 +709,7 @@ function PromotionModal({
                                 <option value="">
                                   {group.destinations.length
                                     ? `Pilih kelas tujuan (${group.nextLevel})`
-                                    : `Kelas ${group.nextLevel} belum tersedia`}
+                                    : `Kelas ${group.nextLevel} dengan rombel sama belum tersedia`}
                                 </option>
 
                                 {group.destinations.map(
@@ -792,12 +795,12 @@ function PromotionModal({
                         {missingDestination && (
                           <p className="mx-4 mb-3 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
                             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                            Kelas {group.nextLevel} jurusan{" "}
-                            {group.jurusanName || "ini"} untuk tahun
-                            ajaran {toYear} belum tersedia. Tambahkan
-                            kelas tujuan di halaman Kelas, atau ubah
-                            aksi siswa menjadi tinggal kelas / tidak
-                            diproses.
+                            Kelas {group.nextLevel} dengan nomor
+                            rombel yang sama untuk jurusan{" "}
+                            {group.jurusanName || "ini"} belum tersedia.
+                            Tambahkan kelas tujuan di halaman Kelas,
+                            atau ubah aksi siswa menjadi tinggal
+                            kelas / tidak diproses.
                           </p>
                         )}
 

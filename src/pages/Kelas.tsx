@@ -32,6 +32,8 @@ interface Major {
   id: string;
   nama: string;
   kode: string;
+  status?: string;
+  isActive?: boolean;
 }
 
 interface ClassData {
@@ -56,6 +58,15 @@ const controlClass =
 
 const buttonClass =
   "transition-all duration-150 ease-out hover:-translate-y-0.5 active:scale-[0.98]";
+
+// Jurusan dianggap aktif jika status "Aktif" (atau isActive bukan false
+// untuk data lama yang belum memiliki field status).
+function isMajorActive(major: Major) {
+  const status =
+    major.status || (major.isActive === false ? "Nonaktif" : "Aktif");
+
+  return status === "Aktif";
+}
 
 function yearsFrom(start: number, end: number) {
   return Array.from({ length: end - start + 1 }, (_, index) =>
@@ -82,6 +93,12 @@ function Kelas() {
 
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
+
+  // Hanya jurusan berstatus Aktif yang boleh muncul di dropdown filter.
+  const activeMajors = useMemo(
+    () => majors.filter(isMajorActive),
+    [majors],
+  );
 
   const [filters, setFilters] = useState<ClassFilterState>(() =>
     normaliseClassFilters(searchParams),
@@ -242,6 +259,12 @@ function Kelas() {
   });
 
   const selectedMajor = majors.find((item) => item.id === form.jurusanId);
+
+  // Jurusan di form: hanya yang aktif. Saat edit, jurusan milik kelas
+  // yang sedang diedit tetap ikut ditampilkan agar datanya tidak hilang.
+  const formMajors = majors.filter(
+    (major) => isMajorActive(major) || major.id === form.jurusanId,
+  );
 
   const generatedName =
     form.level && selectedMajor && form.classNumber
@@ -592,7 +615,7 @@ function Kelas() {
                 className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
               >
                 <option value="">Pilih jurusan</option>
-                {majors.map((major) => (
+                {formMajors.map((major) => (
                   <option key={major.id} value={major.id}>
                     {major.nama} ({major.kode})
                   </option>
@@ -745,7 +768,7 @@ function Kelas() {
               className={`rounded-lg border border-gray-300 dark:border-[#263449] bg-white dark:bg-[#111c2e] px-3 py-2 text-sm ${controlClass}`}
             >
               <option value="">Semua jurusan</option>
-              {majors.map((major) => (
+              {activeMajors.map((major) => (
                 <option key={major.id} value={major.id}>
                   {major.nama}
                 </option>

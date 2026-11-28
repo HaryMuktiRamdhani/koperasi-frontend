@@ -1,9 +1,10 @@
-
 import { useEffect, useState } from "react";
 import {
   GraduationCap,
   Pencil,
   Plus,
+  RotateCcw,
+  Search,
   Trash2,
   X,
 } from "lucide-react";
@@ -12,12 +13,20 @@ import PageHeader from "../components/PageHeader";
 import ConfirmModal from "../components/ConfirmModal";
 import { getStoredRole } from "../utils/permissions";
 
+type StatusJurusan = "Aktif" | "Nonaktif" | "Akan Datang";
+
 interface JurusanData {
   id: string;
   nama: string;
   kode: string;
-  status?: "Aktif" | "Nonaktif" | "Akan Datang";
+  status?: StatusJurusan;
   isActive?: boolean;
+}
+
+const STATUS_OPTIONS: StatusJurusan[] = ["Aktif", "Nonaktif", "Akan Datang"];
+
+function getItemStatus(item: JurusanData): StatusJurusan {
+  return item.status || (item.isActive === false ? "Nonaktif" : "Aktif");
 }
 
 function Jurusan() {
@@ -26,12 +35,12 @@ function Jurusan() {
   const [jurusan, setJurusan] = useState<JurusanData[]>([]);
   const [nama, setNama] = useState("");
   const [kode, setKode] = useState("");
-  const [status, setStatus] =
-    useState<JurusanData["status"]>("Aktif");
+  const [status, setStatus] = useState<StatusJurusan>("Aktif");
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -39,6 +48,33 @@ function Jurusan() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  // Filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"Semua" | StatusJurusan>(
+    "Semua",
+  );
+
+  const keyword = searchQuery.trim().toLowerCase();
+
+  const filteredJurusan = jurusan.filter((item) => {
+    const matchSearch =
+      !keyword ||
+      item.nama.toLowerCase().includes(keyword) ||
+      item.kode.toLowerCase().includes(keyword);
+
+    const matchStatus =
+      statusFilter === "Semua" || getItemStatus(item) === statusFilter;
+
+    return matchSearch && matchStatus;
+  });
+
+  const isFiltering = keyword !== "" || statusFilter !== "Semua";
+
+  function resetFilter() {
+    setSearchQuery("");
+    setStatusFilter("Semua");
+  }
 
   async function getJurusan() {
     try {
@@ -59,6 +95,16 @@ function Jurusan() {
     setEditId(null);
     setErrorMessage("");
     setSuccessMessage("");
+  }
+
+  function openAddForm() {
+    resetForm();
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    resetForm();
+    setShowForm(false);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -99,6 +145,7 @@ function Jurusan() {
       setKode("");
       setStatus("Aktif");
       setEditId(null);
+      setShowForm(false);
 
       await getJurusan();
     } catch (error: unknown) {
@@ -120,9 +167,10 @@ function Jurusan() {
     setEditId(item.id);
     setNama(item.nama);
     setKode(item.kode);
-    setStatus(item.status || (item.isActive === false ? "Nonaktif" : "Aktif"));
+    setStatus(getItemStatus(item));
     setErrorMessage("");
     setSuccessMessage("");
+    setShowForm(true);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -141,7 +189,7 @@ function Jurusan() {
       await api.delete(`/jurusan/${id}`);
 
       if (editId === id) {
-        resetForm();
+        closeForm();
       }
 
       setSuccessMessage("Jurusan berhasil dihapus.");
@@ -199,14 +247,6 @@ function Jurusan() {
 
         .jurusan-section {
           animation: jurusanFadeUp 0.5s ease-out both;
-        }
-
-        .jurusan-section:nth-of-type(2) {
-          animation-delay: 70ms;
-        }
-
-        .jurusan-section:nth-of-type(3) {
-          animation-delay: 120ms;
         }
 
         .jurusan-row {
@@ -304,12 +344,25 @@ function Jurusan() {
           icon={GraduationCap}
         />
 
-        <div className="text-sm text-gray-500 dark:text-[#a7b4c7]">
-          Total{" "}
-          <span className="font-semibold text-gray-900 dark:text-slate-100 tabular-nums">
-            {jurusan.length}
-          </span>{" "}
-          jurusan
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="text-sm text-gray-500 dark:text-[#a7b4c7]">
+            Total{" "}
+            <span className="font-semibold text-gray-900 dark:text-slate-100 tabular-nums">
+              {jurusan.length}
+            </span>{" "}
+            jurusan
+          </div>
+
+          {canManage && !showForm && (
+            <button
+              type="button"
+              onClick={openAddForm}
+              className="jurusan-button inline-flex items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-teal-600/15 hover:bg-teal-700 hover:shadow-md hover:shadow-teal-600/20"
+            >
+              <Plus className="h-4 w-4" />
+              Tambah Jurusan
+            </button>
+          )}
         </div>
       </div>
 
@@ -332,8 +385,8 @@ function Jurusan() {
         </div>
       )}
 
-      {/* Form */}
-      {canManage && (
+      {/* Form (hanya tampil setelah klik Tambah Jurusan / Edit) */}
+      {canManage && showForm && (
         <section className="jurusan-section jurusan-card overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-[#263449] dark:bg-[#111c2e]">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-[#263449] sm:px-6">
             <div>
@@ -348,16 +401,14 @@ function Jurusan() {
               </p>
             </div>
 
-            {editId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="jurusan-button inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] dark:hover:text-slate-100"
-              >
-                <X className="h-4 w-4" />
-                Batal
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={closeForm}
+              className="jurusan-button inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d] dark:hover:text-slate-100"
+            >
+              <X className="h-4 w-4" />
+              Batal
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="p-5 sm:p-6">
@@ -379,6 +430,7 @@ function Jurusan() {
                   onChange={(event) => setNama(event.target.value)}
                   required
                   maxLength={100}
+                  autoFocus
                   className="jurusan-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:border-[#263449] dark:bg-[#111c2e] dark:text-slate-100"
                 />
               </div>
@@ -415,13 +467,15 @@ function Jurusan() {
                   id="status-jurusan"
                   value={status}
                   onChange={(event) =>
-                    setStatus(event.target.value as JurusanData["status"])
+                    setStatus(event.target.value as StatusJurusan)
                   }
                   className="jurusan-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none dark:border-[#263449] dark:bg-[#111c2e] dark:text-slate-100"
                 >
-                  <option value="Aktif">Aktif</option>
-                  <option value="Nonaktif">Nonaktif</option>
-                  <option value="Akan Datang">Akan Datang</option>
+                  {STATUS_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -440,7 +494,7 @@ function Jurusan() {
                   ? "Menyimpan..."
                   : editId
                     ? "Simpan Perubahan"
-                    : "Tambah Jurusan"}
+                    : "Simpan"}
               </button>
             </div>
           </form>
@@ -458,6 +512,69 @@ function Jurusan() {
           <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
             Informasi jurusan yang tersimpan dalam sistem.
           </p>
+        </div>
+
+        {/* Filter */}
+        <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-4 dark:border-[#263449] dark:bg-[#0f1a2b] sm:px-6">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_200px_auto] md:items-end">
+
+            <div>
+              <label
+                htmlFor="cari-jurusan"
+                className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-[#a7b4c7]"
+              >
+                Cari Jurusan
+              </label>
+
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  id="cari-jurusan"
+                  type="text"
+                  placeholder="Cari nama atau kode jurusan..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  className="jurusan-control w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:border-[#263449] dark:bg-[#111c2e] dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="filter-status"
+                className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-[#a7b4c7]"
+              >
+                Status
+              </label>
+
+              <select
+                id="filter-status"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as "Semua" | StatusJurusan)
+                }
+                className="jurusan-control w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none dark:border-[#263449] dark:bg-[#111c2e] dark:text-slate-100"
+              >
+                <option value="Semua">Semua Status</option>
+                {STATUS_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetFilter}
+              disabled={!isFiltering}
+              className="jurusan-button inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#263449] dark:bg-[#111c2e] dark:text-[#a7b4c7] dark:hover:bg-[#1b2a3d]"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -506,15 +623,34 @@ function Jurusan() {
                     </p>
 
                     <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
-                      Tambahkan jurusan melalui formulir di atas.
+                      {canManage
+                        ? 'Klik tombol "Tambah Jurusan" untuk menambahkan data.'
+                        : "Data jurusan belum tersedia."}
+                    </p>
+                  </td>
+                </tr>
+              ) : filteredJurusan.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={canManage ? 5 : 4}
+                    className="px-6 py-12 text-center"
+                  >
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-500 dark:bg-[#1b2a3d] dark:text-[#a7b4c7]">
+                      <Search className="h-6 w-6" />
+                    </div>
+
+                    <p className="mt-3 font-medium text-gray-700 dark:text-[#a7b4c7]">
+                      Jurusan tidak ditemukan
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-500 dark:text-[#a7b4c7]">
+                      Coba ubah kata kunci atau filter status.
                     </p>
                   </td>
                 </tr>
               ) : (
-                jurusan.map((item, index) => {
-                  const itemStatus =
-                    item.status ||
-                    (item.isActive === false ? "Nonaktif" : "Aktif");
+                filteredJurusan.map((item, index) => {
+                  const itemStatus = getItemStatus(item);
 
                   const badgeClass =
                     itemStatus === "Aktif"
@@ -591,7 +727,8 @@ function Jurusan() {
 
         {!fetching && jurusan.length > 0 && (
           <div className="border-t border-gray-100 px-5 py-3 text-xs text-gray-500 dark:border-[#263449] dark:text-[#a7b4c7] sm:px-6">
-            Menampilkan {jurusan.length} data jurusan
+            Menampilkan {filteredJurusan.length} dari {jurusan.length} data
+            jurusan
           </div>
         )}
       </section>

@@ -62,6 +62,8 @@ interface Major {
   id: string;
   nama: string;
   kode: string;
+  status?: string;
+  isActive?: boolean;
 }
 
 interface ImportStudentRow {
@@ -99,6 +101,15 @@ const excelHeaders = [
   "Status",
 ] as const;
 
+// Jurusan dianggap aktif jika status "Aktif" (atau isActive bukan false
+// untuk data lama yang belum memiliki field status).
+function isMajorActive(major: Major) {
+  const status =
+    major.status || (major.isActive === false ? "Nonaktif" : "Aktif");
+
+  return status === "Aktif";
+}
+
 // Menerima "Laki-laki", "Perempuan", atau singkatan "L" / "P".
 function parseGender(value: string) {
   const key = value.trim().replace(/\s+/g, " ").toLocaleLowerCase("id-ID");
@@ -122,6 +133,12 @@ function Student() {
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [majors, setMajors] = useState<Major[]>([]);
+
+  // Hanya jurusan berstatus Aktif yang boleh muncul di dropdown.
+  const activeMajors = useMemo(
+    () => majors.filter(isMajorActive),
+    [majors],
+  );
 
   const [filters, setFilters] = useState<StudentFilterState>(() =>
     normaliseStudentFilters(searchParams),
@@ -345,13 +362,19 @@ function Student() {
       )
     : availableClasses;
 
+  // Jurusan di form: hanya yang aktif. Saat edit, jurusan milik siswa
+  // yang sedang diedit tetap ikut ditampilkan agar datanya tidak hilang.
+  const selectableMajors = majors.filter(
+    (major) => isMajorActive(major) || major.id === form.jurusanId,
+  );
+
   const formMajors = form.classId
     ? relationIdsForClass(form.classId).length > 0
-      ? majors.filter((major) =>
+      ? selectableMajors.filter((major) =>
           relationIdsForClass(form.classId).includes(major.id),
         )
-      : majors
-    : majors;
+      : selectableMajors
+    : selectableMajors;
 
   const unverifiableStudents = students.filter(
     (student) => !student.Class || !student.Jurusan,
@@ -637,11 +660,11 @@ function Student() {
       classes[0];
 
     const templateMajor =
-      majors.find(
+      activeMajors.find(
         (item) =>
           templateClass &&
           relationKnownForClass(templateClass.id, item.id),
-      ) || majors[0];
+      ) || activeMajors[0];
 
     downloadWorkbook(
       [
@@ -676,7 +699,7 @@ function Student() {
         ],
         [
           "Jurusan",
-          "Gunakan nama atau kode jurusan dari data master.",
+          "Gunakan nama atau kode jurusan aktif dari data master.",
         ],
         ["Angkatan", "Gunakan tahun empat digit, contoh 2024."],
         [
@@ -873,6 +896,8 @@ function Student() {
           errors.push(
             "Nama atau kode jurusan tidak ditemukan.",
           );
+        } else if (!isMajorActive(selectedMajor)) {
+          errors.push("Jurusan tidak berstatus Aktif.");
         }
 
         if (
@@ -1037,7 +1062,9 @@ function Student() {
       classId: value,
       jurusanId:
         relationIds.length === 1
-          ? relationIds[0]
+          ? activeMajors.some((major) => major.id === relationIds[0])
+            ? relationIds[0]
+            : ""
           : current.jurusanId &&
               relationKnownForClass(
                 value,
@@ -1468,7 +1495,7 @@ function Student() {
             >
               <option value="">Semua jurusan</option>
 
-              {majors.map((item) => (
+              {activeMajors.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.nama}
                 </option>
