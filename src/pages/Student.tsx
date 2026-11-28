@@ -1005,7 +1005,16 @@ function Student() {
         type: "success",
         message: `${imported} data siswa berhasil diimpor.`,
       });
+
+      // Semua berhasil: tutup modal preview supaya notifikasi terlihat.
+      setImportOpen(false);
+      setImportRows([]);
+      setImportFileName("");
+      setImportError("");
+      setImportSummary(null);
     } else if (imported > 0) {
+      // Sebagian gagal: modal tetap terbuka agar alasan error per baris
+      // masih bisa dilihat. Toast tampil di atas modal.
       setImportToast({
         type: "warning",
         message: `${imported} data berhasil diimpor, ${failed} data gagal disimpan.`,
@@ -1064,7 +1073,7 @@ function Student() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed right-4 top-4 z-100 w-[calc(100%-2rem)] max-w-sm animate-[studentFadeUp_0.25s_ease-out] rounded-xl border bg-white px-4 py-3 shadow-lg dark:bg-[#111c2e]"
+          className="fixed right-4 top-4 z-10000 w-[calc(100%-2rem)] max-w-sm animate-[studentFadeUp_0.25s_ease-out] rounded-xl border bg-white px-4 py-3 shadow-lg dark:bg-[#111c2e]"
           style={{
             borderColor:
               importToast.type === "success"
